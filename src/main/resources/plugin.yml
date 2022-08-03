@@ -1,0 +1,7 @@
+name: iSystem
+version: 1.0.0-SNAPSHOT
+author: GalacticProjects
+main: net.galacticprojects.isystem.spigot.iServer
+api-version: 1.19
+
+commands:

@@ -1,0 +1,29 @@
+System:
+    MaxPlayers: 50
+    Maintenance:
+        Enabled: false
+        EndDate: ''
+Commands:
+    Fallback:
+    - lobby
+    - l
+    - lb
+    - hub
+    - leave
+    - fallback
+    - fb
+Messages:
+    Prefix:
+        System: "&8「 &4&lSYSTEM &8」 &r"
+        Chat: "&8「 &5&lG&d&lP &8」 &r"
+        Menu: "&8「 &5&lGALACTIC&d&lPROJECTS &8」 &r"
+        Maintenance: "&8「 &c&lMAINTENANCE &8」 &r"
+        History: "&8「 &f&lHISTORY &8」 &r"
+        Friends: "&8「 &9&lFRIENDS &8」 &r"
+        Party: "&8「 &b&lPARTY &8」 &r"
+        Clan: "&8「 &3&lCLAN &8」 &r"
+        TeamChat: "&8「 &2&lTEAMCHAT &8」 &r"
+        Report: "&8「 &1&lREPORT &8」 &r"
+        Ban: "&8「 &6&lBANSYSTEM &8」 &r"
+        ChatLog: "&8「 &a&lCHATLOG &8」 &r"
+        Link: "&8「 &e&lLINK &8」 &r"

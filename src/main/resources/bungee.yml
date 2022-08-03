@@ -1,0 +1,4 @@
+name: iSystem
+version: 1.0.0-SNAPSHOT
+author: GalacticProjects
+main: net.galacticprojects.isystem.bungeecord.iProxy
