@@ -19,7 +19,6 @@ public class MainConfiguration {
 
     public File config;
     public Configuration configuration;
-    public ArrayList<String> lbCommands;
 
     private int maxPlayers;
     private boolean maintenanceEnabled;
@@ -116,8 +115,6 @@ public class MainConfiguration {
             }
 
             ConfigurationProvider.getProvider(YamlConfiguration.class).save(configuration, config);
-            lbCommands.clear();
-
             load();
         } catch (IOException e) {
             throw new RuntimeException(e);
