@@ -1,0 +1,43 @@
+Messages:
+    TimeFormat:
+        Days:
+            1: 'Monday'
+            2: 'Tuesday'
+            3: 'Wednesday'
+            4: 'Thursday'
+            5: 'Friday'
+            6: 'Saturday'
+            7: 'Sunday'
+        Months:
+            1: 'January'
+            2: 'February'
+            3: 'March'
+            4: 'April'
+            5: 'May'
+            6: 'June'
+            7: 'July'
+            8: 'August'
+            9: 'September'
+            10: 'October'
+            11: 'November'
+            12: 'December'
+    Languages:
+        English: 'English'
+        German: 'German'
+        French: 'French'
+        Spanish: 'Spanish'
+    System:
+        MOTDs:
+            Maintenance:
+                Line:
+                    1: ""
+                    2: ""
+            Normal:
+                Line:
+                    1: ""
+                    2: ""
+        Tablist:
+            Header: "&7 \n &8「 &5&lGALACTIC&d&lPROJECTS &7■ &fYour &bnetwork &fwith &dgalactical &5power &8」\n &8► Connected to %server% &7■ Currently online &a%online%&d/&c%maxplayers% &8◄\n &7"
+            Footer: "&7 \n &8► Website &7× &dwww.galacticalprojects.net &f■ TeamSpeak &7× &dGalacticalProjects.net &8◄ \n &8► Forum &7× &dforum.galacticalprojects.net &f■ Shop &7× &dshop.galacticalprojects.net &8◄ \n &7"
+        Maintenance:
+            Version: '&8► &4&lMAINTENANCE'

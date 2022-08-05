@@ -7,9 +7,12 @@ import net.galacticprojects.isystem.bungeecord.command.LobbyCommand;
 import net.galacticprojects.isystem.bungeecord.command.SystemCommand;
 import net.galacticprojects.isystem.bungeecord.config.MainConfiguration;
 import net.galacticprojects.isystem.bungeecord.config.PermissionConfiguration;
+import net.galacticprojects.isystem.bungeecord.config.languages.EnglishConfiguration;
+import net.galacticprojects.isystem.bungeecord.config.languages.GermanConfiguration;
 import net.galacticprojects.isystem.bungeecord.listener.ConnectListener;
 
 
+import net.galacticprojects.isystem.bungeecord.listener.PingListener;
 import net.galacticprojects.isystem.utils.JavaInstance;
 import net.galacticprojects.isystem.database.MySQL;
 import net.galacticprojects.isystem.bungeecord.config.SqlConfiguration;
@@ -26,10 +29,11 @@ import java.util.ArrayList;
 
 public class iProxy extends Plugin {
 
-    public Plugin plugin;
+    private static Plugin plugin;
 
     public PluginManager manager;
     private static String pluginDirectory;
+    private static String pluginLangDirectory;
 
     @Override
     public void onEnable() {
@@ -52,11 +56,21 @@ public class iProxy extends Plugin {
             if (!(getDataFolder().exists())) {
                 getDataFolder().mkdir();
             }
-
             pluginDirectory = getDataFolder().getPath();
+
+            File languageDirectory = new File(getDataFolder().getPath() + "/languages");
+
+            if(!(languageDirectory.exists())){
+                languageDirectory.mkdir();
+            }
+
+            pluginLangDirectory = languageDirectory.getPath();
+
             new SqlConfiguration();
             new MainConfiguration();
             new PermissionConfiguration();
+            new EnglishConfiguration();
+            new GermanConfiguration();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -84,6 +98,7 @@ public class iProxy extends Plugin {
 
     public void initializeListener(){
         manager.registerListener(this, new ConnectListener());
+        manager.registerListener(this, new PingListener());
     }
 
     public void initializeCommands() {
@@ -92,11 +107,15 @@ public class iProxy extends Plugin {
         manager.registerCommand(this, new BanCommand());
     }
 
-    public Plugin getInstance() {
+    public static Plugin getInstance() {
         return plugin;
     }
 
     public static String getPluginPath() {
         return pluginDirectory;
+    }
+
+    public static String getLanguageDirectory() {
+        return pluginLangDirectory;
     }
 }

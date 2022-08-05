@@ -40,8 +40,7 @@ public class MainConfiguration {
 
     public MainConfiguration() throws IOException {
         JavaInstance.put(this);
-        lbCommands = new ArrayList<>();
-        lbCommands.add("lobby");
+        lbCommands = new ArrayList<>(); // LOBBY IS MAIN COMMAND
         lbCommands.add("l");
         lbCommands.add("lb");
         lbCommands.add("hub");

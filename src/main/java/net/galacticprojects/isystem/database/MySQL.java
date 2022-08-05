@@ -4,7 +4,9 @@ import com.zaxxer.hikari.pool.HikariPool;
 import net.galacticprojects.isystem.bungeecord.cache.Cache;
 import net.galacticprojects.isystem.bungeecord.cache.ThreadSafeCache;
 import net.galacticprojects.isystem.bungeecord.command.ban.BanType;
+import net.galacticprojects.isystem.database.model.Player;
 import net.galacticprojects.isystem.utils.JavaInstance;
+import net.galacticprojects.isystem.utils.Languages;
 import net.galacticprojects.isystem.utils.MojangProfileService;
 import net.galacticprojects.isystem.utils.TimeHelper;
 import net.galacticprojects.isystem.database.model.Ban;
@@ -45,6 +47,7 @@ public class MySQL {
     private final Timer timer;
 
     private final Cache<UUID, Ban> banCache = new ThreadSafeCache<>(UUID.class, 300);
+    private final Cache<UUID, Player> playerCache = new ThreadSafeCache<>(UUID.class, 300);
 
     private final ExecutorService service = Executors.newCachedThreadPool();
 
@@ -86,15 +89,78 @@ public class MySQL {
     public void createTables() {
         try (Connection connection = pool.getConnection()) {
 
-            PreparedStatement st = connection.prepareStatement("CREATE TABLE IF NOT EXISTS PlayerBans(ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, PLAYER VARCHAR(36), STAFF VARCHAR(36), IP VARCHAR(16), REASON VARCHAR(100), TYPE VARCHAR(12), ENDTIME VARCHAR(32), CREATIONTIME VARCHAR(32), DURATION VARCHAR(20))");
-            PreparedStatement statement = connection.prepareStatement("CREATE TABLE IF NOT EXISTS PlayerData()");
-            PreparedStatement state = connection.prepareStatement("CREATE TABLE IF NOT EXISTS Clans()");
-            PreparedStatement states = connection.prepareStatement("CREATE TABLE IF NOT EXISTS PlayerFriends()");
+            PreparedStatement playersBans = connection.prepareStatement("CREATE TABLE IF NOT EXISTS PlayerBans(ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, PLAYER VARCHAR(36), STAFF VARCHAR(36), IP VARCHAR(16), REASON VARCHAR(100), TYPE VARCHAR(12), ENDTIME VARCHAR(32), CREATIONTIME VARCHAR(32), DURATION VARCHAR(20));");
+            PreparedStatement playerData = connection.prepareStatement("CREATE TABLE IF NOT EXISTS PlayerData(ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, PLAYER VARCHAR(36), NAME VARCHAR(16), IP VARCHAR(16), COUNTRY VARCHAR(64), ONLINETIME LONGTEXT NOT NULL DEFAULT 0, LANGUAGE VARCHAR(86), FIRSTJOIN VARCHAR(32), SERVERONLINE VARCHAR(64) NOT NULL DEFAULT '', LATESTJOIN VARCHAR(32), REPORT BOOLEAN NOT NULL DEFAULT false, TEAMCHAT BOOLEAN NOT NULL DEFAULT false);");
+            PreparedStatement clan = connection.prepareStatement("CREATE TABLE IF NOT EXISTS Clans();");
+            PreparedStatement clanData = connection.prepareStatement("CREATE TABLE IF NOT EXISTS ClansData();");
 
+            playersBans.executeUpdate();
+            playerData.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("[SQLDatabase] A SQLException occurred! Please ignore this Error!!");
         }
+    }
+
+    public CompletableFuture<Player> createPlayer(UUID uuid, String name, String ip, String country, long onlineTime, Languages languages, OffsetDateTime firstJoin, String serverOnline, OffsetDateTime latestJoin, boolean report, boolean teamchat) {
+        return CompletableFuture.supplyAsync(() -> {
+            try (Connection connection = pool.getConnection()){
+                final PreparedStatement statement = connection.prepareStatement("INSERT INTO PlayerData(PLAYER, NAME, IP, COUNTRY, ONLINETIME, LANGUAGE, FIRSTJOIN, SERVERONLINE, LATESTJOIN, REPORT, TEAMCHAT) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+                statement.setString(1, String.valueOf(uuid));
+                statement.setString(2, name);
+                statement.setString(3, ip);
+                statement.setString(4, country);
+                statement.setLong(5, onlineTime);
+                statement.setString(6, String.valueOf(languages));
+                statement.setString(7, TimeHelper.toString(firstJoin));
+                statement.setString(8, serverOnline);
+                statement.setString(9, TimeHelper.toString(latestJoin));
+                statement.setBoolean(10, report);
+                statement.setBoolean(11, teamchat);
+                statement.executeUpdate();
+                Player player = new Player(uuid, name, ip, country, onlineTime, languages, firstJoin, serverOnline, latestJoin, report, teamchat);
+                playerCache.put(uuid, player);
+                return player;
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("[SQLDatabase] A SQLException occurred! Please ignore this Error!!");
+                return null;
+            }
+        }, service);
+    }
+
+    public CompletableFuture<Player> getPlayer(final UUID uniqueId) {
+        return CompletableFuture.supplyAsync(() -> {
+            if (playerCache.has(uniqueId)) {
+                return playerCache.get(uniqueId);
+            }
+            try (Connection connection = pool.getConnection()) {
+                final PreparedStatement statement = connection.prepareStatement("SELECT * FROM PlayerData WHERE UUID = ?");
+                statement.setString(1, uniqueId.toString());
+                ResultSet set = statement.executeQuery();
+                if (set.next()) {
+                    UUID uuid = UUID.fromString(set.getString("PLAYER"));
+                    String name = set.getString("NAME");
+                    String ip = set.getString("IP");
+                    String country = set.getString("COUNTRY");
+                    long onlineTime = set.getLong("ONLINETIME");
+                    Languages languages = Languages.valueOf(set.getString("LANGUAGE"));
+                    OffsetDateTime firstJoin = TimeHelper.fromString(set.getString("FIRSTJOIN"));
+                    String serverOnline = set.getString("SERVERONLINE");
+                    OffsetDateTime latestJoin = TimeHelper.fromString(set.getString("LATESTJOIN"));
+                    boolean report = set.getBoolean("REPORT");
+                    boolean teamchat = set.getBoolean("TEAMCHAT");
+                    Player player = new Player(uuid, name, ip, country, onlineTime, languages, firstJoin, serverOnline, latestJoin, report, teamchat);
+                    playerCache.put(uuid, player);
+                    return player;
+                }
+                return null;
+            } catch (SQLException e) {
+                e.printStackTrace();
+                System.out.println("[SQLDatabase] A SQLException occurred! Please ignore this Error!!");
+                return null;
+            }
+        }, service);
     }
 
     public CompletableFuture<Ban> createBan(final UUID player, final String staff, String ip, final String reason, BanType type, final OffsetDateTime time, final OffsetDateTime creationTime, int duration) {
@@ -190,5 +256,7 @@ public class MySQL {
             }
         }, service);
     }
+
+
 
 }
