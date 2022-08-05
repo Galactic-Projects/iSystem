@@ -27,17 +27,34 @@ Messages:
         French: 'French'
         Spanish: 'Spanish'
     System:
+        Errors:
+            Permission: '&cYou do not have permission to execute this command!'
+            Player: '&cYou must be a player to perform this command!'
+            NotExists: '&cThat player wasn't on the network yet.'
         MOTDs:
             Maintenance:
                 Line:
-                    1: ""
-                    2: ""
+                    1: '&8「 &5&lG&d&lP &7■ &f&bnetwork &fwith &dgalactical &5power &8」'
+                    2: '&8► &fWe are &c&lcurrently &7under &4&lmaintenance&7!'
             Normal:
                 Line:
-                    1: ""
-                    2: ""
+                    1: '&8「 &5&lG&d&lP &7■ &f&bnetwork &fwith &dgalactical &5power &8」'
+                    2: '&8► &4&lOPEN-BETA &fNOW! '
         Tablist:
-            Header: "&7 \n &8「 &5&lGALACTIC&d&lPROJECTS &7■ &fYour &bnetwork &fwith &dgalactical &5power &8」\n &8► Connected to %server% &7■ Currently online &a%online%&d/&c%maxplayers% &8◄\n &7"
-            Footer: "&7 \n &8► Website &7× &dwww.galacticalprojects.net &f■ TeamSpeak &7× &dGalacticalProjects.net &8◄ \n &8► Forum &7× &dforum.galacticalprojects.net &f■ Shop &7× &dshop.galacticalprojects.net &8◄ \n &7"
+            Header: '&7 \n &8「 &5&lGALACTIC&d&lPROJECTS &7■ &fYour &bnetwork &fwith &dgalactical &5power &8」\n &8► &fConnected to &b%server% &7■ &fCurrently online &b%online%&f/&3%maxplayers% &8◄\n &7'
+            Footer: '&7 \n &8► &fWebsite &7× &dwww.galacticalprojects.net &8■ &fTeamSpeak &7× &dGalacticalProjects.net &8◄ \n &8► Forum &7× &dforum.galacticalprojects.net &8■ Shop &7× &dshop.galacticalprojects.net &8◄ \n &7'
         Maintenance:
+            Usage: '%maintenancePrefix% &eUsage &8► &f/maintenance <on, off> <Reason (If on)>'
+            Successful:
+                TurnedOn: '%maintenancePrefix% &7You successfully turned maintenance with the reason %reason% on.'
+                TurnedOff: '%maintenancePrefix% &7You successfully turned maintenance off.'
+            Error:
+                AlreadyOn: '%maintenancePrefix% &7The maintenance is already turned on.'
+                AlreadyOff: '%maintenancePrefix% &7The maintenance is already turned off.'
             Version: '&8► &4&lMAINTENANCE'
+            Reason: 'Construction'
+            EndDate: 'Friday the 16. August 2022 at 18 o'' Clock (UTC)'
+        OnlineTime:
+            Usage: '%onlinePrefix% &eUsage &8► &f/onlinetime <Player>'
+            Errors:
+                NotEnabled: '%onlinePrefix% &cThat player disabled that others can see their online time.'

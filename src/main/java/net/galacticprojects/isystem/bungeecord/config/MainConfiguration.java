@@ -10,7 +10,9 @@ import net.md_5.bungee.config.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class MainConfiguration {
@@ -21,11 +23,10 @@ public class MainConfiguration {
 
     private int maxPlayers;
     private boolean maintenanceEnabled;
-    private OffsetDateTime maintenanceEndDate;
-    private ArrayList<String> fallback;
     private String systemPrefix;
     private String chatPrefix;
     private String menuPrefix;
+    private String onlineTimePrefix;
     private String maintenancePrefix;
     private String historyPrefix;
     private String friendsPrefix;
@@ -40,13 +41,6 @@ public class MainConfiguration {
 
     public MainConfiguration() throws IOException {
         JavaInstance.put(this);
-        lbCommands = new ArrayList<>(); // LOBBY IS MAIN COMMAND
-        lbCommands.add("l");
-        lbCommands.add("lb");
-        lbCommands.add("hub");
-        lbCommands.add("leave");
-        lbCommands.add("fallback");
-        lbCommands.add("fb");
 
         try {
             config = new File(iProxy.getPluginPath(), "config.yml");
@@ -65,14 +59,6 @@ public class MainConfiguration {
                 configuration.set("System.Maintenance.Enabled", false);
             }
 
-            if (!(configuration.contains("System.Maintenance.EndDate"))) {
-                configuration.set("System.Maintenance.EndDate", "UNKNOWN");
-            }
-
-            if (!(configuration.contains("Commands.Fallback"))) {
-                configuration.set("Commands.Fallback", lbCommands);
-            }
-
             if (!(configuration.contains("Messages.Prefix.System"))) {
                 configuration.set("Messages.Prefix.System", "&8「 &4&lSYSTEM &8」 &r");
             }
@@ -83,6 +69,10 @@ public class MainConfiguration {
 
             if (!(configuration.contains("Messages.Prefix.Menu"))) {
                 configuration.set("Messages.Prefix.Menu", "&8「 &5&lGALACTIC&d&lPROJECTS &8」 &r");
+            }
+
+            if (!(configuration.contains("Messages.Prefix.OnlineTime"))) {
+                configuration.set("Messages.Prefix.OnlineTime", "&8「 &0&lONLINETIME &8」 &r");
             }
 
             if (!(configuration.contains("Messages.Prefix.Maintenance"))) {
@@ -140,11 +130,10 @@ public class MainConfiguration {
 
             maxPlayers = configuration.getInt("System.MaxPlayers");
             maintenanceEnabled = configuration.getBoolean("System.Maintenance.Enabled");
-            maintenanceEndDate = OffsetDateTime.parse(configuration.getString("System.Maintenance.EndDate"), TimeHelper.BAN_TIME_FORMATTER);
-            fallback = (ArrayList<String>) configuration.getStringList("Commands.Fallback");
             systemPrefix = Color.apply(configuration.getString("Messages.Prefix.System"));
             chatPrefix = Color.apply(configuration.getString("Messages.Prefix.Chat"));
             menuPrefix = Color.apply(configuration.getString("Messages.Prefix.Menu"));
+            onlineTimePrefix = Color.apply(configuration.getString("Messages.Prefix.OnlineTime"));
             maintenancePrefix = Color.apply(configuration.getString("Messages.Prefix.Maintenance"));
             historyPrefix = Color.apply(configuration.getString("Messages.Prefix.History"));
             friendsPrefix = Color.apply(configuration.getString("Messages.Prefix.Friends"));
@@ -175,15 +164,6 @@ public class MainConfiguration {
     public boolean isMaintenanceEnabled() {
         return maintenanceEnabled;
     }
-
-    public OffsetDateTime getMaintenanceEndDate() {
-        return maintenanceEndDate;
-    }
-
-    public ArrayList<String> getFallback() {
-        return fallback;
-    }
-
     public String getSystemPrefix() {
         return systemPrefix;
     }
@@ -194,6 +174,10 @@ public class MainConfiguration {
 
     public String getMenuPrefix() {
         return menuPrefix;
+    }
+
+    public String getOnlineTimePrefix() {
+        return onlineTimePrefix;
     }
 
     public String getMaintenancePrefix() {

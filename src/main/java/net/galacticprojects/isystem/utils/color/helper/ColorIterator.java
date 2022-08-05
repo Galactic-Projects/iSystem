@@ -1,6 +1,6 @@
 package net.galacticprojects.isystem.utils.color.helper;
 
-import de.syntaxtnt.color.ColorHelper;
+import net.galacticprojects.isystem.utils.color.ColorHelper;
 
 import java.util.Iterator;
 

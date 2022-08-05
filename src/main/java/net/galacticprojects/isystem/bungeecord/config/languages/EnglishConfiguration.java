@@ -1,19 +1,24 @@
 package net.galacticprojects.isystem.bungeecord.config.languages;
 
+import net.galacticprojects.isystem.bungeecord.config.MainConfiguration;
 import net.galacticprojects.isystem.bungeecord.iProxy;
 import net.galacticprojects.isystem.utils.JavaInstance;
+import net.galacticprojects.isystem.utils.TimeHelper;
 import net.galacticprojects.isystem.utils.color.Color;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
+import org.checkerframework.checker.units.qual.C;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.OffsetDateTime;
 
 public class EnglishConfiguration {
 
     public File english;
     public Configuration englishConfiguration;
+    public MainConfiguration mainConfiguration;
 
     private String day1;
     private String day2;
@@ -40,16 +45,28 @@ public class EnglishConfiguration {
     private String langEng;
     private String langFre;
     private String langSpa;
+    private String errorsPermission;
+    private String errorsPlayer;
+    private String errorsNotExists;
     private String motdsMaintenanceLineOne;
     private String motdsMaintenanceLineTwo;
     private String motdsNormalLineOne;
     private String motdsNormalLineTwo;
     private String tablistHeader;
     private String tablistFooter;
+    private String maintenaceUsage;
+    private String maintenanceSuccessfulTurnedOn;
+    private String maintenanceSuccessfulTurnedOff;
+    private String maintenanceErrorsAlreadyOn;
+    private String maintenanceErrorsAlreadyOff;
     private String maintenanceVersion;
+    private String maintenanceReason;
+    private String onlineTimeUsage;
+    private String onlineTimeErrorsNotEnabled;
 
     public EnglishConfiguration () throws IOException {
         JavaInstance.put(this);
+        mainConfiguration = JavaInstance.get(MainConfiguration.class);
 
         try {
             english = new File(iProxy.getLanguageDirectory(), "english.yml");
@@ -153,34 +170,77 @@ public class EnglishConfiguration {
                 englishConfiguration.set("Messages.Languages.Spanish", "Spanish");
             }
 
+            if(!(englishConfiguration.contains("Messages.System.Errors.Permission"))) {
+                englishConfiguration.set("Messages.System.Errors.Permission", "&cYou do not have permission to execute this command!");
+            }
+
+            if(!(englishConfiguration.contains("Messages.System.Errors.Player"))) {
+                englishConfiguration.set("Messages.System.Errors.Player", "&cYou must be a player to perform this command!");
+            }
+
+            if(!(englishConfiguration.contains("Messages.System.Errors.NotExists"))) {
+                englishConfiguration.set("Messages.System.Errors.NotExists", "&cThat player wasn't on the network yet.");
+            }
+
             if(!(englishConfiguration.contains("Messages.System.MOTDs.Maintenance.Line.1"))) {
-                englishConfiguration.set("Messages.System.MOTDs.Maintenance.Line.1", " ");
+                englishConfiguration.set("Messages.System.MOTDs.Maintenance.Line.1", "&8「 &5&lG&d&lP &7■ &fYour &bnetwork &fwith &dgalactical &5power &8」");
             }
 
             if(!(englishConfiguration.contains("Messages.System.MOTDs.Maintenance.Line.2"))) {
-                englishConfiguration.set("Messages.System.MOTDs.Maintenance.Line.2", " ");
+                englishConfiguration.set("Messages.System.MOTDs.Maintenance.Line.2", "&8► &fWe are &c&lcurrently &7under &4&lmaintenance&7!");
             }
 
             if(!(englishConfiguration.contains("Messages.System.MOTDs.Normal.Line.1"))) {
-                englishConfiguration.set("Messages.System.MOTDs.Normal.Line.1", " ");
+                englishConfiguration.set("Messages.System.MOTDs.Normal.Line.1", "&8「 &5&lG&d&lP &7■ &fYour &bnetwork &fwith &dgalactical &5power &8」");
             }
 
             if(!(englishConfiguration.contains("Messages.System.MOTDs.Normal.Line.2"))) {
-                englishConfiguration.set("Messages.System.MOTDs.Normal.Line.2", " ");
+                englishConfiguration.set("Messages.System.MOTDs.Normal.Line.2", "&8► &4&lOPEN-BETA &fNOW! ");
             }
 
             if(!(englishConfiguration.contains("Messages.System.Tablist.Header"))) {
-                englishConfiguration.set("Messages.System.Tablist.Header", "&7 \n &8「 &5&lGALACTIC&d&lPROJECTS &7■ &fYour &bnetwork &fwith &dgalactical &5power &8」\n &8► Connected to %server% &7■ Currently online &a%online%&d/&c%maxplayers% &8◄\n &7");
+                englishConfiguration.set("Messages.System.Tablist.Header", "&7 \n &8「 &5&lGALACTIC&d&lPROJECTS &7■ &fYour &bnetwork &fwith &dgalactical &5power &8」\n &8► &fConnected to &b%server% &7■ &fCurrently online &b%online%&f/&3%maxplayers% &8◄\n &7");
             }
 
             if(!(englishConfiguration.contains("Messages.System.Tablist.Footer"))) {
-                englishConfiguration.set("Messages.System.Tablist.Footer", "&7 \n &8► Website &7× &dwww.galacticalprojects.net &f■ TeamSpeak &7× &dGalacticalProjects.net &8◄ \n &8► Forum &7× &dforum.galacticalprojects.net &f■ Shop &7× &dshop.galacticalprojects.net &8◄ \n &7");
+                englishConfiguration.set("Messages.System.Tablist.Footer", "&7 \n &8► &fWebsite &7× &dwww.galacticalprojects.net &8■ &fTeamSpeak &7× &dGalacticalProjects.net &8◄ \n &8► &fForum &7× &dforum.galacticalprojects.net &8■ &fShop &7× &dshop.galacticalprojects.net &8◄ \n &7");
+            }
+
+            if(!(englishConfiguration.contains("Messages.System.Maintenance.Usage"))) {
+                englishConfiguration.set("Messages.System.Maintenance.Usage", "%maintenancePrefix% &eUsage &8► &f/maintenance <on, off> <Reason (If on)>");
+            }
+
+            if(!(englishConfiguration.contains("Messages.System.Maintenance.Successful.TurnedOn"))) {
+                englishConfiguration.set("Messages.System.Maintenance.Successful.TurnedOn", "%maintenancePrefix% &7You successfully turned maintenance with the reason %reason% on.");
+            }
+
+            if(!(englishConfiguration.contains("Messages.System.Maintenance.Successful.TurnedOff"))) {
+                englishConfiguration.set("Messages.System.Maintenance.Successful.TurnedOff", "%maintenancePrefix% &7You successfully turned maintenance off.");
+            }
+
+            if(!(englishConfiguration.contains("Messages.System.Maintenance.Error.AlreadyOn"))) {
+                englishConfiguration.set("Messages.System.Maintenance.Error.AlreadyOn", "%maintenancePrefix% &7The maintenance is already turned on.");
+            }
+
+            if(!(englishConfiguration.contains("Messages.System.Maintenance.Error.AlreadyOff"))) {
+                englishConfiguration.set("Messages.System.Maintenance.Error.AlreadyOff", "%maintenancePrefix% &7The maintenance is already turned off.");
             }
 
             if(!(englishConfiguration.contains("Messages.System.Maintenance.Version"))) {
                 englishConfiguration.set("Messages.System.Maintenance.Version", "&8► &4&lMAINTENANCE");
             }
 
+            if(!(englishConfiguration.contains("Messages.System.Maintenance.Reason"))) {
+                englishConfiguration.set("Messages.System.Maintenance.Reason", "Construction");
+            }
+
+            if(!(englishConfiguration.contains("Messages.System.OnlineTime.Usage"))) {
+                englishConfiguration.set("Messages.System.Maintenance.Usage", "%onlinePrefix% &eUsage &8► &f/onlinetime <Player>");
+            }
+
+            if(!(englishConfiguration.contains("Messages.System.OnlineTime.Errors.NotEnabled"))) {
+                englishConfiguration.set("Messages.System.OnlineTime.Errors.NotEnabled", "%onlinePrefix% &cThat player disabled that others can see their online time.");
+            }
 
             ConfigurationProvider.getProvider(YamlConfiguration.class).save(englishConfiguration, english);
 
@@ -217,13 +277,24 @@ public class EnglishConfiguration {
             langFre = englishConfiguration.getString("Messages.Languages.French");
             langSpa = englishConfiguration.getString("Messages.Languages.Spanish");
 
+            errorsPermission = Color.apply(englishConfiguration.getString("Messages.System.Errors.Permission"));
+            errorsPlayer = Color.apply(englishConfiguration.getString("Messages.System.Errors.Player"));
+            errorsNotExists = Color.apply(englishConfiguration.getString("Messages.System.Errors.NotExists"));
             motdsMaintenanceLineOne = Color.apply(englishConfiguration.getString("Messages.System.MOTDs.Maintenance.Line.1"));
             motdsMaintenanceLineTwo = Color.apply(englishConfiguration.getString("Messages.System.MOTDs.Maintenance.Line.2"));
             motdsNormalLineOne = Color.apply(englishConfiguration.getString("Messages.System.MOTDs.Normal.Line.1"));
             motdsNormalLineTwo = Color.apply(englishConfiguration.getString("Messages.System.MOTDs.Normal.Line.2"));
             tablistHeader = Color.apply(englishConfiguration.getString("Messages.System.Tablist.Header"));
             tablistFooter = Color.apply(englishConfiguration.getString("Messages.System.Tablist.Footer"));
+            maintenaceUsage = Color.apply(englishConfiguration.getString("Messages.System.Maintenance.Usage").replaceAll("%maintenancePrefix%", mainConfiguration.getMaintenancePrefix()));
+            maintenanceSuccessfulTurnedOn = Color.apply(englishConfiguration.getString("Messages.System.Maintenance.Successful.TurnedOn").replaceAll("%maintenancePrefix%", mainConfiguration.getMaintenancePrefix()));
+            maintenanceSuccessfulTurnedOff = Color.apply(englishConfiguration.getString("Messages.System.Maintenance.Successful.TurnedOff").replaceAll("%maintenancePrefix%", mainConfiguration.getMaintenancePrefix()));
+            maintenanceErrorsAlreadyOn = Color.apply(englishConfiguration.getString("Messages.System.Maintenance.Error.AlreadyOn").replaceAll("%maintenancePrefix%", mainConfiguration.getMaintenancePrefix()));
+            maintenanceErrorsAlreadyOff = Color.apply(englishConfiguration.getString("Messages.System.Maintenance.Error.AlreadyOff").replaceAll("%maintenancePrefix%", mainConfiguration.getMaintenancePrefix()));
             maintenanceVersion = Color.apply(englishConfiguration.getString("Messages.System.Maintenance.Version"));
+            maintenanceReason = englishConfiguration.getString("Messages.System.Maintenance.Reason");
+            onlineTimeUsage = Color.apply(englishConfiguration.getString("Messages.System.OnlineTime.Usage").replaceAll("%onlinePrefix%", mainConfiguration.getOnlineTimePrefix()));
+            onlineTimeErrorsNotEnabled = Color.apply(englishConfiguration.getString("Messages.System.OnlineTime.Errors.NotEnabled").replaceAll("%onlinePrefix%", mainConfiguration.getOnlineTimePrefix()));
 
         } catch (IOException e){
             throw new RuntimeException(e);
@@ -282,6 +353,10 @@ public class EnglishConfiguration {
         return month4;
     }
 
+    public String getMonth5() {
+        return month5;
+    }
+
     public String getMonth6() {
         return month6;
     }
@@ -326,6 +401,18 @@ public class EnglishConfiguration {
         return langSpa;
     }
 
+    public String getErrorsPermission() {
+        return errorsPermission;
+    }
+
+    public String getErrorsPlayer() {
+        return errorsPlayer;
+    }
+
+    public String getErrorsNotExists() {
+        return errorsNotExists;
+    }
+
     public String getMotdsMaintenanceLineOne() {
         return motdsMaintenanceLineOne;
     }
@@ -350,7 +437,39 @@ public class EnglishConfiguration {
         return tablistFooter;
     }
 
+    public String getMaintenaceUsage() {
+        return maintenaceUsage;
+    }
+
+    public String getMaintenanceSuccessfulTurnedOn() {
+        return maintenanceSuccessfulTurnedOn;
+    }
+
+    public String getMaintenanceSuccessfulTurnedOff() {
+        return maintenanceSuccessfulTurnedOff;
+    }
+
+    public String getMaintenanceErrorsAlreadyOn() {
+        return maintenanceErrorsAlreadyOn;
+    }
+
+    public String getMaintenanceErrorsAlreadyOff() {
+        return maintenanceErrorsAlreadyOff;
+    }
+
     public String getMaintenanceVersion() {
         return maintenanceVersion;
+    }
+
+    public String getMaintenanceReason() {
+        return maintenanceReason;
+    }
+
+    public String getOnlineTimeUsage() {
+        return onlineTimeUsage;
+    }
+
+    public String getOnlineTimeErrorsNotEnabled() {
+        return onlineTimeErrorsNotEnabled;
     }
 }

@@ -3,7 +3,7 @@ package net.galacticprojects.isystem.bungeecord;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.pool.HikariPool;
 import net.galacticprojects.isystem.bungeecord.command.BanCommand;
-import net.galacticprojects.isystem.bungeecord.command.LobbyCommand;
+import net.galacticprojects.isystem.bungeecord.command.OnlineTimeCommand;
 import net.galacticprojects.isystem.bungeecord.command.SystemCommand;
 import net.galacticprojects.isystem.bungeecord.config.MainConfiguration;
 import net.galacticprojects.isystem.bungeecord.config.PermissionConfiguration;
@@ -17,15 +17,13 @@ import net.galacticprojects.isystem.utils.JavaInstance;
 import net.galacticprojects.isystem.database.MySQL;
 import net.galacticprojects.isystem.bungeecord.config.SqlConfiguration;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
-import net.md_5.bungee.config.Configuration;
-import net.md_5.bungee.config.ConfigurationProvider;
-import net.md_5.bungee.config.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 public class iProxy extends Plugin {
 
@@ -42,6 +40,7 @@ public class iProxy extends Plugin {
         initializeConfiguration();
         connectDatabase();
         initializeApiVersion();
+        initializeTimeUnits();
         initializeListener();
         initializeCommands();
     }
@@ -96,6 +95,23 @@ public class iProxy extends Plugin {
 
     }
 
+    public void initializeTimeUnits() {
+        ProxyServer.getInstance().getScheduler().schedule(this, new Runnable() {
+            @Override
+            public void run() {
+                MySQL mySQL = JavaInstance.get(MySQL.class);
+
+                for(ProxiedPlayer all : ProxyServer.getInstance().getPlayers()) {
+                    mySQL.updateOnlineTime(all.getUniqueId(), 60000);
+                }
+
+
+            }
+        }, 1, 1, TimeUnit.MINUTES);
+
+
+    }
+
     public void initializeListener(){
         manager.registerListener(this, new ConnectListener());
         manager.registerListener(this, new PingListener());
@@ -103,8 +119,8 @@ public class iProxy extends Plugin {
 
     public void initializeCommands() {
         manager.registerCommand(this, new SystemCommand());
-        manager.registerCommand(this, new LobbyCommand());
         manager.registerCommand(this, new BanCommand());
+        manager.registerCommand(this, new OnlineTimeCommand());
     }
 
     public static Plugin getInstance() {

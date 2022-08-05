@@ -27,12 +27,7 @@ public class BanCommand extends Command implements TabExecutor {
 
     @Override
     public void execute(CommandSender sender, String[] args) {
-            if(sender instanceof ProxiedPlayer) {
-                ProxiedPlayer player = (ProxiedPlayer) sender;
-                staff = player.getUniqueId().toString();
-            } else {
-                staff = sender.getName();
-            }
+
 
             if(args.length < 3) {
                 StringBuilder builder = new StringBuilder();

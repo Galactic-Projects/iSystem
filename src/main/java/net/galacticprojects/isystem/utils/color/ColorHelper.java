@@ -1,8 +1,8 @@
 package net.galacticprojects.isystem.utils.color;
 
 import com.syntaxphoenix.syntaxapi.utils.java.lang.StringBuilder;
-import de.syntaxtnt.color.helper.ColorIterator;
-import de.syntaxtnt.color.helper.LinearGradient;
+import net.galacticprojects.isystem.utils.color.helper.ColorIterator;
+import net.galacticprojects.isystem.utils.color.helper.LinearGradient;
 
 public class ColorHelper {
     public static final String HEX_FORMAT = "%02X";

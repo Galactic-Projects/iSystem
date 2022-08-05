@@ -1,6 +1,7 @@
 package net.galacticprojects.isystem.utils.color.helper;
 
-import de.syntaxtnt.color.ColorHelper;
+
+import net.galacticprojects.isystem.utils.color.ColorHelper;
 
 public class LinearGradient extends ColorIterator {
     private final float[] color0;

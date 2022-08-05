@@ -18,7 +18,7 @@ public class PermissionConfiguration {
         JavaInstance.put(this);
 
         try {
-            permissions = new File(iProxy.getPluginPath(), "permissions.yml.yml");
+            permissions = new File(iProxy.getPluginPath(), "permissions.yml");
 
             if (!(permissions.exists())) {
                 permissions.createNewFile();

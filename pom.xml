@@ -97,18 +97,12 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
-            <version>1.7.25</version>
+            <version>1.7.30</version>
         </dependency>
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
             <version>4.4.0_350</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>club.minnced</groupId>
-                    <artifactId>opus-java</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <dependency>
             <groupId>io.github.waterfallmc</groupId>
@@ -133,8 +127,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!--<server.dir>C:\Users\David\Desktop\Development\spigot-latest</server.dir>-->
-        <server.dir>C:\Users\%user%\Desktop\TestServers\</server.dir>
+        <server.dir>C:\Users\David\Desktop\Development\workspace\GalacticProjects\iSystem\out</server.dir>
     </properties>
 
     <build>
@@ -142,7 +135,7 @@
             <plugin>
                 <groupId>net.md-5</groupId>
                 <artifactId>specialsource-maven-plugin</artifactId>
-                <version>1.2.2</version>
+                <version>1.2.4</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -236,7 +229,7 @@
                         </goals>
                         <configuration>
                             <target>
-                                <copy file="${project.build.directory}/${project.build.finalName}.jar" tofile="${server.dir}/1.19/plugins/${project.artifactId}.jar" />
+                                <copy file="${project.build.directory}/${project.build.finalName}.jar" tofile="${server.dir}/${project.artifactId}.jar" />
                             </target>
                         </configuration>
                     </execution>
@@ -250,13 +243,4 @@
             </resource>
         </resources>
     </build>
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.spigotmc</groupId>
-                <artifactId>spigot</artifactId>
-                <version>1.19-R0.1-SNAPSHOT</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 </project>
