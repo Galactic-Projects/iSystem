@@ -54,59 +54,59 @@ public class MainConfiguration {
             }
 
             if (!(configuration.contains("Messages.Prefix.System"))) {
-                configuration.set("Messages.Prefix.System", "&8「 &4&lSYSTEM &8」 &r");
+                configuration.set("Messages.Prefix.System", "&8「 &4&lSYSTEM &8」&r");
             }
 
             if (!(configuration.contains("Messages.Prefix.Chat"))) {
-                configuration.set("Messages.Prefix.Chat", "&8「 &5&lG&d&lP &8」 &r");
+                configuration.set("Messages.Prefix.Chat", "&8「 &5&lG&d&lP &8」&r");
             }
 
             if (!(configuration.contains("Messages.Prefix.Menu"))) {
-                configuration.set("Messages.Prefix.Menu", "&8「 &5&lGALACTIC&d&lPROJECTS &8」 &r");
+                configuration.set("Messages.Prefix.Menu", "&8「 &5&lGALACTIC&d&lPROJECTS &8」&r");
             }
 
             if (!(configuration.contains("Messages.Prefix.OnlineTime"))) {
-                configuration.set("Messages.Prefix.OnlineTime", "&8「 &0&lONLINETIME &8」 &r");
+                configuration.set("Messages.Prefix.OnlineTime", "&8「 &0&lONLINETIME &8」&r");
             }
 
             if (!(configuration.contains("Messages.Prefix.Maintenance"))) {
-                configuration.set("Messages.Prefix.Maintenance", "&8「 &c&lMAINTENANCE &8」 &r");
+                configuration.set("Messages.Prefix.Maintenance", "&8「 &c&lMAINTENANCE &8 &r");
             }
 
             if (!(configuration.contains("Messages.Prefix.History"))) {
-                configuration.set("Messages.Prefix.History", "&8「 &f&lHISTORY &8」 &r");
+                configuration.set("Messages.Prefix.History", "&8「 &f&lHISTORY &8」&r");
             }
 
             if (!(configuration.contains("Messages.Prefix.Friends"))) {
-                configuration.set("Messages.Prefix.Friends", "&8「 &9&lFRIENDS &8」 &r");
+                configuration.set("Messages.Prefix.Friends", "&8「 &9&lFRIENDS &8」&r");
             }
 
             if (!(configuration.contains("Messages.Prefix.Party"))) {
-                configuration.set("Messages.Prefix.Party", "&8「 &b&lPARTY &8」 &r");
+                configuration.set("Messages.Prefix.Party", "&8「 &b&lPARTY &8 &r");
             }
 
             if (!(configuration.contains("Messages.Prefix.Clan"))) {
-                configuration.set("Messages.Prefix.Clan", "&8「 &3&lCLAN &8」 &r");
+                configuration.set("Messages.Prefix.Clan", "&8「 &3&lCLAN &8」&r");
             }
 
             if (!(configuration.contains("Messages.Prefix.TeamChat"))) {
-                configuration.set("Messages.Prefix.TeamChat", "&8「 &2&lTEAMCHAT &8」 &r");
+                configuration.set("Messages.Prefix.TeamChat", "&8「 &2&lTEAMCHAT &8」&r");
             }
 
             if (!(configuration.contains("Messages.Prefix.Report"))) {
-                configuration.set("Messages.Prefix.Report", "&8「 &1&lREPORT &8」 &r");
+                configuration.set("Messages.Prefix.Report", "&8「 &1&lREPORT &8」&r");
             }
 
             if (!(configuration.contains("Messages.Prefix.Ban"))) {
-                configuration.set("Messages.Prefix.Ban", "&8「 &6&lBANSYSTEM &8」 &");
+                configuration.set("Messages.Prefix.Ban", "&8「 &6&lBANSYSTEM &8」&r");
             }
 
             if (!(configuration.contains("Messages.Prefix.ChatLog"))) {
-                configuration.set("Messages.Prefix.ChatLog", "&8「 &a&lCHATLOG &8」 &r");
+                configuration.set("Messages.Prefix.ChatLog", "&8「 &a&lCHATLOG &8」&r");
             }
 
             if (!(configuration.contains("Messages.Prefix.Link"))) {
-                configuration.set("Messages.Prefix.Link", "&8「 &e&lLINK &8」 &r");
+                configuration.set("Messages.Prefix.Link", "&8「 &e&lLINK &8」&r");
             }
 
             ConfigurationProvider.getProvider(YamlConfiguration.class).save(configuration, config);

@@ -3,6 +3,7 @@ package net.galacticprojects.isystem.bungeecord;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.pool.HikariPool;
 import net.galacticprojects.isystem.bungeecord.command.BanCommand;
+import net.galacticprojects.isystem.bungeecord.command.MaintenanceCommand;
 import net.galacticprojects.isystem.bungeecord.command.OnlineTimeCommand;
 import net.galacticprojects.isystem.bungeecord.command.SystemCommand;
 import net.galacticprojects.isystem.bungeecord.config.MainConfiguration;
@@ -92,7 +93,6 @@ public class iProxy extends Plugin {
     }
 
     public void initializeApiVersion() {
-
     }
 
     public void initializeTimeUnits() {
@@ -102,7 +102,9 @@ public class iProxy extends Plugin {
                 MySQL mySQL = JavaInstance.get(MySQL.class);
 
                 for(ProxiedPlayer all : ProxyServer.getInstance().getPlayers()) {
-                    mySQL.updateOnlineTime(all.getUniqueId(), 60000);
+                    if(mySQL != null) {
+                        mySQL.updateOnlineTime(all.getUniqueId(), 60000);
+                    }
                 }
 
 
@@ -121,6 +123,7 @@ public class iProxy extends Plugin {
         manager.registerCommand(this, new SystemCommand());
         manager.registerCommand(this, new BanCommand());
         manager.registerCommand(this, new OnlineTimeCommand());
+        manager.registerCommand(this, new MaintenanceCommand());
     }
 
     public static Plugin getInstance() {

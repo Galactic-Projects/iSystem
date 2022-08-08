@@ -3,10 +3,17 @@ package net.galacticprojects.isystem.bungeecord.listener;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import de.dytanic.cloudnet.driver.CloudNetDriver;
+import de.dytanic.cloudnet.driver.permission.IPermissible;
+import de.dytanic.cloudnet.driver.permission.IPermissionManagement;
+import de.dytanic.cloudnet.driver.permission.IPermissionUser;
+import de.dytanic.cloudnet.driver.permission.Permission;
 import de.dytanic.cloudnet.ext.bridge.BridgePlayerManager;
+import de.dytanic.cloudnet.ext.bridge.BridgePlayerProvider;
+import de.dytanic.cloudnet.ext.bridge.player.CloudPlayer;
 import de.dytanic.cloudnet.ext.bridge.player.ICloudPlayer;
 import de.dytanic.cloudnet.ext.bridge.player.IPlayerManager;
-import net.dv8tion.jda.api.events.DisconnectEvent;
+import net.galacticprojects.isystem.bungeecord.config.MainConfiguration;
+import net.galacticprojects.isystem.bungeecord.config.languages.EnglishConfiguration;
 import net.galacticprojects.isystem.bungeecord.iProxy;
 import net.galacticprojects.isystem.database.MySQL;
 import net.galacticprojects.isystem.database.model.Ban;
@@ -15,10 +22,12 @@ import net.galacticprojects.isystem.utils.JavaInstance;
 import net.galacticprojects.isystem.utils.Languages;
 import net.galacticprojects.isystem.utils.TabManager;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
+import net.md_5.bungee.protocol.packet.Login;
 
 import java.io.*;
 import java.net.MalformedURLException;
@@ -30,6 +39,33 @@ public class ConnectListener implements Listener {
 
     public MySQL mySQL = JavaInstance.get(MySQL.class);
     public TabManager tabManager;
+    public MainConfiguration mainConfiguration = JavaInstance.get(MainConfiguration.class);
+    public EnglishConfiguration englishConfiguration = JavaInstance.get(EnglishConfiguration.class);
+
+
+    @EventHandler
+    public void onLogin(LoginEvent event) {
+        if (mainConfiguration.isMaintenanceEnabled()) {
+            IPermissionManagement permissionManagement = CloudNetDriver.getInstance().getPermissionManagement();
+            IPermissible iPermissible = (IPermissible) permissionManagement.getUserAsync(mySQL.getPlayerFromIp(event.getConnection().getAddress().getAddress().getHostAddress()).join().getUUID());
+            if (!(permissionManagement.hasPermission(iPermissible, "*"))) {
+                switch (mySQL.getPlayerFromIp(event.getConnection().getAddress().getAddress().getHostAddress()).join().getLanguages()) {
+                    case GERMAN:
+                    case SPANISH: {
+
+                        break;
+                    }
+                    case ENGLISH: {
+                        event.setCancelReason(new TextComponent(englishConfiguration.getKickMaintenanceCurrently().replaceAll("%reason%", englishConfiguration.getMaintenanceReason()).replaceAll("%enddate%", englishConfiguration.getMaintenanceEndDate())));
+                        break;
+                    }
+                    case FRENCH: {
+
+                    }
+                }
+            }
+        }
+    }
 
     @EventHandler
     public void onConnect(PostLoginEvent event) {
@@ -58,7 +94,9 @@ public class ConnectListener implements Listener {
             public void run() {
                 IPlayerManager playerManager = CloudNetDriver.getInstance().getServicesRegistry().getFirstService(IPlayerManager.class);
                 ICloudPlayer cloudPlayer = playerManager.getOnlinePlayer(player.getUniqueId());
-                updatePlayer(player, "Online on " + cloudPlayer.getConnectedService().getServiceId().getName());
+                if(cloudPlayer != null) {
+                    updatePlayer(player, "Online on " + cloudPlayer.getConnectedService().getServiceId().getName());
+                }
             }
         }, 1, TimeUnit.SECONDS);
     }
@@ -141,7 +179,7 @@ public class ConnectListener implements Listener {
 
                 }
             }
-        }, 20, TimeUnit.MILLISECONDS);
+        }, 40, TimeUnit.MILLISECONDS);
     }
 
     public void updatePlayer(ProxiedPlayer player, String service) {

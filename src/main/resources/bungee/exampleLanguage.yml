@@ -44,7 +44,7 @@ Messages:
             Header: '&7 \n &8「 &5&lGALACTIC&d&lPROJECTS &7■ &fYour &bnetwork &fwith &dgalactical &5power &8」\n &8► &fConnected to &b%server% &7■ &fCurrently online &b%online%&f/&3%maxplayers% &8◄\n &7'
             Footer: '&7 \n &8► &fWebsite &7× &dwww.galacticalprojects.net &8■ &fTeamSpeak &7× &dGalacticalProjects.net &8◄ \n &8► Forum &7× &dforum.galacticalprojects.net &8■ Shop &7× &dshop.galacticalprojects.net &8◄ \n &7'
         Maintenance:
-            Usage: '%maintenancePrefix% &eUsage &8► &f/maintenance <on, off> <Reason (If on)>'
+            Usage: '%maintenancePrefix% &eUsage &8► &f/maintenance <on, off> <Time> <Reason (If on)>'
             Successful:
                 TurnedOn: '%maintenancePrefix% &7You successfully turned maintenance with the reason %reason% on.'
                 TurnedOff: '%maintenancePrefix% &7You successfully turned maintenance off.'
@@ -53,8 +53,22 @@ Messages:
                 AlreadyOff: '%maintenancePrefix% &7The maintenance is already turned off.'
             Version: '&8► &4&lMAINTENANCE'
             Reason: 'Construction'
-            EndDate: 'Friday the 16. August 2022 at 18 o'' Clock (UTC)'
+            EndDate: ''
         OnlineTime:
-            Usage: '%onlinePrefix% &eUsage &8► &f/onlinetime <Player>'
+            Usage: '%onlinePrefix% &eUsage &8► &f/onlinetime <Off, On, Player>'
+            Success:
+                Self: '%onlinePrefix% &7Your &bonlinetime &7is &3%year% Year(s)&7,&3 %month% Month(s)&7,&3 %day% Day(s)&7,&3 %hour% Hour(s) &7and &3%minute% Minute(s)&7.'
+                Others: '%onlinePrefix% &7The &bonlinetime &7by %player% &7is &3%year% Year(s)&7,&3 %month% Month(s)&7,&3 %day% Day(s)&7,&3 %hour% Hour(s) &7and &3%minute% Minute(s)&7.'
+                Enabled: '%onlinePrefix% &7You &asuccessfully &benabled &7showing your &3onlinetime &7to others.'
+                Disabled: '%onlinePrefix% &7You &asuccessfully &bdisabled &7showing your &3onlinetime &7to others.'
             Errors:
+                AlreadyOff: '%onlinePrefix% &cYou already disabled showing  your onlinetime to others.'
+                AlreadyOn: '%onlinePrefix% &cYou already enabled showing your onlinetime to others.'
                 NotEnabled: '%onlinePrefix% &cThat player disabled that others can see their online time.'
+        Kick:
+            Maintenance:
+                Currently: '%menuPrefix%\n&7The &bnetwork &7is &3currently &7in &cmaintenance mode&7.\n\n&7► &cReason &8■ &4%reason%\n&7► &cEnd Date &8■ &4%enddate%\n\n&7Want to contact us?\n&7► &dWebsite &8■ &5www.GalacticProjects.net'
+                Now: '%menuPrefix%\n&7The &bnetwork &7is &3now &7in &cmaintenance mode&7.\n\n&7► &cReason &8■ &4%reason%\n&7► &cEnd Date &8■ &4%enddate%\n\n&7Want to contact us?\n&7► &dWebsite &8■ &5www.GalacticProjects.net'
+            Ban:
+                Temporary: ''
+                Permanently: ''

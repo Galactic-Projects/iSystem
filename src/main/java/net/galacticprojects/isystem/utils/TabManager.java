@@ -7,6 +7,7 @@ import net.galacticprojects.isystem.bungeecord.config.MainConfiguration;
 import net.galacticprojects.isystem.bungeecord.config.languages.EnglishConfiguration;
 import net.galacticprojects.isystem.database.MySQL;
 import net.galacticprojects.isystem.database.model.Player;
+import net.galacticprojects.isystem.utils.JavaInstance;
 import net.galacticprojects.isystem.utils.color.Color;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ComponentBuilder;

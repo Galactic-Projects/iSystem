@@ -3,16 +3,13 @@ package net.galacticprojects.isystem.bungeecord.config.languages;
 import net.galacticprojects.isystem.bungeecord.config.MainConfiguration;
 import net.galacticprojects.isystem.bungeecord.iProxy;
 import net.galacticprojects.isystem.utils.JavaInstance;
-import net.galacticprojects.isystem.utils.TimeHelper;
 import net.galacticprojects.isystem.utils.color.Color;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
-import org.checkerframework.checker.units.qual.C;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.OffsetDateTime;
 
 public class EnglishConfiguration {
 
@@ -61,8 +58,17 @@ public class EnglishConfiguration {
     private String maintenanceErrorsAlreadyOff;
     private String maintenanceVersion;
     private String maintenanceReason;
+    private String maintenanceEndDate;
     private String onlineTimeUsage;
+    private String onlineTimeSuccessSelf;
+    private String onlineTimeSuccessOthers;
+    private String onlineTimeSuccessEnabled;
+    private String onlineTimeSuccessDisabled;
     private String onlineTimeErrorsNotEnabled;
+    private String onlineTimeErrorsAlreadyEnabled;
+    private String onlineTimeErrorsAlreadyDisabled;
+    private String kickMaintenanceCurrently;
+    private String kickMaintenanceNow;
 
     public EnglishConfiguration () throws IOException {
         JavaInstance.put(this);
@@ -187,7 +193,7 @@ public class EnglishConfiguration {
             }
 
             if(!(englishConfiguration.contains("Messages.System.MOTDs.Maintenance.Line.2"))) {
-                englishConfiguration.set("Messages.System.MOTDs.Maintenance.Line.2", "&8► &fWe are &c&lcurrently &7under &4&lmaintenance&7!");
+                englishConfiguration.set("Messages.System.MOTDs.Maintenance.Line.2", "&8► &7We are &c&lcurrently &7under &4&lmaintenance&7!");
             }
 
             if(!(englishConfiguration.contains("Messages.System.MOTDs.Normal.Line.1"))) {
@@ -207,11 +213,11 @@ public class EnglishConfiguration {
             }
 
             if(!(englishConfiguration.contains("Messages.System.Maintenance.Usage"))) {
-                englishConfiguration.set("Messages.System.Maintenance.Usage", "%maintenancePrefix% &eUsage &8► &f/maintenance <on, off> <Reason (If on)>");
+                englishConfiguration.set("Messages.System.Maintenance.Usage", "%maintenancePrefix% &eUsage &8► &f/maintenance <on, off> <Time (If on, in Hours)> <Reason (If on)>");
             }
 
             if(!(englishConfiguration.contains("Messages.System.Maintenance.Successful.TurnedOn"))) {
-                englishConfiguration.set("Messages.System.Maintenance.Successful.TurnedOn", "%maintenancePrefix% &7You successfully turned maintenance with the reason %reason% on.");
+                englishConfiguration.set("Messages.System.Maintenance.Successful.TurnedOn", "%maintenancePrefix% &7You successfully turned maintenance with the &creason &4%reason% &7and the end &bdate &3%enddate% &7on.");
             }
 
             if(!(englishConfiguration.contains("Messages.System.Maintenance.Successful.TurnedOff"))) {
@@ -234,12 +240,48 @@ public class EnglishConfiguration {
                 englishConfiguration.set("Messages.System.Maintenance.Reason", "Construction");
             }
 
+            if(!(englishConfiguration.contains("Messages.System.Maintenance.EndDate"))) {
+                englishConfiguration.set("Messages.System.Maintenance.EndDate", "Fridat the 16. August 16:20:00 (UTC)");
+            }
+
             if(!(englishConfiguration.contains("Messages.System.OnlineTime.Usage"))) {
-                englishConfiguration.set("Messages.System.Maintenance.Usage", "%onlinePrefix% &eUsage &8► &f/onlinetime <Player>");
+                englishConfiguration.set("Messages.System.OnlineTime.Usage", "%onlinePrefix% &eUsage &8► &f/onlinetime <Off, On, Player>");
+            }
+
+            if(!(englishConfiguration.contains("Messages.System.OnlineTime.Success.Self"))) {
+                englishConfiguration.set("Messages.System.OnlineTime.Success.Self", "%onlinePrefix% &7Your &bonlinetime &7is &3%year% Year(s)&7,&3 %month% Month(s)&7,&3 %day% Day(s)&7,&3 %hour% Hour(s) &7and &3%minute% Minute(s)&7.");
+            }
+
+            if(!(englishConfiguration.contains("Messages.System.OnlineTime.Success.Others"))) {
+                englishConfiguration.set("Messages.System.OnlineTime.Success.Others", "%onlinePrefix% &7The &bonlinetime &7by %player% &7is &3%year% Year(s)&7,&3 %month% Month(s)&7,&3 %day% Day(s)&7,&3 %hour% Hour(s) &7and &3%minute% Minute(s)&7.");
+            }
+
+            if(!(englishConfiguration.contains("Messages.System.OnlineTime.Success.Enabled"))) {
+                englishConfiguration.set("Messages.System.OnlineTime.Success.Enabled", "%onlinePrefix% &7You &asuccessfully &benabled &7showing your &3onlinetime &7to others.");
+            }
+
+            if(!(englishConfiguration.contains("Messages.System.OnlineTime.Success.Disabled"))) {
+                englishConfiguration.set("Messages.System.OnlineTime.Success.Disabled", "%onlinePrefix% &7You &asuccessfully &bdisabled &7showing your &3onlinetime &7to others.");
+            }
+
+            if(!(englishConfiguration.contains("Messages.System.OnlineTime.Errors.AlreadyOn"))) {
+                englishConfiguration.set("Messages.System.OnlineTime.Errors.AlreadyOn", "%onlinePrefix% &cYou already enabled showing your onlinetime to others.");
+            }
+
+            if(!(englishConfiguration.contains("Messages.System.OnlineTime.Errors.AlreadyOff"))) {
+                englishConfiguration.set("Messages.System.OnlineTime.Errors.AlreadyOff", "%onlinePrefix% &cYou already disabled showing  your onlinetime to others.");
             }
 
             if(!(englishConfiguration.contains("Messages.System.OnlineTime.Errors.NotEnabled"))) {
                 englishConfiguration.set("Messages.System.OnlineTime.Errors.NotEnabled", "%onlinePrefix% &cThat player disabled that others can see their online time.");
+            }
+            
+            if(!(englishConfiguration.contains("Messages.System.Kick.Maintenance.Currently"))) {
+                englishConfiguration.set("Messages.System.Kick.Maintenance.Currently", "%menuPrefix%\n&7The &bnetwork &7is &3currently &7in &cmaintenance mode&7.\n\n&7► &cReason &8■ &4%reason%\n&7► &cEnd Date &8■ &4%enddate%\n\n&7Want to contact us?\n&7► &dWebsite &8■ &5www.GalacticProjects.net");
+            }
+
+            if(!(englishConfiguration.contains("Messages.System.Kick.Maintenance.Now"))) {
+                englishConfiguration.set("Messages.System.Kick.Maintenance.Now", "%menuPrefix%\n&7The &bnetwork &7is &3now &7in &cmaintenance mode&7.\n\n&7► &cReason &8■ &4%reason%\n&7► &cEnd Date &8■ &4%enddate%\n\n&7Want to contact us?\n&7► &dWebsite &8■ &5www.GalacticProjects.net");
             }
 
             ConfigurationProvider.getProvider(YamlConfiguration.class).save(englishConfiguration, english);
@@ -280,12 +322,15 @@ public class EnglishConfiguration {
             errorsPermission = Color.apply(englishConfiguration.getString("Messages.System.Errors.Permission"));
             errorsPlayer = Color.apply(englishConfiguration.getString("Messages.System.Errors.Player"));
             errorsNotExists = Color.apply(englishConfiguration.getString("Messages.System.Errors.NotExists"));
+
             motdsMaintenanceLineOne = Color.apply(englishConfiguration.getString("Messages.System.MOTDs.Maintenance.Line.1"));
             motdsMaintenanceLineTwo = Color.apply(englishConfiguration.getString("Messages.System.MOTDs.Maintenance.Line.2"));
             motdsNormalLineOne = Color.apply(englishConfiguration.getString("Messages.System.MOTDs.Normal.Line.1"));
             motdsNormalLineTwo = Color.apply(englishConfiguration.getString("Messages.System.MOTDs.Normal.Line.2"));
+
             tablistHeader = Color.apply(englishConfiguration.getString("Messages.System.Tablist.Header"));
             tablistFooter = Color.apply(englishConfiguration.getString("Messages.System.Tablist.Footer"));
+
             maintenaceUsage = Color.apply(englishConfiguration.getString("Messages.System.Maintenance.Usage").replaceAll("%maintenancePrefix%", mainConfiguration.getMaintenancePrefix()));
             maintenanceSuccessfulTurnedOn = Color.apply(englishConfiguration.getString("Messages.System.Maintenance.Successful.TurnedOn").replaceAll("%maintenancePrefix%", mainConfiguration.getMaintenancePrefix()));
             maintenanceSuccessfulTurnedOff = Color.apply(englishConfiguration.getString("Messages.System.Maintenance.Successful.TurnedOff").replaceAll("%maintenancePrefix%", mainConfiguration.getMaintenancePrefix()));
@@ -293,8 +338,19 @@ public class EnglishConfiguration {
             maintenanceErrorsAlreadyOff = Color.apply(englishConfiguration.getString("Messages.System.Maintenance.Error.AlreadyOff").replaceAll("%maintenancePrefix%", mainConfiguration.getMaintenancePrefix()));
             maintenanceVersion = Color.apply(englishConfiguration.getString("Messages.System.Maintenance.Version"));
             maintenanceReason = englishConfiguration.getString("Messages.System.Maintenance.Reason");
+            maintenanceEndDate = englishConfiguration.getString("Messages.System.Maintenance.EndDate");
+
             onlineTimeUsage = Color.apply(englishConfiguration.getString("Messages.System.OnlineTime.Usage").replaceAll("%onlinePrefix%", mainConfiguration.getOnlineTimePrefix()));
+            onlineTimeSuccessSelf = Color.apply(englishConfiguration.getString("Messages.System.OnlineTime.Success.Self").replaceAll("%onlinePrefix%", mainConfiguration.getOnlineTimePrefix()));
+            onlineTimeSuccessOthers = Color.apply(englishConfiguration.getString("Messages.System.OnlineTime.Success.Others").replaceAll("%onlinePrefix%", mainConfiguration.getOnlineTimePrefix()));
+            onlineTimeSuccessEnabled = Color.apply(englishConfiguration.getString("Messages.System.OnlineTime.Success.Enabled").replaceAll("%onlinePrefix%", mainConfiguration.getOnlineTimePrefix()));
+            onlineTimeSuccessDisabled = Color.apply(englishConfiguration.getString("Messages.System.OnlineTime.Success.Disabled").replaceAll("%onlinePrefix%", mainConfiguration.getOnlineTimePrefix()));
+            onlineTimeErrorsAlreadyEnabled = Color.apply(englishConfiguration.getString("Messages.System.OnlineTime.Errors.AlreadyOn").replaceAll("%onlinePrefix%", mainConfiguration.getOnlineTimePrefix()));
+            onlineTimeErrorsAlreadyDisabled = Color.apply(englishConfiguration.getString("Messages.System.OnlineTime.Errors.AlreadyOff").replaceAll("%onlinePrefix%", mainConfiguration.getOnlineTimePrefix()));
             onlineTimeErrorsNotEnabled = Color.apply(englishConfiguration.getString("Messages.System.OnlineTime.Errors.NotEnabled").replaceAll("%onlinePrefix%", mainConfiguration.getOnlineTimePrefix()));
+
+            kickMaintenanceCurrently = Color.apply(englishConfiguration.getString("Messages.System.Kick.Maintenance.Currently").replaceAll("%menuPrefix%", mainConfiguration.getMenuPrefix()));
+            kickMaintenanceNow = Color.apply(englishConfiguration.getString("Messages.System.Kick.Maintenance.Now").replaceAll("%menuPrefix%", mainConfiguration.getMenuPrefix()));
 
         } catch (IOException e){
             throw new RuntimeException(e);
@@ -465,11 +521,45 @@ public class EnglishConfiguration {
         return maintenanceReason;
     }
 
+    public String getMaintenanceEndDate() { return maintenanceEndDate; }
+
     public String getOnlineTimeUsage() {
         return onlineTimeUsage;
     }
 
+    public String getOnlineTimeSuccessSelf() {
+        return onlineTimeSuccessSelf;
+    }
+
+    public String getOnlineTimeSuccessOthers() {
+        return onlineTimeSuccessOthers;
+    }
+
+    public String getOnlineTimeSuccessEnabled() {
+        return onlineTimeSuccessEnabled;
+    }
+
+    public String getOnlineTimeSuccessDisabled() {
+        return onlineTimeSuccessDisabled;
+    }
+
+    public String getOnlineTimeErrorsAlreadyEnabled() {
+        return onlineTimeErrorsAlreadyEnabled;
+    }
+
+    public String getOnlineTimeErrorsAlreadyDisabled() {
+        return onlineTimeErrorsAlreadyDisabled;
+    }
+
     public String getOnlineTimeErrorsNotEnabled() {
         return onlineTimeErrorsNotEnabled;
+    }
+
+    public String getKickMaintenanceCurrently() {
+        return kickMaintenanceCurrently;
+    }
+
+    public String getKickMaintenanceNow() {
+        return kickMaintenanceNow;
     }
 }
