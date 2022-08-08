@@ -47,20 +47,22 @@ public class ConnectListener implements Listener {
     public void onLogin(LoginEvent event) {
         if (mainConfiguration.isMaintenanceEnabled()) {
             IPermissionManagement permissionManagement = CloudNetDriver.getInstance().getPermissionManagement();
-            IPermissible iPermissible = (IPermissible) permissionManagement.getUserAsync(mySQL.getPlayerFromIp(event.getConnection().getAddress().getAddress().getHostAddress()).join().getUUID());
-            if (!(permissionManagement.hasPermission(iPermissible, "*"))) {
-                switch (mySQL.getPlayerFromIp(event.getConnection().getAddress().getAddress().getHostAddress()).join().getLanguages()) {
-                    case GERMAN:
-                    case SPANISH: {
+            IPermissionUser iPermissionUser = permissionManagement.getUser(mySQL.getPlayerFromIp(event.getConnection().getAddress().getAddress().getHostAddress()).join().getUUID());
+            if(iPermissionUser != null) {
+                if (!(permissionManagement.hasPermission(iPermissionUser, "*"))) {
+                    switch (mySQL.getPlayerFromIp(event.getConnection().getAddress().getAddress().getHostAddress()).join().getLanguages()) {
+                        case GERMAN:
+                        case SPANISH: {
 
-                        break;
-                    }
-                    case ENGLISH: {
-                        event.setCancelReason(new TextComponent(englishConfiguration.getKickMaintenanceCurrently().replaceAll("%reason%", englishConfiguration.getMaintenanceReason()).replaceAll("%enddate%", englishConfiguration.getMaintenanceEndDate())));
-                        break;
-                    }
-                    case FRENCH: {
+                            break;
+                        }
+                        case ENGLISH: {
+                            event.setCancelReason(new TextComponent(englishConfiguration.getKickMaintenanceCurrently().replaceAll("%reason%", englishConfiguration.getMaintenanceReason()).replaceAll("%enddate%", englishConfiguration.getMaintenanceEndDate())));
+                            break;
+                        }
+                        case FRENCH: {
 
+                        }
                     }
                 }
             }
