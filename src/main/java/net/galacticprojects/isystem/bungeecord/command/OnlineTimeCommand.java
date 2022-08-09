@@ -31,96 +31,68 @@ public class OnlineTimeCommand extends Command implements TabExecutor {
     public MySQL mySQL = JavaInstance.get(MySQL.class);
     @Override
     public void execute(CommandSender sender, String[] args) {
-        if(sender instanceof ProxiedPlayer) {
+        if (sender instanceof ProxiedPlayer) {
             ProxiedPlayer player = (ProxiedPlayer) sender;
 
-            switch (mySQL.getPlayer(player.getUniqueId()).join().getLanguages())  {
-                case GERMAN ->  {
+            switch (mySQL.getPlayer(player.getUniqueId()).join().getLanguages()) {
+                case GERMAN -> {
                 }
                 case ENGLISH -> {
-                    if(args.length == 0) {
+                    if (args.length == 0) {
                         long milliseconds = mySQL.getPlayer(player.getUniqueId()).join().getOnlineTime();
-                        long seconds = 0;
-                        long minutes = 0;
-                        long hours = 0;
-                        long days = 0;
-                        long month = 0;
-                        long year = 0;
+                        long seconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds) - TimeUnit.MILLISECONDS.toSeconds(TimeUnit.MILLISECONDS.toMinutes(milliseconds));
+                        long minutes = TimeUnit.MILLISECONDS.toMinutes(milliseconds) - TimeUnit.MILLISECONDS.toMinutes(TimeUnit.MILLISECONDS.toHours(seconds));
+                        long hours = TimeUnit.MILLISECONDS.toHours(milliseconds) - TimeUnit.MILLISECONDS.toHours(TimeUnit.MILLISECONDS.toDays(milliseconds));
+                        long days = TimeUnit.MILLISECONDS.toDays(seconds);
+                        long month = days / 30 - TimeUnit.MILLISECONDS.toDays(seconds);
+                        long year = month / 12 - days;
 
                         player.sendMessage(new TextComponent(englishConfiguration.getOnlineTimeSuccessSelf().replaceAll("%year%", "" + year).replaceAll("%month%", "" + month).replaceAll("%day%", "" + days).replaceAll("%hour%", "" + hours).replaceAll("%minute%", "" + minutes)));
-                    } else if(args.length == 1) {
-                         if (args[0].equalsIgnoreCase("on")) {
-                             if(!(mySQL.getPlayer(player.getUniqueId()).join().isShowtime())) {
-                                 mySQL.updateShowTime(player.getUniqueId(), true);
-                                 player.sendMessage(new TextComponent(englishConfiguration.getOnlineTimeSuccessEnabled()));
-                             } else {
-                                 player.sendMessage(new TextComponent(englishConfiguration.getOnlineTimeErrorsAlreadyEnabled()));
-                             }
-                         } else if(args[0].equalsIgnoreCase("off")) {
-                             if(mySQL.getPlayer(player.getUniqueId()).join().isShowtime()) {
-                                 mySQL.updateShowTime(player.getUniqueId(), false);
-                                 player.sendMessage(new TextComponent(englishConfiguration.getOnlineTimeSuccessDisabled()));
-                             } else {
-                                 player.sendMessage(new TextComponent(englishConfiguration.getOnlineTimeErrorsAlreadyDisabled()));
-                             }
-                         } else {
-                             ProxiedPlayer target = ProxyServer.getInstance().getPlayer(args[0]);
-                             if(target != null) {
-                                 if (mySQL.getPlayer(target.getUniqueId()).join().isShowtime()) {
-                                     long milliseconds = mySQL.getPlayer(player.getUniqueId()).join().getOnlineTime();
-                                     long seconds = 0;
-                                     long minutes = 0;
-                                     long hours = 0;
-                                     long days = 0;
-                                     long month = 0;
-                                     long year = 0;
+                    } else if (args.length == 1) {
+                        if (args[0].equalsIgnoreCase("on")) {
+                            if (!(mySQL.getPlayer(player.getUniqueId()).join().isShowtime())) {
+                                mySQL.updateShowTime(player.getUniqueId(), true);
+                                player.sendMessage(new TextComponent(englishConfiguration.getOnlineTimeSuccessEnabled()));
+                            } else {
+                                player.sendMessage(new TextComponent(englishConfiguration.getOnlineTimeErrorsAlreadyEnabled()));
+                            }
+                        } else if (args[0].equalsIgnoreCase("off")) {
+                            if (mySQL.getPlayer(player.getUniqueId()).join().isShowtime()) {
+                                mySQL.updateShowTime(player.getUniqueId(), false);
+                                player.sendMessage(new TextComponent(englishConfiguration.getOnlineTimeSuccessDisabled()));
+                            } else {
+                                player.sendMessage(new TextComponent(englishConfiguration.getOnlineTimeErrorsAlreadyDisabled()));
+                            }
+                        } else {
 
-                                     IPermissionManagement iPermissionManagement = CloudNetDriver.getInstance().getPermissionManagement();
-                                     String display = "&f";
-                                     for (PermissionUserGroupInfo group : Objects.requireNonNull(iPermissionManagement.getUser(target.getUniqueId())).getGroups()) {
-                                         if (Objects.requireNonNull(iPermissionManagement.getUser(target.getUniqueId())).inGroup(group.getGroup())) {
-                                             IPermissionGroup iPermissionGroup = iPermissionManagement.getGroup(group.getGroup());
-                                             if (iPermissionGroup != null) {
-                                                 display = iPermissionGroup.getDisplay();
-                                             }
-                                         }
-                                     }
+                            UUID uuid = mySQL.getPlayerFromName(args[0]).join().getUUID();
 
-                                     player.sendMessage(new TextComponent(englishConfiguration.getOnlineTimeSuccessOthers().replaceAll("%player%", display + mySQL.getPlayer(target.getUniqueId()).join().getName()).replaceAll("%year%", "" + year).replaceAll("%month%", "" + month).replaceAll("%day%", "" + days).replaceAll("%hour%", "" + hours).replaceAll("%minute%", "" + minutes)));
+                            if (mySQL.getPlayer(uuid).join().isShowtime() || player.hasPermission("*")) {
+                                long milliseconds = mySQL.getPlayer(uuid).join().getOnlineTime();
+                                long seconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds) - TimeUnit.MILLISECONDS.toSeconds(TimeUnit.MILLISECONDS.toMinutes(milliseconds));
+                                long minutes = TimeUnit.MILLISECONDS.toMinutes(milliseconds) - TimeUnit.MILLISECONDS.toMinutes(TimeUnit.MILLISECONDS.toHours(seconds));
+                                long hours = TimeUnit.MILLISECONDS.toHours(milliseconds) - TimeUnit.MILLISECONDS.toHours(TimeUnit.MILLISECONDS.toDays(milliseconds));
+                                long days = TimeUnit.MILLISECONDS.toDays(seconds);
+                                long month = days / 30 - TimeUnit.MILLISECONDS.toDays(seconds);
+                                long year = month / 12 - days;
 
-                                 } else {
-                                     player.sendMessage(new TextComponent(englishConfiguration.getOnlineTimeErrorsNotEnabled()));
-                                 }
-                             } else {
-                                 UUID uuid = mySQL.getPlayerFromName(args[0]).join().getUUID();
+                                IPermissionManagement iPermissionManagement = CloudNetDriver.getInstance().getPermissionManagement();
+                                String display = "&f";
+                                for (PermissionUserGroupInfo group : Objects.requireNonNull(iPermissionManagement.getUser(uuid)).getGroups()) {
+                                    if (Objects.requireNonNull(iPermissionManagement.getUser(uuid)).inGroup(group.getGroup())) {
+                                        IPermissionGroup iPermissionGroup = iPermissionManagement.getGroup(group.getGroup());
+                                        if (iPermissionGroup != null) {
+                                            display = iPermissionGroup.getDisplay();
+                                        }
+                                    }
+                                }
 
-                                 if (mySQL.getPlayer(uuid).join().isShowtime()) {
-                                     long milliseconds = mySQL.getPlayer(player.getUniqueId()).join().getOnlineTime();
-                                     long seconds = 0;
-                                     long minutes = 0;
-                                     long hours = 0;
-                                     long days = 0;
-                                     long month = 0;
-                                     long year = 0;
+                                player.sendMessage(new TextComponent(englishConfiguration.getOnlineTimeSuccessOthers().replaceAll("%player%", display + mySQL.getPlayer(uuid).join().getName()).replaceAll("%year%", "" + year).replaceAll("%month%", "" + month).replaceAll("%day%", "" + days).replaceAll("%hour%", "" + hours).replaceAll("%minute%", "" + minutes)));
 
-                                     IPermissionManagement iPermissionManagement = CloudNetDriver.getInstance().getPermissionManagement();
-                                     String display = "&f";
-                                     for (PermissionUserGroupInfo group : Objects.requireNonNull(iPermissionManagement.getUser(uuid)).getGroups()) {
-                                         if (Objects.requireNonNull(iPermissionManagement.getUser(uuid)).inGroup(group.getGroup())) {
-                                             IPermissionGroup iPermissionGroup = iPermissionManagement.getGroup(group.getGroup());
-                                             if (iPermissionGroup != null) {
-                                                 display = iPermissionGroup.getDisplay();
-                                             }
-                                         }
-                                     }
-
-                                     player.sendMessage(new TextComponent(englishConfiguration.getOnlineTimeSuccessOthers().replaceAll("%player%", display + mySQL.getPlayer(uuid).join().getName()).replaceAll("%year%", "" + year).replaceAll("%month%", "" + month).replaceAll("%day%", "" + days).replaceAll("%hour%", "" + hours).replaceAll("%minute%", "" + minutes)));
-
-                                 } else {
-                                     player.sendMessage(new TextComponent(englishConfiguration.getOnlineTimeErrorsNotEnabled()));
-                                 }
-                             }
-                         }
+                            } else {
+                                player.sendMessage(new TextComponent(englishConfiguration.getOnlineTimeErrorsNotEnabled()));
+                            }
+                        }
                     } else {
                         player.sendMessage(new TextComponent(englishConfiguration.getOnlineTimeUsage()));
                     }
