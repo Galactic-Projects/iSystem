@@ -103,7 +103,7 @@ public class iProxy extends Plugin {
 
                 for(ProxiedPlayer all : ProxyServer.getInstance().getPlayers()) {
                     if(mySQL != null) {
-                        mySQL.updateOnlineTime(all.getUniqueId(), 60000);
+                        mySQL.updateOnlineTime(all.getUniqueId(), 60);
                     }
                 }
 

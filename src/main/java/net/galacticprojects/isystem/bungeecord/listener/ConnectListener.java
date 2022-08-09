@@ -177,7 +177,7 @@ public class ConnectListener implements Listener {
                 }
 
                 if (playerDB.getUUID() != player.getUniqueId()) {
-                    mySQL.updatePlayer(player.getUniqueId(), player.getName(), ip, getCountry(ip), Languages.ENGLISH, OffsetDateTime.now(), englishConfiguration.getFormatOnline().replaceAll("%server%", cloudPlayer.getConnectedService().getServiceId().getName()), OffsetDateTime.now(), false, false, false);
+                    mySQL.updatePlayer(player.getUniqueId(), player.getName(), ip, getCountry(ip), Languages.ENGLISH, mySQL.getPlayer(player.getUniqueId()).join().getFirstJoin(), englishConfiguration.getFormatOnline().replaceAll("%server%", cloudPlayer.getConnectedService().getServiceId().getName()), OffsetDateTime.now(), false, false, false);
 
                 }
             }

@@ -14,6 +14,8 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -39,13 +41,12 @@ public class OnlineTimeCommand extends Command implements TabExecutor {
                 }
                 case ENGLISH -> {
                     if (args.length == 0) {
-                        long milliseconds = mySQL.getPlayer(player.getUniqueId()).join().getOnlineTime();
-                        long seconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds) - TimeUnit.MILLISECONDS.toSeconds(TimeUnit.MILLISECONDS.toMinutes(milliseconds));
-                        long minutes = TimeUnit.MILLISECONDS.toMinutes(milliseconds) - TimeUnit.MILLISECONDS.toMinutes(TimeUnit.MILLISECONDS.toHours(seconds));
-                        long hours = TimeUnit.MILLISECONDS.toHours(milliseconds) - TimeUnit.MILLISECONDS.toHours(TimeUnit.MILLISECONDS.toDays(milliseconds));
-                        long days = TimeUnit.MILLISECONDS.toDays(seconds);
-                        long month = days / 30 - TimeUnit.MILLISECONDS.toDays(seconds);
-                        long year = month / 12 - days;
+                        long seconds = mySQL.getPlayer(player.getUniqueId()).join().getOnlineTime();
+                        long year = seconds / 31556952;
+                        long month = seconds % 31556952 / 2629746;
+                        long days = seconds % 2629746 / 86400;
+                        long hours = seconds % 86400 / 3600;
+                        long minutes = seconds % 3600 / 60;
 
                         player.sendMessage(new TextComponent(englishConfiguration.getOnlineTimeSuccessSelf().replaceAll("%year%", "" + year).replaceAll("%month%", "" + month).replaceAll("%day%", "" + days).replaceAll("%hour%", "" + hours).replaceAll("%minute%", "" + minutes)));
                     } else if (args.length == 1) {
@@ -68,13 +69,12 @@ public class OnlineTimeCommand extends Command implements TabExecutor {
                             UUID uuid = mySQL.getPlayerFromName(args[0]).join().getUUID();
 
                             if (mySQL.getPlayer(uuid).join().isShowtime() || player.hasPermission("*")) {
-                                long milliseconds = mySQL.getPlayer(uuid).join().getOnlineTime();
-                                long seconds = TimeUnit.MILLISECONDS.toSeconds(milliseconds) - TimeUnit.MILLISECONDS.toSeconds(TimeUnit.MILLISECONDS.toMinutes(milliseconds));
-                                long minutes = TimeUnit.MILLISECONDS.toMinutes(milliseconds) - TimeUnit.MILLISECONDS.toMinutes(TimeUnit.MILLISECONDS.toHours(seconds));
-                                long hours = TimeUnit.MILLISECONDS.toHours(milliseconds) - TimeUnit.MILLISECONDS.toHours(TimeUnit.MILLISECONDS.toDays(milliseconds));
-                                long days = TimeUnit.MILLISECONDS.toDays(seconds);
-                                long month = days / 30 - TimeUnit.MILLISECONDS.toDays(seconds);
-                                long year = month / 12 - days;
+                                long seconds = mySQL.getPlayer(uuid).join().getOnlineTime();
+                                long year = seconds / 31556952;
+                                long month = seconds % 31556952 / 2629746;
+                                long days = seconds % 2629746 / 86400;
+                                long hours = seconds % 86400 / 3600;
+                                long minutes = seconds % 3600 / 60;
 
                                 IPermissionManagement iPermissionManagement = CloudNetDriver.getInstance().getPermissionManagement();
                                 String display = "&f";
