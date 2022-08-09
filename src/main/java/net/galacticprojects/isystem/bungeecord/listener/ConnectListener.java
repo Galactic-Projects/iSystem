@@ -85,7 +85,7 @@ public class ConnectListener implements Listener {
 
         removeTablist(player);
         updateTablist();
-        updatePlayer(player, "OFFLINE");
+        updatePlayer(player, englishConfiguration.getFormatOffline());
     }
 
     @EventHandler
@@ -97,7 +97,7 @@ public class ConnectListener implements Listener {
                 IPlayerManager playerManager = CloudNetDriver.getInstance().getServicesRegistry().getFirstService(IPlayerManager.class);
                 ICloudPlayer cloudPlayer = playerManager.getOnlinePlayer(player.getUniqueId());
                 if(cloudPlayer != null) {
-                    updatePlayer(player, "Online on " + cloudPlayer.getConnectedService().getServiceId().getName());
+                    updatePlayer(player, englishConfiguration.getFormatOnline().replaceAll("%server%", cloudPlayer.getConnectedService().getServiceId().getName()));
                 }
             }
         }, 1, TimeUnit.SECONDS);
@@ -119,7 +119,7 @@ public class ConnectListener implements Listener {
                 IPlayerManager playerManager = CloudNetDriver.getInstance().getServicesRegistry().getFirstService(IPlayerManager.class);
                 ICloudPlayer cloudPlayer = playerManager.getOnlinePlayer(player.getUniqueId());
                 if(cloudPlayer != null) {
-                    updatePlayer(player, "Online on " + cloudPlayer.getConnectedService().getServiceId().getName());
+                    updatePlayer(player, englishConfiguration.getFormatOnline().replaceAll("%server%", cloudPlayer.getConnectedService().getServiceId().getName()));
                 }
             }
         }, 1, TimeUnit.SECONDS);
@@ -136,7 +136,7 @@ public class ConnectListener implements Listener {
                     tabManager.setTablist();
                 }
             }
-        }, 30, TimeUnit.MILLISECONDS);
+        }, 1, TimeUnit.SECONDS);
     }
 
     public void removeTablist(ProxiedPlayer player) {
@@ -168,7 +168,7 @@ public class ConnectListener implements Listener {
                 ICloudPlayer cloudPlayer = playerManager.getOnlinePlayer(player.getUniqueId());
                 String ip = player.getAddress().getAddress().getHostAddress();
 
-                mySQL.createPlayer(player.getUniqueId(), player.getName(), ip, getCountry(ip), 0, Languages.ENGLISH, OffsetDateTime.now(), "Online on " + cloudPlayer.getConnectedService().getServiceId().getName(), OffsetDateTime.now(), false, false);
+                mySQL.createPlayer(player.getUniqueId(), player.getName(), ip, getCountry(ip), 0, Languages.ENGLISH, OffsetDateTime.now(), englishConfiguration.getFormatOnline().replaceAll("%server%", cloudPlayer.getConnectedService().getServiceId().getName()), OffsetDateTime.now(), false, false, false);
 
                 Player playerDB = mySQL.getPlayer(player.getUniqueId()).join();
 
@@ -177,7 +177,7 @@ public class ConnectListener implements Listener {
                 }
 
                 if (playerDB.getUUID() != player.getUniqueId()) {
-                    mySQL.updatePlayer(player.getUniqueId(), player.getName(), ip, getCountry(ip), Languages.ENGLISH, OffsetDateTime.now(), "Online on " + cloudPlayer.getConnectedService().getServiceId().getName(), OffsetDateTime.now(), false, false);
+                    mySQL.updatePlayer(player.getUniqueId(), player.getName(), ip, getCountry(ip), Languages.ENGLISH, OffsetDateTime.now(), englishConfiguration.getFormatOnline().replaceAll("%server%", cloudPlayer.getConnectedService().getServiceId().getName()), OffsetDateTime.now(), false, false, false);
 
                 }
             }

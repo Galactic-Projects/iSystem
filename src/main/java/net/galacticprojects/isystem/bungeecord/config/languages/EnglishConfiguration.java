@@ -42,6 +42,8 @@ public class EnglishConfiguration {
     private String langEng;
     private String langFre;
     private String langSpa;
+    private String formatOffline;
+    private String formatOnline;
     private String errorsPermission;
     private String errorsPlayer;
     private String errorsNotExists;
@@ -174,6 +176,14 @@ public class EnglishConfiguration {
 
             if(!(englishConfiguration.contains("Messages.Languages.Spanish"))) {
                 englishConfiguration.set("Messages.Languages.Spanish", "Spanish");
+            }
+
+            if(!(englishConfiguration.contains("Messages.Format.Offline"))) {
+                englishConfiguration.set("Messages.Format.Offline", "OFFLINE");
+            }
+
+            if(!(englishConfiguration.contains("Messages.Format.Online"))) {
+                englishConfiguration.set("Messages.Format.Online", "ONLINE (%server%)");
             }
 
             if(!(englishConfiguration.contains("Messages.System.Errors.Permission"))) {
@@ -319,6 +329,9 @@ public class EnglishConfiguration {
             langFre = englishConfiguration.getString("Messages.Languages.French");
             langSpa = englishConfiguration.getString("Messages.Languages.Spanish");
 
+            formatOffline = englishConfiguration.getString("Messages.Format.Offline");
+            formatOnline = englishConfiguration.getString("Messages.Format.Online");
+
             errorsPermission = Color.apply(englishConfiguration.getString("Messages.System.Errors.Permission"));
             errorsPlayer = Color.apply(englishConfiguration.getString("Messages.System.Errors.Player"));
             errorsNotExists = Color.apply(englishConfiguration.getString("Messages.System.Errors.NotExists"));
@@ -455,6 +468,14 @@ public class EnglishConfiguration {
 
     public String getLangSpa() {
         return langSpa;
+    }
+
+    public String getFormatOffline() {
+        return formatOffline;
+    }
+
+    public String getFormatOnline() {
+        return formatOnline;
     }
 
     public String getErrorsPermission() {

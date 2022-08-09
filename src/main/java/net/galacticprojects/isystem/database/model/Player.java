@@ -18,8 +18,9 @@ public class Player {
     private final OffsetDateTime latestJoin;
     private final boolean report;
     private final boolean teamchat;
+    private final boolean showtime;
 
-    public Player (UUID uuid, String name, String ip, String country, long onlineTime, Languages languages, OffsetDateTime firstJoin, String serverOnline, OffsetDateTime latestJoin, boolean report, boolean teamchat) {
+    public Player (UUID uuid, String name, String ip, String country, long onlineTime, Languages languages, OffsetDateTime firstJoin, String serverOnline, OffsetDateTime latestJoin, boolean report, boolean teamchat, boolean showtime) {
         this.uuid = uuid;
         this.name = name;
         this.ip = ip;
@@ -31,6 +32,7 @@ public class Player {
         this.latestJoin = latestJoin;
         this.report = report;
         this.teamchat = teamchat;
+        this.showtime = showtime;
     }
 
     public UUID getUUID() {
@@ -73,5 +75,9 @@ public class Player {
 
     public boolean isTeamchat() {
         return teamchat;
+    }
+
+    public boolean isShowtime() {
+        return showtime;
     }
 }

@@ -205,7 +205,9 @@ public class MaintenanceCommand extends Command implements TabExecutor {
             return time;
         } else if(args.length >= 3) {
             List<String> players = new ArrayList<>();
-            players.add(sender.getName());
+            for(ProxiedPlayer all : ProxyServer.getInstance().getPlayers()) {
+                players.add(all.getName());
+            }
             return players;
         }
         return null;
