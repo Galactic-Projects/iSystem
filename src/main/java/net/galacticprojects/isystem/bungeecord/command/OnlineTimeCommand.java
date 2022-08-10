@@ -7,6 +7,7 @@ import net.galacticprojects.isystem.database.MySQL;
 import net.galacticprojects.isystem.utils.JavaInstance;
 import net.galacticprojects.isystem.utils.MojangProfileService;
 import net.galacticprojects.isystem.utils.TimeHelper;
+import net.galacticprojects.isystem.utils.color.Color;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -82,7 +83,7 @@ public class OnlineTimeCommand extends Command implements TabExecutor {
                                     if (Objects.requireNonNull(iPermissionManagement.getUser(uuid)).inGroup(group.getGroup())) {
                                         IPermissionGroup iPermissionGroup = iPermissionManagement.getGroup(group.getGroup());
                                         if (iPermissionGroup != null) {
-                                            display = iPermissionGroup.getDisplay();
+                                            display = Color.apply(iPermissionGroup.getDisplay());
                                         }
                                     }
                                 }
