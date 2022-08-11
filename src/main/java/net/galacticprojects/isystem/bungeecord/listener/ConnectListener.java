@@ -97,7 +97,7 @@ public class ConnectListener implements Listener {
                 IPlayerManager playerManager = CloudNetDriver.getInstance().getServicesRegistry().getFirstService(IPlayerManager.class);
                 ICloudPlayer cloudPlayer = playerManager.getOnlinePlayer(player.getUniqueId());
                 if(cloudPlayer != null) {
-                    updatePlayer(player, englishConfiguration.getFormatOnline().replaceAll("%server%", cloudPlayer.getConnectedService().getServiceId().getName()));
+                    updatePlayer(player, englishConfiguration.getFormatOnline().replaceAll("%server%", cloudPlayer.getConnectedService().getServiceId().getName().toUpperCase()));
                 }
             }
         }, 1, TimeUnit.SECONDS);
@@ -119,7 +119,7 @@ public class ConnectListener implements Listener {
                 IPlayerManager playerManager = CloudNetDriver.getInstance().getServicesRegistry().getFirstService(IPlayerManager.class);
                 ICloudPlayer cloudPlayer = playerManager.getOnlinePlayer(player.getUniqueId());
                 if(cloudPlayer != null) {
-                    updatePlayer(player, englishConfiguration.getFormatOnline().replaceAll("%server%", cloudPlayer.getConnectedService().getServiceId().getName()));
+                    updatePlayer(player, englishConfiguration.getFormatOnline().replaceAll("%server%", cloudPlayer.getConnectedService().getServiceId().getName().toUpperCase()));
                 }
             }
         }, 1, TimeUnit.SECONDS);
@@ -168,7 +168,9 @@ public class ConnectListener implements Listener {
                 ICloudPlayer cloudPlayer = playerManager.getOnlinePlayer(player.getUniqueId());
                 String ip = player.getAddress().getAddress().getHostAddress();
 
-                mySQL.createPlayer(player.getUniqueId(), player.getName(), ip, getCountry(ip), 0, Languages.ENGLISH, OffsetDateTime.now(), englishConfiguration.getFormatOnline().replaceAll("%server%", cloudPlayer.getConnectedService().getServiceId().getName()), OffsetDateTime.now(), false, false, false);
+                if(mySQL.getPlayer(player.getUniqueId()) == null) {
+                    mySQL.createPlayer(player.getUniqueId(), player.getName(), ip, getCountry(ip), 0, Languages.ENGLISH, OffsetDateTime.now(), englishConfiguration.getFormatOnline().replaceAll("%server%", cloudPlayer.getConnectedService().getServiceId().getName().toUpperCase()), OffsetDateTime.now(), false, false, false);
+                }
 
                 Player playerDB = mySQL.getPlayer(player.getUniqueId()).join();
 
@@ -176,12 +178,13 @@ public class ConnectListener implements Listener {
                     return;
                 }
 
-                if (playerDB.getUUID() != player.getUniqueId()) {
-                    mySQL.updatePlayer(player.getUniqueId(), player.getName(), ip, getCountry(ip), Languages.ENGLISH, mySQL.getPlayer(player.getUniqueId()).join().getFirstJoin(), englishConfiguration.getFormatOnline().replaceAll("%server%", cloudPlayer.getConnectedService().getServiceId().getName()), OffsetDateTime.now(), false, false, false);
-
+                if (playerDB.getUUID() == player.getUniqueId()) {
+                    if(playerDB.getName() != player.getName() || playerDB.getIP() != ip || playerDB.getCountry() != getCountry(ip)) {
+                        mySQL.updatePlayer(player.getUniqueId(), player.getName(), ip, getCountry(ip), Languages.ENGLISH, mySQL.getPlayer(player.getUniqueId()).join().getFirstJoin(), englishConfiguration.getFormatOnline().replaceAll("%server%", cloudPlayer.getConnectedService().getServiceId().getName().toUpperCase()), OffsetDateTime.now(), false, false, false);
+                    }
                 }
             }
-        }, 40, TimeUnit.MILLISECONDS);
+        }, 1, TimeUnit.SECONDS);
     }
 
     public void updatePlayer(ProxiedPlayer player, String service) {
@@ -190,7 +193,7 @@ public class ConnectListener implements Listener {
             public void run() {
                 mySQL.updateServer(player.getUniqueId(), service);
             }
-        }, 20, TimeUnit.MILLISECONDS);
+        }, 1, TimeUnit.SECONDS);
     }
 
     public void checkBan(ProxiedPlayer player) {
@@ -272,7 +275,7 @@ public class ConnectListener implements Listener {
             String websiteResponse = stream.readLine();
             stream.close();
             JsonObject resp = new Gson().fromJson(websiteResponse, JsonObject.class);
-            if (resp != null && resp.has("country")) return resp.get("country").getAsString();
+            if (resp != null && resp.has("country")) return resp.get("country").getAsString().toUpperCase();
             return null;
         } catch(MalformedURLException e) {
             e.printStackTrace();

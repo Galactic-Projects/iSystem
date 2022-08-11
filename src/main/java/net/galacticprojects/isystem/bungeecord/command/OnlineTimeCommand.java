@@ -69,29 +69,33 @@ public class OnlineTimeCommand extends Command implements TabExecutor {
 
                             UUID uuid = mySQL.getPlayerFromName(args[0]).join().getUUID();
 
-                            if (mySQL.getPlayer(uuid).join().isShowtime() || player.hasPermission("*")) {
-                                long seconds = mySQL.getPlayer(uuid).join().getOnlineTime();
-                                long year = seconds / 31556952;
-                                long month = seconds % 31556952 / 2629746;
-                                long days = seconds % 2629746 / 86400;
-                                long hours = seconds % 86400 / 3600;
-                                long minutes = seconds % 3600 / 60;
+                            if (player.getUniqueId() != uuid) {
+                                if (mySQL.getPlayer(uuid).join().isShowtime() || player.hasPermission("*")) {
+                                    long seconds = mySQL.getPlayer(uuid).join().getOnlineTime();
+                                    long year = seconds / 31556952;
+                                    long month = seconds % 31556952 / 2629746;
+                                    long days = seconds % 2629746 / 86400;
+                                    long hours = seconds % 86400 / 3600;
+                                    long minutes = seconds % 3600 / 60;
 
-                                IPermissionManagement iPermissionManagement = CloudNetDriver.getInstance().getPermissionManagement();
-                                String display = "&f";
-                                for (PermissionUserGroupInfo group : Objects.requireNonNull(iPermissionManagement.getUser(uuid)).getGroups()) {
-                                    if (Objects.requireNonNull(iPermissionManagement.getUser(uuid)).inGroup(group.getGroup())) {
-                                        IPermissionGroup iPermissionGroup = iPermissionManagement.getGroup(group.getGroup());
-                                        if (iPermissionGroup != null) {
-                                            display = Color.apply(iPermissionGroup.getDisplay());
+                                    IPermissionManagement iPermissionManagement = CloudNetDriver.getInstance().getPermissionManagement();
+                                    String display = "&f";
+                                    for (PermissionUserGroupInfo group : Objects.requireNonNull(iPermissionManagement.getUser(uuid)).getGroups()) {
+                                        if (Objects.requireNonNull(iPermissionManagement.getUser(uuid)).inGroup(group.getGroup())) {
+                                            IPermissionGroup iPermissionGroup = iPermissionManagement.getGroup(group.getGroup());
+                                            if (iPermissionGroup != null) {
+                                                display = Color.apply(iPermissionGroup.getDisplay());
+                                            }
                                         }
                                     }
+
+                                    player.sendMessage(new TextComponent(englishConfiguration.getOnlineTimeSuccessOthers().replaceAll("%player%", display + mySQL.getPlayer(uuid).join().getName()).replaceAll("%year%", "" + year).replaceAll("%month%", "" + month).replaceAll("%day%", "" + days).replaceAll("%hour%", "" + hours).replaceAll("%minute%", "" + minutes)));
+
+                                } else {
+                                    player.sendMessage(new TextComponent(englishConfiguration.getOnlineTimeErrorsNotEnabled()));
                                 }
-
-                                player.sendMessage(new TextComponent(englishConfiguration.getOnlineTimeSuccessOthers().replaceAll("%player%", display + mySQL.getPlayer(uuid).join().getName()).replaceAll("%year%", "" + year).replaceAll("%month%", "" + month).replaceAll("%day%", "" + days).replaceAll("%hour%", "" + hours).replaceAll("%minute%", "" + minutes)));
-
                             } else {
-                                player.sendMessage(new TextComponent(englishConfiguration.getOnlineTimeErrorsNotEnabled()));
+                                player.chat("/onlinetime");
                             }
                         }
                     } else {
