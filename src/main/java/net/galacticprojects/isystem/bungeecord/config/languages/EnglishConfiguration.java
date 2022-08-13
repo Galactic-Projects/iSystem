@@ -71,6 +71,14 @@ public class EnglishConfiguration {
     private String onlineTimeErrorsAlreadyDisabled;
     private String kickMaintenanceCurrently;
     private String kickMaintenanceNow;
+    private String kickNetworkBanTemporary;
+    private String kickNetworkBanPermanently;
+    private String kickServerBanTemporary;
+    private String kickServerBanPermanently;
+    private String chatNetworkBanTemporary;
+    private String chatNetworkBanPermanently;
+    private String chatServerBanTemporary;
+    private String chatServerBanPermanently;
 
     public EnglishConfiguration () throws IOException {
         JavaInstance.put(this);
@@ -279,7 +287,7 @@ public class EnglishConfiguration {
             }
 
             if(!(englishConfiguration.contains("Messages.System.OnlineTime.Errors.AlreadyOff"))) {
-                englishConfiguration.set("Messages.System.OnlineTime.Errors.AlreadyOff", "%onlinePrefix% &cYou already disabled showing  your onlinetime to others.");
+                englishConfiguration.set("Messages.System.OnlineTime.Errors.AlreadyOff", "%onlinePrefix% &cYou already disabled showing your onlinetime to others.");
             }
 
             if(!(englishConfiguration.contains("Messages.System.OnlineTime.Errors.NotEnabled"))) {
@@ -293,6 +301,39 @@ public class EnglishConfiguration {
             if(!(englishConfiguration.contains("Messages.System.Kick.Maintenance.Now"))) {
                 englishConfiguration.set("Messages.System.Kick.Maintenance.Now", "%menuPrefix%\n&7The &bnetwork &7is &3now &7in &cmaintenance mode&7.\n\n&7► &cReason &8■ &4%reason%\n&7► &cEnd Date &8■ &4%enddate%\n\n&7Want to contact us?\n&7► &dWebsite &8■ &5www.GalacticProjects.net");
             }
+
+            if(!(englishConfiguration.contains("Messages.System.Kick.Ban.Network.Temporary"))) {
+                englishConfiguration.set("Messages.System.Kick.Ban.Network.Temporary", "%menuPrefix%\n&7You were &btemporary &cbanned &7from our &3network&7.\n\n&7► &cBan-ID &8■ &4%id%\n&7► &cStaff &8■ &4%staffName%\n&7► &cReason &8■ &4%reason%\n&7► &cDuration &8■ &4%duration%\n&7► &cUnban-Date &8■ &4%unbanDate%\n\n&7Do you think you were wrongly banned?\n&7\nYou can submit a unban request at the following links:\n&7► &dForum &8■ &5foum.GalacticProjects.net");
+            }
+
+            if(!(englishConfiguration.contains("Messages.System.Kick.Ban.Network.Permanently"))) {
+                englishConfiguration.set("Messages.System.Kick.Ban.Network.Permanently", "%menuPrefix%\n&7You were &bpermanently &cbanned &7from our &3network&7.\n\n&7► &cBan-ID &8■ &4%id%\n&7► &cStaff &8■ &4%staffName%\n&7► &cReason &8■ &4%reason%\n&7► &cUnban-Date &8■ &4%unbanDate%\n\n&7Do you think you were wrongly banned?\n&7\nYou can submit a unban request at the following links:\n&7► &dForum &8■ &5foum.GalacticProjects.net");
+            }
+
+            if(!(englishConfiguration.contains("Messages.System.Kick.Ban.Server.Temporary"))) {
+                englishConfiguration.set("Messages.System.Kick.Ban.Server.Temporary", "%chatPrefix% &7You were &btemporary &cbanned &7from this &3server&7.\n&7► &cBan-ID &8■ &4%id%\n&7► &cStaff &8■ &4%staffName%\n&7► &cReason &8■ &4%reason%\n&7► &cDuration &8■ &4%duration%\n&7► &cUnban-Date &8■ &4%unbanDate%\n&7Do you think you were wrongly banned?\n&7\nYou can submit a unban request at the following links:\n&7► &dForum &8■ &5foum.GalacticProjects.net");
+            }
+
+            if(!(englishConfiguration.contains("Messages.System.Kick.Ban.Server.Permanently"))) {
+                englishConfiguration.set("Messages.System.Kick.Ban.Server.Permanently", "%chatPrefix% &7You were &bpermanently &cbanned &7from this &3server&7.\n&7► &cBan-ID &8■ &4%id%\n&7► &cStaff &8■ &4%staffName%\n&7► &cReason &8■ &4%reason%\n&7► &cUnban-Date &8■ &4%unbanDate%\n&7Do you think you were wrongly banned?\n&7\nYou can submit a unban request at the following links:\n&7► &dForum &8■ &5foum.GalacticProjects.net");
+            }
+
+            if(!(englishConfiguration.contains("Messages.System.Kick.Mute.Network.Temporary"))) {
+                englishConfiguration.set("Messages.System.Kick.Mute.Network.Temporary", "%chatPrefix% &7You were &btemporary &cbanned &7from the &4chat &7of our &3network&7.\n&7► &cBan-ID &8■ &4%id%\n&7► &cStaff &8■ &4%staffName%\n&7► &cReason &8■ &4%reason%\n&7► &cDuration &8■ &4%duration%\n&7► &cMessage &8■ &4%message%\n&7► &cUnban-Date &8■ &4%unbanDate%\n&7Do you think you were wrongly banned?\n&7\nYou can submit a unban request at the following links:\n&7► &dForum &8■ &5foum.GalacticProjects.net");
+            }
+
+            if(!(englishConfiguration.contains("Messages.System.Chat.Mute.Network.Permanently"))) {
+                englishConfiguration.set("Messages.System.Chat.Mute.Network.Permanently", "%chatPrefix% &7You were &bpermanently &cbanned &7from the &4chat &7of our &3network&7.\n&7► &cBan-ID &8■ &4%id%\n&7► &cStaff &8■ &4%staffName%\n&7► &cReason &8■ &4%reason%\n&7► &cMessage &8■ &4%message%\n&7► &cUnban-Date &8■ &4%unbanDate%\n&7Do you think you were wrongly banned?\n&7\nYou can submit a unban request at the following links:\n&7► &dForum &8■ &5foum.GalacticProjects.net");
+            }
+
+            if(!(englishConfiguration.contains("Messages.System.Kick.Mute.Server.Temporary"))) {
+                englishConfiguration.set("Messages.System.Kick.Mute.Server.Temporary", "%chatPrefix% &7You were &btemporary &cbanned &7from the &4chat &7of this &3server&7.\n&7► &cBan-ID &8■ &4%id%\n&7► &cStaff &8■ &4%staffName%\n&7► &cReason &8■ &4%reason%\n&7► &cDuration &8■ &4%duration%\n&7► &cMessage &8■ &4%message%\n&7► &cUnban-Date &8■ &4%unbanDate%\n&7Do you think you were wrongly banned?\n&7\nYou can submit a unban request at the following links:\n&7► &dForum &8■ &5foum.GalacticProjects.net");
+            }
+
+            if(!(englishConfiguration.contains("Messages.System.Chat.Mute.Server.Permanently"))) {
+                englishConfiguration.set("Messages.System.Chat.Mute.Server.Permanently", "%chatPrefix% &7You were &bpermanently &cbanned &7from the &4chat &7of this &3server&7.\n&7► &cBan-ID &8■ &4%id%\n&7► &cStaff &8■ &4%staffName%\n&7► &cReason &8■ &4%reason%\n&7► &cMessage &8■ &4%message%\n&7► &cUnban-Date &8■ &4%unbanDate%\n&7Do you think you were wrongly banned?\n&7\nYou can submit a unban request at the following links:\n&7► &dForum &8■ &5foum.GalacticProjects.net");
+            }
+
 
             ConfigurationProvider.getProvider(YamlConfiguration.class).save(englishConfiguration, english);
 
@@ -364,7 +405,15 @@ public class EnglishConfiguration {
 
             kickMaintenanceCurrently = Color.apply(englishConfiguration.getString("Messages.System.Kick.Maintenance.Currently").replaceAll("%menuPrefix%", mainConfiguration.getMenuPrefix()));
             kickMaintenanceNow = Color.apply(englishConfiguration.getString("Messages.System.Kick.Maintenance.Now").replaceAll("%menuPrefix%", mainConfiguration.getMenuPrefix()));
-
+            kickNetworkBanTemporary = Color.apply(englishConfiguration.getString("Messages.System.Kick.Ban.Network.Permanently").replaceAll("%menuPrefix%", mainConfiguration.getMenuPrefix()));
+            kickNetworkBanPermanently = Color.apply(englishConfiguration.getString("Messages.System.Kick.Ban.Network.Temporary").replaceAll("%menuPrefix%", mainConfiguration.getMenuPrefix()));
+            kickServerBanTemporary = Color.apply(englishConfiguration.getString("Messages.System.Kick.Ban.Server.Permanently").replaceAll("%chatPrefix%", mainConfiguration.getChatPrefix()));
+            kickServerBanPermanently = Color.apply(englishConfiguration.getString("Messages.System.Kick.Ban.Server.Permanently").replaceAll("%chatPrefix%", mainConfiguration.getChatPrefix()));
+            chatNetworkBanTemporary = Color.apply(englishConfiguration.getString("Messages.System.Kick.Mute.Network.Temporary").replaceAll("%chatPrefix%", mainConfiguration.getChatPrefix()));
+            chatNetworkBanPermanently = Color.apply(englishConfiguration.getString("Messages.System.Chat.Mute.Network.Permanently").replaceAll("%chatPrefix%", mainConfiguration.getChatPrefix()));
+            chatServerBanTemporary = Color.apply(englishConfiguration.getString("Messages.System.Kick.Mute.Server.Temporary").replaceAll("%chatPrefix%", mainConfiguration.getChatPrefix()));
+            chatServerBanPermanently = Color.apply(englishConfiguration.getString("Messages.System.Chat.Mute.Server.Permanently").replaceAll("%chatPrefix%", mainConfiguration.getChatPrefix()));
+        
         } catch (IOException e){
             throw new RuntimeException(e);
         }
@@ -582,5 +631,37 @@ public class EnglishConfiguration {
 
     public String getKickMaintenanceNow() {
         return kickMaintenanceNow;
+    }
+
+    public String getKickNetworkBanTemporary() {
+        return kickNetworkBanTemporary;
+    }
+
+    public String getKickNetworkBanPermanently() {
+        return kickNetworkBanPermanently;
+    }
+
+    public String getKickServerBanTemporary() {
+        return kickServerBanTemporary;
+    }
+
+    public String getKickServerBanPermanently() {
+        return kickServerBanPermanently;
+    }
+
+    public String getChatNetworkBanTemporary() {
+        return chatNetworkBanTemporary;
+    }
+
+    public String getChatNetworkBanPermanently() {
+        return chatNetworkBanPermanently;
+    }
+
+    public String getChatServerBanTemporary() {
+        return chatServerBanTemporary;
+    }
+
+    public String getChatServerBanPermanently() {
+        return chatServerBanPermanently;
     }
 }

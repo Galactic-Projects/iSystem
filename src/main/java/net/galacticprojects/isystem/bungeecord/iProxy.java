@@ -10,6 +10,7 @@ import net.galacticprojects.isystem.bungeecord.config.MainConfiguration;
 import net.galacticprojects.isystem.bungeecord.config.PermissionConfiguration;
 import net.galacticprojects.isystem.bungeecord.config.languages.EnglishConfiguration;
 import net.galacticprojects.isystem.bungeecord.config.languages.GermanConfiguration;
+import net.galacticprojects.isystem.bungeecord.listener.ChatListener;
 import net.galacticprojects.isystem.bungeecord.listener.ConnectListener;
 
 
@@ -80,14 +81,18 @@ public class iProxy extends Plugin {
         new MySQL(() -> {
             SqlConfiguration sql = JavaInstance.get(SqlConfiguration.class);
             HikariConfig poolConfig = new HikariConfig();
-            poolConfig.setConnectionTimeout(7500);
-            poolConfig.setMaximumPoolSize(8);
-            poolConfig.setMinimumIdle(1);
-            poolConfig.setJdbcUrl("jdbc:mysql://" + sql.getHost() + ":" + sql.getPort() + "/" + sql.getDatabase()
-                    + "?serverTimezone=UTC&useLegacyDatetimeCode=false");
-            System.out.println(poolConfig.getJdbcUrl());
-            poolConfig.setUsername(sql.getUser());
-            poolConfig.setPassword(sql.getPassword());
+            if(sql != null) {
+                poolConfig.setConnectionTimeout(7500);
+                poolConfig.setMaximumPoolSize(8);
+                poolConfig.setMinimumIdle(1);
+                if (sql.getHost() != null && sql.getPort() != null && sql.getDatabase() != null && sql.getUser() != null && sql.getPassword() != null) {
+                    poolConfig.setJdbcUrl("jdbc:mysql://" + sql.getHost() + ":" + sql.getPort() + "/" + sql.getDatabase()
+                            + "?serverTimezone=UTC&useLegacyDatetimeCode=false");
+                    System.out.println(poolConfig.getJdbcUrl());
+                    poolConfig.setUsername(sql.getUser());
+                    poolConfig.setPassword(sql.getPassword());
+                }
+            }
             return new HikariPool(poolConfig);
         });
     }
@@ -117,6 +122,7 @@ public class iProxy extends Plugin {
     public void initializeListener(){
         manager.registerListener(this, new ConnectListener());
         manager.registerListener(this, new PingListener());
+        manager.registerListener(this, new ChatListener());
     }
 
     public void initializeCommands() {

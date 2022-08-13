@@ -210,58 +210,32 @@ public class ConnectListener implements Listener {
                     return;
                 }
                 switch (ban.getType().name()) {
-                    case "nban": {
+                    case "nban" -> {
 
                         switch (Boolean.toString(ban.isPermanent())) {
-                            case "true": {
+                            case "true" -> {
 
                                 break;
                             }
-                            case "false": {
+                            case "false" -> {
 
                             }
                         }
 
                         break;
                     }
-                    case "sban": {
+                    case "sban" -> {
 
                         switch (Boolean.toString(ban.isPermanent())) {
-                            case "true": {
+                            case "true" -> {
 
                                 break;
                             }
-                            case "false": {
-
-                            }
-                        }
-                        break;
-                    }
-                    case "nmute": {
-
-                        switch (Boolean.toString(ban.isPermanent())) {
-                            case "true": {
-
-                                break;
-                            }
-                            case "false": {
-
-                            }
-                        }
-                        break;
-                    }
-                    case "smute": {
-
-                        switch (Boolean.toString(ban.isPermanent())) {
-                            case "true": {
-                                break;
-                            }
-                            case "false": {
+                            case "false" -> {
 
                             }
                         }
                     }
-
                 }
             }
         }, 20, TimeUnit.MILLISECONDS);

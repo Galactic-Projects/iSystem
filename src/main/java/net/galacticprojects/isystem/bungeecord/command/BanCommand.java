@@ -46,14 +46,14 @@ public class BanCommand extends Command implements TabExecutor {
 
     }
 
-    public void banPlayer(ProxiedPlayer player, CommandSender sender, String staff, String reason, BanType type, int duration) {
+    public void banPlayer(ProxiedPlayer player, CommandSender sender, String staff, String reason, String server, BanType type, int duration) {
 
         switch (type.name().toLowerCase()) {
             case "nban": {
                 if (duration == 0 || duration == -1) {
                     OffsetDateTime time = OffsetDateTime.now().plusYears(100);
                     String ip = player.getAddress().toString().replace(":" + player.getAddress().getPort(), "");
-                    mySQL.createBan(player.getUniqueId(), staff, ip, reason, type, time, OffsetDateTime.now(), -1);
+                    mySQL.createBan(player.getUniqueId(), staff, ip, reason, server, type, time, OffsetDateTime.now(), -1);
                     StringBuilder builder = new StringBuilder();
                     builder.append("");
                     player.disconnect(new TextComponent(Color.apply(builder.toStringClear())));
@@ -63,7 +63,7 @@ public class BanCommand extends Command implements TabExecutor {
 
                 OffsetDateTime time = OffsetDateTime.now().plusDays(duration);
                 String ip = player.getAddress().toString().replace(":" + player.getAddress().getPort(), "");
-                mySQL.createBan(player.getUniqueId(), staff, ip, reason, type, time, OffsetDateTime.now(), duration);
+                mySQL.createBan(player.getUniqueId(), staff, ip, reason, server, type, time, OffsetDateTime.now(), duration);
                 StringBuilder builder = new StringBuilder();
                 builder.append("");
                 player.disconnect(new TextComponent(Color.apply(builder.toStringClear())));
@@ -74,7 +74,7 @@ public class BanCommand extends Command implements TabExecutor {
                 if (duration == 0 || duration == -1) {
                     OffsetDateTime time = OffsetDateTime.now().plusYears(100);
                     String ip = player.getAddress().toString().replace(":" + player.getAddress().getPort(), "");
-                    mySQL.createBan(player.getUniqueId(), staff, ip, reason, type, time, OffsetDateTime.now(), -1);
+                    mySQL.createBan(player.getUniqueId(), staff, ip, reason, server, type, time, OffsetDateTime.now(), -1);
                     StringBuilder builder = new StringBuilder();
                     builder.append("");
                     player.disconnect(new TextComponent(Color.apply(builder.toStringClear())));
@@ -84,7 +84,7 @@ public class BanCommand extends Command implements TabExecutor {
 
                 OffsetDateTime time = OffsetDateTime.now().plusDays(duration);
                 String ip = player.getAddress().toString().replace(":" + player.getAddress().getPort(), "");
-                mySQL.createBan(player.getUniqueId(), staff, ip, reason, type, time, OffsetDateTime.now(), duration);
+                mySQL.createBan(player.getUniqueId(), staff, ip, reason, server, type, time, OffsetDateTime.now(), duration);
                 StringBuilder builder = new StringBuilder();
                 builder.append("");
                 player.disconnect(new TextComponent(Color.apply(builder.toStringClear())));
@@ -96,7 +96,7 @@ public class BanCommand extends Command implements TabExecutor {
                 if (duration == 0 || duration == -1) {
                     OffsetDateTime time = OffsetDateTime.now().plusYears(100);
                     String ip = player.getAddress().toString().replace(":" + player.getAddress().getPort(), "");
-                    mySQL.createBan(player.getUniqueId(), staff, ip, reason, type, time, OffsetDateTime.now(), -1);
+                    mySQL.createBan(player.getUniqueId(), staff, ip, reason, server, type, time, OffsetDateTime.now(), -1);
                     StringBuilder builder = new StringBuilder();
                     builder.append("");
                     player.sendMessage(new TextComponent(Color.apply(builder.toStringClear())));
@@ -106,7 +106,7 @@ public class BanCommand extends Command implements TabExecutor {
 
                 OffsetDateTime time = OffsetDateTime.now().plusDays(duration);
                 String ip = player.getAddress().toString().replace(":" + player.getAddress().getPort(), "");
-                mySQL.createBan(player.getUniqueId(), staff, ip, reason, type, time, OffsetDateTime.now(), duration);
+                mySQL.createBan(player.getUniqueId(), staff, ip, reason, server, type, time, OffsetDateTime.now(), duration);
                 StringBuilder builder = new StringBuilder();
                 builder.append("");
                 player.sendMessage(new TextComponent(Color.apply(builder.toStringClear())));
@@ -118,7 +118,7 @@ public class BanCommand extends Command implements TabExecutor {
                 if (duration == 0 || duration == -1) {
                     OffsetDateTime time = OffsetDateTime.now().plusYears(100);
                     String ip = player.getAddress().toString().replace(":" + player.getAddress().getPort(), "");
-                    mySQL.createBan(player.getUniqueId(), staff, ip, reason, type, time, OffsetDateTime.now(), -1);
+                    mySQL.createBan(player.getUniqueId(), staff, ip, reason, server, type, time, OffsetDateTime.now(), -1);
                     StringBuilder builder = new StringBuilder();
                     builder.append("");
                     player.sendMessage(new TextComponent(Color.apply(builder.toStringClear())));
@@ -128,7 +128,7 @@ public class BanCommand extends Command implements TabExecutor {
 
                 OffsetDateTime time = OffsetDateTime.now().plusDays(duration);
                 String ip = player.getAddress().toString().replace(":" + player.getAddress().getPort(), "");
-                mySQL.createBan(player.getUniqueId(), staff, ip, reason, type, time, OffsetDateTime.now(), duration);
+                mySQL.createBan(player.getUniqueId(), staff, ip, reason, server, type, time, OffsetDateTime.now(), duration);
                 StringBuilder builder = new StringBuilder();
                 builder.append("");
                 player.sendMessage(new TextComponent(Color.apply(builder.toStringClear())));

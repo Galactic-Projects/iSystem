@@ -12,16 +12,18 @@ public class Ban {
     private final String ip;
 
     private final String reason;
+    private final String server;
     private final BanType type;
     private final OffsetDateTime endTime;
     private final OffsetDateTime creationTime;
     private final int duration;
 
-    public Ban(UUID player, String staff, String ip, String reason, BanType type, OffsetDateTime endTime, OffsetDateTime creationTime, int duration) {
+    public Ban(UUID player, String staff, String ip, String reason, String server, BanType type, OffsetDateTime endTime, OffsetDateTime creationTime, int duration) {
         this.player = player;
         this.staff = staff;
         this.ip = ip;
         this.reason = reason;
+        this.server = server;
         this.type = type;
         this.endTime = endTime;
         this.creationTime = creationTime;
@@ -52,6 +54,10 @@ public class Ban {
         return reason;
     }
 
+    public String getServer() {
+        return server;
+    }
+
     public BanType getType() {
         return type;
     }
@@ -67,6 +73,5 @@ public class Ban {
     public int getDuration() {
         return duration;
     }
-
 
 }

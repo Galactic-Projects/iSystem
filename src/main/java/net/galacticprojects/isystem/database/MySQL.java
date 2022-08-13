@@ -92,13 +92,15 @@ public class MySQL {
     public void createTables() {
         try (Connection connection = pool.getConnection()) {
 
-            PreparedStatement playersBans = connection.prepareStatement("CREATE TABLE IF NOT EXISTS PlayerBans(ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, UUID VARCHAR(36), STAFF VARCHAR(36), IP VARCHAR(16), REASON VARCHAR(100), TYPE VARCHAR(12), ENDTIME VARCHAR(256), CREATIONTIME VARCHAR(32), DURATION VARCHAR(20));");
+            PreparedStatement playersBans = connection.prepareStatement("CREATE TABLE IF NOT EXISTS PlayerBans(ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, UUID VARCHAR(36), STAFF VARCHAR(36), IP VARCHAR(16), REASON VARCHAR(100), SERVER VARCHAR(100), TYPE VARCHAR(12), ENDTIME VARCHAR(256), CREATIONTIME VARCHAR(32), DURATION VARCHAR(20));");
             PreparedStatement playerData = connection.prepareStatement("CREATE TABLE IF NOT EXISTS PlayerData(ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, UUID VARCHAR(36), NAME VARCHAR(16), IP VARCHAR(16), COUNTRY VARCHAR(64), ONLINETIME LONGTEXT NOT NULL DEFAULT 0, LANGUAGE VARCHAR(86), FIRSTJOIN VARCHAR(256), SERVERONLINE VARCHAR(64) NOT NULL DEFAULT '', LATESTJOIN VARCHAR(256), REPORT BOOLEAN NOT NULL DEFAULT false, TEAMCHAT BOOLEAN NOT NULL DEFAULT false, SHOWTIME BOOLEAN NOT NULL DEFAULT false);");
+            PreparedStatement playerHistory = connection.prepareStatement("CREATE TABLE IF NOT EXISTS PlayerHistory(ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, UUID VARCHAR(36), STAFF VARCHAR(36), IP VARCHAR(16), REASON VARCHAR(100), SERVER VARCHAR(100), TYPE VARCHAR(12), ENDTIME VARCHAR(256), CREATIONTIME VARCHAR(32), DURATION VARCHAR(20))");
             PreparedStatement clan = connection.prepareStatement("CREATE TABLE IF NOT EXISTS Clans();");
             PreparedStatement clanData = connection.prepareStatement("CREATE TABLE IF NOT EXISTS ClansData();");
 
             playersBans.executeUpdate();
             playerData.executeUpdate();
+            playerHistory.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("[SQLDatabase] A SQLException occurred! Please ignore this Error!!");
@@ -315,20 +317,21 @@ public class MySQL {
         }, service);
     }
 
-    public CompletableFuture<Ban> createBan(final UUID player, final String staff, String ip, final String reason, BanType type, final OffsetDateTime time, final OffsetDateTime creationTime, int duration) {
+    public CompletableFuture<Ban> createBan(final UUID player, final String staff, String ip, final String reason, final String server,  BanType type, final OffsetDateTime time, final OffsetDateTime creationTime, int duration) {
         return CompletableFuture.supplyAsync(() -> {
             try (Connection connection = pool.getConnection()) {
-                final PreparedStatement statement = connection.prepareStatement("INSERT INTO PlayerBans (UUID, STAFF, IP, REASON, TYPE, ENDTIME, CREATIONTIME, DURATION) VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
+                final PreparedStatement statement = connection.prepareStatement("INSERT INTO PlayerBans (UUID, STAFF, IP, REASON, SERVER, TYPE, ENDTIME, CREATIONTIME, DURATION) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);");
                 statement.setString(1, player.toString());
                 statement.setString(2, staff);
                 statement.setString(3, ip);
                 statement.setString(4, reason);
-                statement.setString(5, type.name());
-                statement.setString(6, TimeHelper.toString(time));
-                statement.setString(7, TimeHelper.toString(creationTime));
-                statement.setInt(8, duration);
+                statement.setString(5, server);
+                statement.setString(6, type.name());
+                statement.setString(7, TimeHelper.toString(time));
+                statement.setString(8, TimeHelper.toString(creationTime));
+                statement.setInt(9, duration);
                 statement.executeUpdate();
-                Ban ban = new Ban(player, staff, ip, reason, type, time, creationTime, duration);
+                Ban ban = new Ban(player, staff, ip, reason, server, type, time, creationTime, duration);
                 banCache.put(player, ban);
                 return ban;
             } catch (SQLException e) {
@@ -339,23 +342,24 @@ public class MySQL {
         }, service);
     }
 
-    public CompletableFuture<Ban> updateBan(final UUID player, final String staff, String ip, final String reason, BanType type, final OffsetDateTime endtime, final OffsetDateTime creationTime, int duration) {
+    public CompletableFuture<Ban> updateBan(final UUID player, final String staff, String ip, final String reason, final String server, BanType type, final OffsetDateTime endtime, final OffsetDateTime creationTime, int duration) {
         return CompletableFuture.supplyAsync(() -> {
             try (Connection connection = pool.getConnection()) {
                 PreparedStatement state = connection.prepareStatement("DELETE * FROM PlayerBans WHERE UUID = ?");
                 state.setString(1, player.toString());
                 state.executeUpdate();
-                final PreparedStatement statement = connection.prepareStatement("INSERT INTO PlayerBans (UUID, STAFF, IP, REASON, TYPE, ENDTIME, CREATIONTIME, DURATION) VALUES (?, ?, ?, ?, ?, ?, ?, ?);");
+                final PreparedStatement statement = connection.prepareStatement("INSERT INTO PlayerBans (UUID, STAFF, IP, REASON, SERVER, TYPE, ENDTIME, CREATIONTIME, DURATION) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);");
                 statement.setString(1, player.toString());
                 statement.setString(2, staff);
                 statement.setString(3, ip);
                 statement.setString(4, reason);
-                statement.setString(5, type.name());
-                statement.setString(6, TimeHelper.toString(endtime));
-                statement.setString(7, TimeHelper.toString(creationTime));
-                statement.setInt(8, duration);
+                statement.setString(5, server);
+                statement.setString(6, type.name());
+                statement.setString(7, TimeHelper.toString(endtime));
+                statement.setString(8, TimeHelper.toString(creationTime));
+                statement.setInt(9, duration);
                 statement.executeUpdate();
-                Ban ban = new Ban(player, staff, ip, reason, type, endtime, creationTime, duration);
+                Ban ban = new Ban(player, staff, ip, reason, server, type, endtime, creationTime, duration);
                 banCache.put(player, ban);
                 return ban;
             } catch(SQLException e) {
@@ -379,11 +383,12 @@ public class MySQL {
                     String staff = set.getString("STAFF");
                     String ip = set.getString("IP");
                     String reason = set.getString("REASON");
+                    String server = set.getString("SERVER");
                     BanType type = BanType.fromString(set.getString("TYPE"));
                     OffsetDateTime endTime = TimeHelper.fromString(set.getString("ENDTIME"));
                     OffsetDateTime creationTime = TimeHelper.fromString(set.getString("CREATIONTIME"));
                     int duration = set.getInt("DURATION");
-                    Ban ban = new Ban(player, staff, ip, reason, type, endTime, creationTime, duration);
+                    Ban ban = new Ban(player, staff, ip, reason, server, type, endTime, creationTime, duration);
                     banCache.put(player, ban);
                     return ban;
                 }
