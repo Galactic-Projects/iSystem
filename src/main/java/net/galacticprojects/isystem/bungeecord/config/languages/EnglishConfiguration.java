@@ -227,7 +227,7 @@ public class EnglishConfiguration {
             }
 
             if(!(englishConfiguration.contains("Messages.System.Tablist.Footer"))) {
-                englishConfiguration.set("Messages.System.Tablist.Footer", "&7 \n &8► &fWebsite &7× &dwww.galacticalprojects.net &8■ &fTeamSpeak &7× &dGalacticalProjects.net &8◄ \n &8► &fForum &7× &dforum.galacticalprojects.net &8■ &fShop &7× &dshop.galacticalprojects.net &8◄ \n &7");
+                englishConfiguration.set("Messages.System.Tablist.Footer", "&7 \n &8► &fWebsite &7× &dwww.galacticalprojects.net &8■ &fForum &7× &dforum.galacticalprojects.net &8◄ \n &8► &fShop &7× &dshop.galacticalprojects.net &8◄ \n &7");
             }
 
             if(!(englishConfiguration.contains("Messages.System.Maintenance.Usage"))) {
@@ -664,4 +664,5 @@ public class EnglishConfiguration {
     public String getChatServerBanPermanently() {
         return chatServerBanPermanently;
     }
+
 }

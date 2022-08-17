@@ -15,7 +15,7 @@ public class LabyModListener implements Listener{
     @EventHandler
     public void onLabyJoin(LabyModPlayerJoinEvent event) {
         Player player = event.getPlayer();
-        SubtitleAPI.setSubtitle(player, player.getUniqueId(), mySQL);
+        SubtitleAPI.setSubtitle(player, player.getUniqueId(), "");
     }
 
 }
