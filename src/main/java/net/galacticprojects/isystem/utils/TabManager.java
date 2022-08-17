@@ -21,8 +21,8 @@ public class TabManager {
     private final ProxiedPlayer player;
     private MySQL mySQL = JavaInstance.get(MySQL.class);
     private Player playerDB;
-    private final String header;
-    private final String footer;
+    private String header;
+    private String footer;
     private final String group;
     private final String server;
 
@@ -37,26 +37,25 @@ public class TabManager {
         this.group = group;
         this.server = server;
         playerDB = mySQL.getPlayer(player.getUniqueId()).join();
+        if(playerDB == null) {
+            this.header = englishConfiguration.getTablistHeader();
+            this.footer = englishConfiguration.getTablistFooter();
+            return;
+        }
         switch (playerDB.getLanguages()) {
-            case ENGLISH: {
+            case ENGLISH -> {
                 this.header = englishConfiguration.getTablistHeader();
                 this.footer = englishConfiguration.getTablistFooter();
-                break;
+
             }
-            case GERMAN: {
+            case GERMAN -> {
                 this.header = Color.apply("");
                 this.footer = Color.apply("");
-                break;
+
             }
-            case FRENCH:
-            case SPANISH: {
+            case FRENCH, SPANISH -> {
                 this.header = Color.apply("&fNot translated yet");
                 this.footer = Color.apply("&fNot translated yet");
-                break;
-            }
-            default: {
-                this.header = englishConfiguration.getTablistHeader();
-                this.footer = englishConfiguration.getTablistFooter();
             }
         }
     }

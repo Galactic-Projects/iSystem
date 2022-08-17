@@ -93,7 +93,7 @@ public class MySQL {
         try (Connection connection = pool.getConnection()) {
 
             PreparedStatement playersBans = connection.prepareStatement("CREATE TABLE IF NOT EXISTS PlayerBans(ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, UUID VARCHAR(36), STAFF VARCHAR(36), IP VARCHAR(16), REASON VARCHAR(100), SERVER VARCHAR(100), TYPE VARCHAR(12), ENDTIME VARCHAR(256), CREATIONTIME VARCHAR(32), DURATION VARCHAR(20));");
-            PreparedStatement playerData = connection.prepareStatement("CREATE TABLE IF NOT EXISTS PlayerData(ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, UUID VARCHAR(36), NAME VARCHAR(16), IP VARCHAR(16), COUNTRY VARCHAR(64), ONLINETIME LONGTEXT NOT NULL DEFAULT 0, LANGUAGE VARCHAR(86), FIRSTJOIN VARCHAR(256), SERVERONLINE VARCHAR(64) NOT NULL DEFAULT '', LATESTJOIN VARCHAR(256), REPORT BOOLEAN NOT NULL DEFAULT false, TEAMCHAT BOOLEAN NOT NULL DEFAULT false, SHOWTIME BOOLEAN NOT NULL DEFAULT false);");
+            PreparedStatement playerData = connection.prepareStatement("CREATE TABLE IF NOT EXISTS PlayerData(ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, UUID VARCHAR(36), NAME VARCHAR(16), IP VARCHAR(16), COUNTRY VARCHAR(64), ONLINETIME LONGTEXT NOT NULL DEFAULT 0, LANGUAGE VARCHAR(86), FIRSTJOIN VARCHAR(256), SERVERONLINE VARCHAR(64) NOT NULL DEFAULT '', LATESTJOIN VARCHAR(256), COINS LONGTEXT, REPORT BOOLEAN NOT NULL DEFAULT false, TEAMCHAT BOOLEAN NOT NULL DEFAULT false, SHOWTIME BOOLEAN NOT NULL DEFAULT false);");
             PreparedStatement playerHistory = connection.prepareStatement("CREATE TABLE IF NOT EXISTS PlayerHistory(ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, UUID VARCHAR(36), STAFF VARCHAR(36), IP VARCHAR(16), REASON VARCHAR(100), SERVER VARCHAR(100), TYPE VARCHAR(12), ENDTIME VARCHAR(256), CREATIONTIME VARCHAR(32), DURATION VARCHAR(20))");
             PreparedStatement playerLaby = connection.prepareStatement("CREATE TABLE IF NOT EXISTS PlayerLaby(ID INT NOT NULL AUTO_INCREMENT PRIMARY KEY, UUID VARCHAR(36), SUBTITLE VARCHAR(32), ");
             PreparedStatement clan = connection.prepareStatement("CREATE TABLE IF NOT EXISTS Clans();");
@@ -108,13 +108,13 @@ public class MySQL {
         }
     }
 
-    public CompletableFuture<Player> createPlayer(UUID uuid, String name, String ip, String country, long onlineTime, Languages languages, OffsetDateTime firstJoin, String serverOnline, OffsetDateTime latestJoin, boolean report, boolean teamchat, boolean showtime) {
+    public CompletableFuture<Player> createPlayer(UUID uuid, String name, String ip, String country, long onlineTime, Languages languages, OffsetDateTime firstJoin, String serverOnline, OffsetDateTime latestJoin, long coins, boolean report, boolean teamchat, boolean showtime) {
         return CompletableFuture.supplyAsync(() -> {
-            if (playerCache.has(uuid)) {
+            if(playerCache.has(uuid)) {
                 return playerCache.get(uuid);
             }
             try (Connection connection = pool.getConnection()){
-                final PreparedStatement statement = connection.prepareStatement("INSERT INTO PlayerData(UUID, NAME, IP, COUNTRY, ONLINETIME, LANGUAGE, FIRSTJOIN, SERVERONLINE, LATESTJOIN, REPORT, TEAMCHAT, SHOWTIME) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
+                final PreparedStatement statement = connection.prepareStatement("INSERT INTO PlayerData(UUID, NAME, IP, COUNTRY, ONLINETIME, LANGUAGE, FIRSTJOIN, SERVERONLINE, LATESTJOIN, COINS, REPORT, TEAMCHAT, SHOWTIME) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);");
                 statement.setString(1, String.valueOf(uuid));
                 statement.setString(2, name);
                 statement.setString(3, ip);
@@ -124,11 +124,12 @@ public class MySQL {
                 statement.setString(7, TimeHelper.toString(firstJoin));
                 statement.setString(8, serverOnline);
                 statement.setString(9, TimeHelper.toString(latestJoin));
-                statement.setBoolean(10, report);
-                statement.setBoolean(11, teamchat);
-                statement.setBoolean(12, showtime);
+                statement.setLong(10, coins);
+                statement.setBoolean(11, report);
+                statement.setBoolean(12, teamchat);
+                statement.setBoolean(13, showtime);
                 statement.executeUpdate();
-                Player player = new Player(uuid, name, ip, country, onlineTime, languages, firstJoin, serverOnline, latestJoin, report, teamchat, showtime);
+                Player player = new Player(uuid, name, ip, country, onlineTime, languages, firstJoin, serverOnline, latestJoin, coins, report, teamchat, showtime);
                 playerCache.put(uuid, player);
                 return player;
             } catch (SQLException e) {
@@ -158,10 +159,11 @@ public class MySQL {
                     OffsetDateTime firstJoin = TimeHelper.fromString(set.getString("FIRSTJOIN"));
                     String serverOnline = set.getString("SERVERONLINE");
                     OffsetDateTime latestJoin = TimeHelper.fromString(set.getString("LATESTJOIN"));
+                    long coins = set.getLong("COINS");
                     boolean report = set.getBoolean("REPORT");
                     boolean teamchat = set.getBoolean("TEAMCHAT");
                     boolean showtime = set.getBoolean("SHOWTIME");
-                    Player player = new Player(uuid, name, ip, country, onlineTime, languages, firstJoin, serverOnline, latestJoin, report, teamchat, showtime);
+                    Player player = new Player(uuid, name, ip, country, onlineTime, languages, firstJoin, serverOnline, latestJoin, coins, report, teamchat, showtime);
                     playerCache.put(uuid, player);
                     return player;
                 }
@@ -189,10 +191,11 @@ public class MySQL {
                     OffsetDateTime firstJoin = TimeHelper.fromString(set.getString("FIRSTJOIN"));
                     String serverOnline = set.getString("SERVERONLINE");
                     OffsetDateTime latestJoin = TimeHelper.fromString(set.getString("LATESTJOIN"));
+                    long coins = set.getLong("COINS");
                     boolean report = set.getBoolean("REPORT");
                     boolean teamchat = set.getBoolean("TEAMCHAT");
                     boolean showtime = set.getBoolean("SHOWTIME");
-                    Player player = new Player(uuid, name, ip, country, onlineTime, languages, firstJoin, serverOnline, latestJoin, report, teamchat, showtime);
+                    Player player = new Player(uuid, name, ip, country, onlineTime, languages, firstJoin, serverOnline, latestJoin, coins,  report, teamchat, showtime);
                     playerCache.put(uuid, player);
                     return player;
                 }
@@ -220,10 +223,11 @@ public class MySQL {
                     OffsetDateTime firstJoin = TimeHelper.fromString(set.getString("FIRSTJOIN"));
                     String serverOnline = set.getString("SERVERONLINE");
                     OffsetDateTime latestJoin = TimeHelper.fromString(set.getString("LATESTJOIN"));
+                    long coins = set.getLong("COINS");
                     boolean report = set.getBoolean("REPORT");
                     boolean teamchat = set.getBoolean("TEAMCHAT");
                     boolean showtime = set.getBoolean("SHOWTIME");
-                    Player player = new Player(uuid, name, ip, country, onlineTime, languages, firstJoin, serverOnline, latestJoin, report, teamchat, showtime);
+                    Player player = new Player(uuid, name, ip, country, onlineTime, languages, firstJoin, serverOnline, latestJoin, coins, report, teamchat, showtime);
                     playerCache.put(uuid, player);
                     return player;
                 }
@@ -236,10 +240,10 @@ public class MySQL {
         }, service);
     }
 
-    public CompletableFuture<Player> updatePlayer(UUID uuid, String name, String ip, String country, Languages languages, OffsetDateTime firstJoin, String serverOnline, OffsetDateTime latestJoin, boolean report, boolean teamchat, boolean showtime) {
+    public CompletableFuture<Player> updatePlayer(UUID uuid, String name, String ip, String country, Languages languages, OffsetDateTime firstJoin, String serverOnline, OffsetDateTime latestJoin, long coins, boolean report, boolean teamchat, boolean showtime) {
         return CompletableFuture.supplyAsync(() -> {
             try (Connection connection = pool.getConnection()) {
-                final PreparedStatement statement = connection.prepareStatement("UPDATE PlayerData SET NAME = ?, IP = ?, COUNTRY = ?, LANGUAGE = ?, FIRSTJOIN = ?, SERVERONLINE = ?, LATESTJOIN = ?, REPORT = ?, TEAMCHAT = ?, SHOWTIME = ? WHERE UUID = ?");
+                final PreparedStatement statement = connection.prepareStatement("UPDATE PlayerData SET NAME = ?, IP = ?, COUNTRY = ?, LANGUAGE = ?, FIRSTJOIN = ?, SERVERONLINE = ?, LATESTJOIN = ?, COINS = ?, REPORT = ?, TEAMCHAT = ?, SHOWTIME = ? WHERE UUID = ?");
                 statement.setString(1, name);
                 statement.setString(2, ip);
                 statement.setString(3, country);
@@ -247,12 +251,13 @@ public class MySQL {
                 statement.setString(5, TimeHelper.toString(firstJoin));
                 statement.setString(6, serverOnline);
                 statement.setString(7, TimeHelper.toString(latestJoin));
-                statement.setBoolean(8, report);
-                statement.setBoolean(9, teamchat);
-                statement.setBoolean(10, showtime);
-                statement.setString(11, String.valueOf(uuid));
+                statement.setLong(8, coins);
+                statement.setBoolean(9, report);
+                statement.setBoolean(10, teamchat);
+                statement.setBoolean(11, showtime);
+                statement.setString(12, String.valueOf(uuid));
                 statement.executeUpdate();
-                Player player = new Player(uuid, name, ip, country, playerCache.get(uuid).getOnlineTime(), languages, firstJoin, serverOnline, latestJoin, report, teamchat, showtime);
+                Player player = new Player(uuid, name, ip, country, playerCache.get(uuid).getOnlineTime(), languages, firstJoin, serverOnline, latestJoin, coins, report, teamchat, showtime);
                 playerCache.put(uuid, player);
                 return player;
             } catch(SQLException e) {
@@ -270,7 +275,7 @@ public class MySQL {
                 statement.setString(1, serverOnline);
                 statement.setString(2, String.valueOf(uuid));
                 statement.executeUpdate();
-                Player player = new Player(uuid, playerCache.get(uuid).getName(), playerCache.get(uuid).getIP(), playerCache.get(uuid).getIP(), playerCache.get(uuid).getOnlineTime(), playerCache.get(uuid).getLanguages(), playerCache.get(uuid).getFirstJoin(), serverOnline, playerCache.get(uuid).getLatestJoin(), playerCache.get(uuid).isReport(), playerCache.get(uuid).isTeamchat(), playerCache.get(uuid).isShowtime());
+                Player player = new Player(uuid, playerCache.get(uuid).getName(), playerCache.get(uuid).getIP(), playerCache.get(uuid).getIP(), playerCache.get(uuid).getOnlineTime(), playerCache.get(uuid).getLanguages(), playerCache.get(uuid).getFirstJoin(), serverOnline, playerCache.get(uuid).getLatestJoin(), playerCache.get(uuid).getCoins(), playerCache.get(uuid).isReport(), playerCache.get(uuid).isTeamchat(), playerCache.get(uuid).isShowtime());
                 playerCache.put(uuid, player);
                 return player;
             } catch(SQLException e) {
@@ -289,7 +294,7 @@ public class MySQL {
                 statement.setLong(1, newTime);
                 statement.setString(2, String.valueOf(uuid));
                 statement.executeUpdate();
-                Player player = new Player(uuid, playerCache.get(uuid).getName(), playerCache.get(uuid).getIP(), playerCache.get(uuid).getIP(), newTime, playerCache.get(uuid).getLanguages(), playerCache.get(uuid).getFirstJoin(), playerCache.get(uuid).getServerOnline(), playerCache.get(uuid).getLatestJoin(), playerCache.get(uuid).isReport(), playerCache.get(uuid).isTeamchat(), playerCache.get(uuid).isShowtime());
+                Player player = new Player(uuid, playerCache.get(uuid).getName(), playerCache.get(uuid).getIP(), playerCache.get(uuid).getIP(), newTime, playerCache.get(uuid).getLanguages(), playerCache.get(uuid).getFirstJoin(), playerCache.get(uuid).getServerOnline(), playerCache.get(uuid).getLatestJoin(), playerCache.get(uuid).getCoins(), playerCache.get(uuid).isReport(), playerCache.get(uuid).isTeamchat(), playerCache.get(uuid).isShowtime());
                 playerCache.put(uuid, player);
                 return player;
             } catch(SQLException e) {
@@ -307,7 +312,7 @@ public class MySQL {
                 statement.setBoolean(1, showTime);
                 statement.setString(2, String.valueOf(uuid));
                 statement.executeUpdate();
-                Player player = new Player(uuid, playerCache.get(uuid).getName(), playerCache.get(uuid).getIP(), playerCache.get(uuid).getIP(), playerCache.get(uuid).getOnlineTime(), playerCache.get(uuid).getLanguages(), playerCache.get(uuid).getFirstJoin(), playerCache.get(uuid).getServerOnline(), playerCache.get(uuid).getLatestJoin(), playerCache.get(uuid).isReport(), playerCache.get(uuid).isTeamchat(), showTime);
+                Player player = new Player(uuid, playerCache.get(uuid).getName(), playerCache.get(uuid).getIP(), playerCache.get(uuid).getIP(), playerCache.get(uuid).getOnlineTime(), playerCache.get(uuid).getLanguages(), playerCache.get(uuid).getFirstJoin(), playerCache.get(uuid).getServerOnline(), playerCache.get(uuid).getLatestJoin(), playerCache.get(uuid).getCoins(), playerCache.get(uuid).isReport(), playerCache.get(uuid).isTeamchat(), showTime);
                 playerCache.put(uuid, player);
                 return player;
             } catch(SQLException e) {

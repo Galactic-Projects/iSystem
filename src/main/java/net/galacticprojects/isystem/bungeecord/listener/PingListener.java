@@ -40,48 +40,55 @@ public class PingListener implements Listener {
         englishConfiguration = JavaInstance.get(EnglishConfiguration.class);
 
         if (JavaInstance.get(MainConfiguration.class).isMaintenanceEnabled()) {
+            if (playerDB == null) {
+                protocol.setProtocol(2);
+                ping.setDescriptionComponent(new TextComponent(englishConfiguration.getMotdsMaintenanceLineOne() + "\n" + englishConfiguration.getMotdsMaintenanceLineTwo()));
+                protocol.setName(englishConfiguration.getMaintenanceVersion());
+                players.setMax(mainConfiguration.getMaxPlayers());
+                ping.setVersion(protocol);
+                ping.setPlayers(players);
+                return;
+            }
             switch (playerDB.getLanguages()) {
-                case ENGLISH: {
+                case GERMAN -> {
+
+                }
+                case FRENCH -> {
+
+                }
+                case SPANISH -> {
+
+                }
+                case ENGLISH -> {
                     protocol.setProtocol(2);
                     ping.setDescriptionComponent(new TextComponent(englishConfiguration.getMotdsMaintenanceLineOne() + "\n" + englishConfiguration.getMotdsMaintenanceLineTwo()));
                     protocol.setName(englishConfiguration.getMaintenanceVersion());
                     players.setMax(mainConfiguration.getMaxPlayers());
                     ping.setVersion(protocol);
                     ping.setPlayers(players);
-                    break;
-                }
-                case GERMAN: {
-
-                    break;
-                }
-                case FRENCH: {
-
-                    break;
-                }
-                case SPANISH: {
-
-                    break;
                 }
             }
         } else {
+            if (playerDB == null) {
+                ping.setDescriptionComponent(new TextComponent(englishConfiguration.getMotdsNormalLineOne() + "\n" + englishConfiguration.getMotdsNormalLineTwo()));
+                players.setMax(mainConfiguration.getMaxPlayers());
+                ping.setPlayers(players);
+                return;
+            }
             switch (playerDB.getLanguages()) {
-                case ENGLISH: {
+                case GERMAN -> {
+
+                }
+                case FRENCH -> {
+
+                }
+                case SPANISH -> {
+
+                }
+                case ENGLISH -> {
                     ping.setDescriptionComponent(new TextComponent(englishConfiguration.getMotdsNormalLineOne() + "\n" + englishConfiguration.getMotdsNormalLineTwo()));
                     players.setMax(mainConfiguration.getMaxPlayers());
                     ping.setPlayers(players);
-                    break;
-                }
-                case GERMAN: {
-
-                    break;
-                }
-                case FRENCH: {
-
-                    break;
-                }
-                case SPANISH: {
-
-                    break;
                 }
             }
         }

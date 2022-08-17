@@ -16,11 +16,13 @@ public class Player {
     private final OffsetDateTime firstJoin;
     private final String serverOnline;
     private final OffsetDateTime latestJoin;
+
+    private final long coins;
     private final boolean report;
     private final boolean teamchat;
     private final boolean showtime;
 
-    public Player (UUID uuid, String name, String ip, String country, long onlineTime, Languages languages, OffsetDateTime firstJoin, String serverOnline, OffsetDateTime latestJoin, boolean report, boolean teamchat, boolean showtime) {
+    public Player (UUID uuid, String name, String ip, String country, long onlineTime, Languages languages, OffsetDateTime firstJoin, String serverOnline, OffsetDateTime latestJoin, long coins, boolean report, boolean teamchat, boolean showtime) {
         this.uuid = uuid;
         this.name = name;
         this.ip = ip;
@@ -30,6 +32,7 @@ public class Player {
         this.firstJoin = firstJoin;
         this.serverOnline = serverOnline;
         this.latestJoin = latestJoin;
+        this.coins = coins;
         this.report = report;
         this.teamchat = teamchat;
         this.showtime = showtime;
@@ -67,6 +70,10 @@ public class Player {
 
     public OffsetDateTime getLatestJoin() {
         return latestJoin;
+    }
+
+    public long getCoins() {
+        return coins;
     }
 
     public boolean isReport() {

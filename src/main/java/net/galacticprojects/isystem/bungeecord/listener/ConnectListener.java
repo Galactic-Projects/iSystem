@@ -33,6 +33,7 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.OffsetDateTime;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 public class ConnectListener implements Listener {
@@ -46,21 +47,26 @@ public class ConnectListener implements Listener {
     @EventHandler
     public void onLogin(LoginEvent event) {
         if (mainConfiguration.isMaintenanceEnabled()) {
+            String ip = event.getConnection().getAddress().getAddress().getHostAddress();
             IPermissionManagement permissionManagement = CloudNetDriver.getInstance().getPermissionManagement();
-            IPermissionUser iPermissionUser = permissionManagement.getUser(mySQL.getPlayerFromIp(event.getConnection().getAddress().getAddress().getHostAddress()).join().getUUID());
+
+
+            if(mySQL.getPlayerFromIp(ip) == null){
+                event.setCancelReason(new TextComponent(englishConfiguration.getKickMaintenanceCurrently().replaceAll("%reason%", englishConfiguration.getMaintenanceReason()).replaceAll("%enddate%", englishConfiguration.getMaintenanceEndDate())));
+                return;
+            }
+            IPermissionUser iPermissionUser = permissionManagement.getUser(mySQL.getPlayerFromIp(ip).join().getUUID());
             if(iPermissionUser != null) {
                 if (!(permissionManagement.hasPermission(iPermissionUser, "*"))) {
-                    switch (mySQL.getPlayerFromIp(event.getConnection().getAddress().getAddress().getHostAddress()).join().getLanguages()) {
-                        case GERMAN:
-                        case SPANISH: {
+                    switch (mySQL.getPlayerFromIp(ip).join().getLanguages()) {
+                        case GERMAN, SPANISH -> {
 
-                            break;
                         }
-                        case ENGLISH: {
+                        case FRENCH -> {
+
+                        }
+                        case ENGLISH  -> {
                             event.setCancelReason(new TextComponent(englishConfiguration.getKickMaintenanceCurrently().replaceAll("%reason%", englishConfiguration.getMaintenanceReason()).replaceAll("%enddate%", englishConfiguration.getMaintenanceEndDate())));
-                            break;
-                        }
-                        case FRENCH: {
 
                         }
                     }
@@ -168,9 +174,8 @@ public class ConnectListener implements Listener {
                 ICloudPlayer cloudPlayer = playerManager.getOnlinePlayer(player.getUniqueId());
                 String ip = player.getAddress().getAddress().getHostAddress();
 
-                if(mySQL.getPlayer(player.getUniqueId()) == null) {
-                    mySQL.createPlayer(player.getUniqueId(), player.getName(), ip, getCountry(ip), 0, Languages.ENGLISH, OffsetDateTime.now(), englishConfiguration.getFormatOnline().replaceAll("%server%", cloudPlayer.getConnectedService().getServiceId().getName().toUpperCase()), OffsetDateTime.now(), false, false, false);
-                }
+
+                mySQL.createPlayer(player.getUniqueId(), player.getName(), ip, getCountry(ip), 0, Languages.ENGLISH, OffsetDateTime.now(), englishConfiguration.getFormatOnline().replaceAll("%server%", cloudPlayer.getConnectedService().getServiceId().getName().toUpperCase()), OffsetDateTime.now(), 0, false, false, false);
 
                 Player playerDB = mySQL.getPlayer(player.getUniqueId()).join();
 
@@ -179,8 +184,8 @@ public class ConnectListener implements Listener {
                 }
 
                 if (playerDB.getUUID() == player.getUniqueId()) {
-                    if(playerDB.getName() != player.getName() || playerDB.getIP() != ip || playerDB.getCountry() != getCountry(ip)) {
-                        mySQL.updatePlayer(player.getUniqueId(), player.getName(), ip, getCountry(ip), Languages.ENGLISH, mySQL.getPlayer(player.getUniqueId()).join().getFirstJoin(), englishConfiguration.getFormatOnline().replaceAll("%server%", cloudPlayer.getConnectedService().getServiceId().getName().toUpperCase()), OffsetDateTime.now(), false, false, false);
+                    if (playerDB.getName() != player.getName() || playerDB.getIP() != ip || playerDB.getCountry() != getCountry(ip) || !Objects.equals(playerDB.getLatestJoin(), OffsetDateTime.now())) {
+                        mySQL.updatePlayer(player.getUniqueId(), player.getName(), ip, getCountry(ip), Languages.ENGLISH, mySQL.getPlayer(player.getUniqueId()).join().getFirstJoin(), englishConfiguration.getFormatOnline().replaceAll("%server%", cloudPlayer.getConnectedService().getServiceId().getName().toUpperCase()), OffsetDateTime.now(), playerDB.getCoins(), playerDB.isReport(), playerDB.isReport(), playerDB.isShowtime());
                     }
                 }
             }
