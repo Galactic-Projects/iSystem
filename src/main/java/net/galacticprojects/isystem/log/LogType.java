@@ -1,4 +1,4 @@
-package net.galacticprojects.isystem.logger;
+package net.galacticprojects.isystem.log;
 
 public enum LogType {
 

@@ -1,4 +1,4 @@
-package net.galacticprojects.isystem.discord.logger;
+package net.galacticprojects.isystem.discord.log;
 
 import net.galacticprojects.isystem.bungeecord.config.DiscordConfiguration;
 import net.galacticprojects.isystem.utils.JavaInstance;

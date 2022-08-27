@@ -1,4 +1,4 @@
-package net.galacticprojects.isystem.discord.logger;
+package net.galacticprojects.isystem.discord.log;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;

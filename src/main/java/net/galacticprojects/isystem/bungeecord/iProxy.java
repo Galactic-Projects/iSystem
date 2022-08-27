@@ -6,9 +6,7 @@ import net.galacticprojects.isystem.bungeecord.command.BanCommand;
 import net.galacticprojects.isystem.bungeecord.command.MaintenanceCommand;
 import net.galacticprojects.isystem.bungeecord.command.OnlineTimeCommand;
 import net.galacticprojects.isystem.bungeecord.command.SystemCommand;
-import net.galacticprojects.isystem.bungeecord.config.DiscordConfiguration;
-import net.galacticprojects.isystem.bungeecord.config.MainConfiguration;
-import net.galacticprojects.isystem.bungeecord.config.PermissionConfiguration;
+import net.galacticprojects.isystem.bungeecord.config.*;
 import net.galacticprojects.isystem.bungeecord.config.languages.EnglishConfiguration;
 import net.galacticprojects.isystem.bungeecord.config.languages.GermanConfiguration;
 import net.galacticprojects.isystem.bungeecord.listener.ChatListener;
@@ -17,10 +15,9 @@ import net.galacticprojects.isystem.bungeecord.listener.ConnectListener;
 
 import net.galacticprojects.isystem.bungeecord.listener.PingListener;
 import net.galacticprojects.isystem.discord.Bot;
-import net.galacticprojects.isystem.logger.Logger;
+import net.galacticprojects.isystem.log.Logger;
 import net.galacticprojects.isystem.utils.JavaInstance;
 import net.galacticprojects.isystem.database.MySQL;
-import net.galacticprojects.isystem.bungeecord.config.SqlConfiguration;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -77,6 +74,7 @@ public class iProxy extends Plugin {
             new PermissionConfiguration();
             new EnglishConfiguration();
             new GermanConfiguration();
+            new AutoModConfiguration();
         } catch (IOException e) {
             e.printStackTrace();
         }

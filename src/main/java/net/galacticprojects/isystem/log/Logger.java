@@ -1,4 +1,4 @@
-package net.galacticprojects.isystem.logger;
+package net.galacticprojects.isystem.log;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 public class Logger {
 

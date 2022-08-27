@@ -8,10 +8,10 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.galacticprojects.isystem.discord.Bot;
-import net.galacticprojects.isystem.discord.logger.DiscordLogger;
-import net.galacticprojects.isystem.discord.logger.LoggerType;
-import net.galacticprojects.isystem.logger.LogType;
-import net.galacticprojects.isystem.logger.Logger;
+import net.galacticprojects.isystem.discord.log.DiscordLogger;
+import net.galacticprojects.isystem.discord.log.LoggerType;
+import net.galacticprojects.isystem.log.LogType;
+import net.galacticprojects.isystem.log.Logger;
 
 public class CommandListener extends ListenerAdapter {
 

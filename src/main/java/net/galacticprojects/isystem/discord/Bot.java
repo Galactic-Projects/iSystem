@@ -5,9 +5,10 @@ import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.galacticprojects.isystem.bungeecord.config.DiscordConfiguration;
+import net.galacticprojects.isystem.discord.listeners.AutoModListener;
 import net.galacticprojects.isystem.discord.listeners.CommandListener;
-import net.galacticprojects.isystem.logger.LogType;
-import net.galacticprojects.isystem.logger.Logger;
+import net.galacticprojects.isystem.log.LogType;
+import net.galacticprojects.isystem.log.Logger;
 import net.galacticprojects.isystem.utils.JavaInstance;
 
 import javax.security.auth.login.LoginException;
@@ -33,6 +34,7 @@ public class Bot {
                     builder.enableIntents(intent);
                 }
                 builder.addEventListeners(new CommandListener());
+                builder.addEventListeners(new AutoModListener());
                 try {
                     JDA = builder.build();
                 } catch(LoginException e) {
