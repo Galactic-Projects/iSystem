@@ -10,8 +10,8 @@ import net.md_5.bungee.config.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.lang.reflect.Array;
+import java.util.*;
 
 public class AutoModConfiguration {
 
@@ -65,18 +65,10 @@ public class AutoModConfiguration {
                 hash.put(bad3, word3);
                 hash.put(bad4, word4);
                 hash.put(bad5, word5);
-                for(ArrayList<Integer> key : hash.keySet()) {
-                    autoModConfiguration.set("System.Blocked." + key, hash.get(key));
-                }
-
-            }
-
-            if(!(autoModConfiguration.contains("System.Punishment"))) {
-                ArrayList<Integer> stages = new ArrayList<>();
                 for(int i = 0; i < 5; i++) {
-                    stages.add(i);
+                    autoModConfiguration.set("System.Blocked." + i, hash.get(new ArrayList<Integer>(i)));
                 }
-                autoModConfiguration.set("System.Punishment."+stages, "//Hier kommt ne Bestrafung rein");
+
             }
 
             ConfigurationProvider.getProvider(YamlConfiguration.class).save(autoModConfiguration, amconfig);
@@ -94,7 +86,8 @@ public class AutoModConfiguration {
             ArrayList<String> words = new ArrayList<>();
             for(String key : autoModConfiguration.getSection("System.Blocked").getKeys()) {
                 ids.add(Integer.parseInt(key));
-                words.add(autoModConfiguration.getString("System.Blocked.["+key+"]"));
+
+                words.add(autoModConfiguration.getString("System.Blocked."+ key));
             }
             blacklist.put(ids, words);
 
@@ -130,5 +123,16 @@ public class AutoModConfiguration {
 
     public ArrayList<String> getBlacklistedWords5() {
         return blacklistedWords5;
+    }
+
+    public Integer[] toIntArray(Set<ArrayList<Integer>> set) {
+        Integer[] ret = new Integer[set.size()];
+        int j = 0;
+        for(ArrayList<Integer> i : set) {
+            for(int f = 0; f < i.size(); f++) {
+                ret[f] = i.get(f);
+            }
+        }
+        return ret;
     }
 }

@@ -7,11 +7,13 @@ import net.galacticprojects.isystem.discord.Bot;
 
 public class DiscordLogger {
 
-    private static JDA jda = Bot.JDA;
+    private static final JDA jda = Bot.JDA;
 
     public static void log(LoggerType type, EmbedBuilder message) {
         TextChannel channel = jda.getTextChannelById(type.id);
-        channel.sendMessage(message.build()).complete();
+        if (channel != null) {
+            channel.sendMessageEmbeds(message.build()).complete();
+        }
     }
 
 }
