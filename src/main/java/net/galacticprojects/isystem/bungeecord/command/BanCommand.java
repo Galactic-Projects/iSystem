@@ -3,6 +3,7 @@ package net.galacticprojects.isystem.bungeecord.command;
 import com.syntaxphoenix.syntaxapi.utils.java.lang.StringBuilder;
 import net.galacticprojects.isystem.bungeecord.command.ban.BanType;
 import net.galacticprojects.isystem.bungeecord.config.MainConfiguration;
+import net.galacticprojects.isystem.bungeecord.config.languages.EnglishConfiguration;
 import net.galacticprojects.isystem.database.MySQL;
 import net.galacticprojects.isystem.utils.JavaInstance;
 import net.galacticprojects.isystem.utils.color.Color;
@@ -11,6 +12,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
+import org.w3c.dom.Text;
 
 import java.time.OffsetDateTime;
 
@@ -22,27 +24,47 @@ public class BanCommand extends Command implements TabExecutor {
 
     String staff;
 
-    MainConfiguration mainConfiguration = JavaInstance.get(MainConfiguration.class);
     MySQL mySQL = JavaInstance.get(MySQL.class);
+    public EnglishConfiguration englishConfiguration = JavaInstance.get(EnglishConfiguration.class);
+    public MainConfiguration mainConfiguration = JavaInstance.get(MainConfiguration.class);
 
     @Override
     public void execute(CommandSender sender, String[] args) {
 
+        if (!(sender.hasPermission("*"))) {
+            if (sender instanceof ProxiedPlayer) {
+                switch (mySQL.getPlayer(((ProxiedPlayer) sender).getUniqueId()).join().getLanguages()) {
+                    case ENGLISH -> {
+                        sender.sendMessage(new TextComponent(englishConfiguration.getErrorsPermission()));
+                    }
+                    case GERMAN -> {
 
-            if(args.length < 3) {
-                StringBuilder builder = new StringBuilder();
-                builder.append(mainConfiguration.getBanPrefix() + " &cNot enough arguments, please enter \n");
-                builder.append("&e/ban (player) (id) \n");
-                builder.append("&e/ban (player) (custom message) \n");
-                builder.append("&aOur ids: \n");
-                builder.append("");
-            }
+                    }
+                    case FRENCH, SPANISH -> {
 
-            switch(args[1].toLowerCase()) {
-                case "": {
-
+                    }
                 }
+                return;
             }
+            sender.sendMessage(new TextComponent(englishConfiguration.getErrorsPermission()));
+            return;
+        }
+
+        if (args.length < 3) {
+            StringBuilder builder = new StringBuilder();
+            builder.append(mainConfiguration.getBanPrefix()).append(" &6&lInformation \n");
+            builder.append("&e/ban (player) (id) \n");
+            builder.append("&e/ban (player) (custom message) \n");
+            builder.append("&aOur ids: \n");
+            builder.append("");
+            sender.sendMessage("");
+        }
+
+        switch (args[1].toLowerCase()) {
+            case "": {
+
+            }
+        }
 
     }
 

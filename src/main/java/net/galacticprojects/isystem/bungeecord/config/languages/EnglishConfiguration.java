@@ -80,6 +80,13 @@ public class EnglishConfiguration {
     private String chatServerBanTemporary;
     private String chatServerBanPermanently;
 
+    private String administratorErrorNoNumber;
+    private String administratorErrorAlreadyNumber;
+    private String administratorErrorNoLesserThan;
+    private String administratorErrorNegativeNumber;
+    private String administratorErrorMaintenance;
+    private String administratorSuccessSetNumber;
+
     public EnglishConfiguration () throws IOException {
         JavaInstance.put(this);
         mainConfiguration = JavaInstance.get(MainConfiguration.class);
@@ -334,6 +341,29 @@ public class EnglishConfiguration {
                 englishConfiguration.set("Messages.System.Chat.Mute.Server.Permanently", "%chatPrefix% &7You were &bpermanently &cbanned &7from the &4chat &7of this &3server&7.\n&7► &cBan-ID &8■ &4%id%\n&7► &cStaff &8■ &4%staffName%\n&7► &cReason &8■ &4%reason%\n&7► &cMessage &8■ &4%message%\n&7► &cUnban-Date &8■ &4%unbanDate%\n&7Do you think you were wrongly banned?\n&7\nYou can submit a unban request at the following links:\n&7► &dForum &8■ &5foum.GalacticProjects.net");
             }
 
+            if(!(englishConfiguration.contains("Messages.System.Administrator.Errors.NoNumber"))) {
+                englishConfiguration.set("Messages.System.Administrator.Errors.NoNumber", "%systemPrefix% &cThis is not a valid number!");
+            }
+
+            if(!(englishConfiguration.contains("Messages.System.Administrator.Errors.AlreadyNumber"))) {
+                englishConfiguration.set("Messages.System.Administrator.Errors.AlreadyNumber", "%systemPrefix% &cThis number is already the player number!");
+            }
+
+            if(!(englishConfiguration.contains("Messages.System.Administrator.Errors.NoLesserThan"))) {
+                englishConfiguration.set("Messages.System.Administrator.Errors.NoLesserThan", "%systemPrefix% &cThe player count is larger than your number!");
+            }
+
+            if(!(englishConfiguration.contains("Messages.System.Administrator.Errors.NegativeNumber"))) {
+                englishConfiguration.set("Messages.System.Administrator.Errors.NegativeNumber", "%systemPrefix% &cNumber can not lesser than 0!");
+            }
+
+            if(!(englishConfiguration.contains("Messages.System.Administrator.Errors.Maintenance"))) {
+                englishConfiguration.set("Messages.System.Administrator.Errors.Maintenance", "%systemPrefix% &cMaintenance is enabled!");
+            }
+
+            if(!(englishConfiguration.contains("Messages.System.Administrator.Success.SetNumber"))) {
+                englishConfiguration.set("Messages.System.Administrator.Success.SetNumber", "%systemPrefix% &7You have set the &bplayer amount &7to &3%amount%&7.");
+            }
 
             ConfigurationProvider.getProvider(YamlConfiguration.class).save(englishConfiguration, english);
 
@@ -413,7 +443,14 @@ public class EnglishConfiguration {
             chatNetworkBanPermanently = Color.apply(englishConfiguration.getString("Messages.System.Chat.Mute.Network.Permanently").replaceAll("%chatPrefix%", mainConfiguration.getChatPrefix()));
             chatServerBanTemporary = Color.apply(englishConfiguration.getString("Messages.System.Kick.Mute.Server.Temporary").replaceAll("%chatPrefix%", mainConfiguration.getChatPrefix()));
             chatServerBanPermanently = Color.apply(englishConfiguration.getString("Messages.System.Chat.Mute.Server.Permanently").replaceAll("%chatPrefix%", mainConfiguration.getChatPrefix()));
-        
+
+            administratorErrorNoNumber = Color.apply(englishConfiguration.getString("Messages.System.Administrator.Errors.NoNumber").replaceAll("%systemPrefix%", mainConfiguration.getSystemPrefix()));
+            administratorErrorAlreadyNumber = Color.apply(englishConfiguration.getString("Messages.System.Administrator.Errors.AlreadyNumber").replaceAll("%systemPrefix%", mainConfiguration.getSystemPrefix()));
+            administratorErrorNoLesserThan = Color.apply(englishConfiguration.getString("Messages.System.Administrator.Errors.NoLesserThan").replaceAll("%systemPrefix%", mainConfiguration.getSystemPrefix()));
+            administratorErrorNegativeNumber = Color.apply(englishConfiguration.getString("Messages.System.Administrator.Errors.NegativeNumber").replaceAll("%systemPrefix%", mainConfiguration.getSystemPrefix()));
+            administratorErrorMaintenance = Color.apply(englishConfiguration.getString("Messages.System.Administrator.Errors.Maintenance").replaceAll("%systemPrefix%", mainConfiguration.getSystemPrefix()));
+            administratorSuccessSetNumber = Color.apply(englishConfiguration.getString("Messages.System.Administrator.Success.SetNumber").replaceAll("%systemPrefix%", mainConfiguration.getSystemPrefix()));
+
         } catch (IOException e){
             throw new RuntimeException(e);
         }
@@ -664,5 +701,30 @@ public class EnglishConfiguration {
     public String getChatServerBanPermanently() {
         return chatServerBanPermanently;
     }
+
+    public String getAdministratorErrorAlreadyNumber() {
+        return administratorErrorAlreadyNumber;
+    }
+
+    public String getAdministratorErrorNegativeNumber() {
+        return administratorErrorNegativeNumber;
+    }
+
+    public String getAdministratorErrorNoLesserThan() {
+        return administratorErrorNoLesserThan;
+    }
+
+    public String getAdministratorErrorNoNumber() {
+        return administratorErrorNoNumber;
+    }
+
+    public String getAdministratorErrorMaintenance() {
+        return administratorErrorMaintenance;
+    }
+
+    public String getAdministratorSuccessSetNumber() {
+        return administratorSuccessSetNumber;
+    }
+
 
 }

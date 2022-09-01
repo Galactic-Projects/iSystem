@@ -84,3 +84,12 @@ Messages:
                 Server:
                     Temporary: '%chatPrefix% &7You were &btemporary &cbanned &7from the &4chat &7of this &3server&7.\n&7► &cBan-ID &8■ &4%id%\n&7► &cStaff &8■ &4%staffName%\n&7► &cReason &8■ &4%reason%\n&7► &cDuration &8■ &4%duration%\n&7► &cMessage &8■ &4%message%\n&7► &cUnban-Date &8■ &4%unbanDate%\n&7Do you think you were wrongly banned?\n&7\nYou can submit a unban request at the following links:\n&7► &dForum &8■ &5foum.GalacticProjects.net'
                     Permanently: '%chatPrefix% &7You were &bpermanently &cbanned &7from the &4chat &7of this &3server&7.\n&7► &cBan-ID &8■ &4%id%\n&7► &cStaff &8■ &4%staffName%\n&7► &cReason &8■ &4%reason%\n&7► &cMessage &8■ &4%message%\n&7► &cUnban-Date &8■ &4%unbanDate%\n&7Do you think you were wrongly banned?\n&7\nYou can submit a unban request at the following links:\n&7► &dForum &8■ &5foum.GalacticProjects.net'
+        Administrator:
+            Errors:
+                NoNumber: '%systemPrefix% &cThis is not a valid number!'
+                AlreadyNumber: '%systemPrefix% &cThis number is already the player number!'
+                NoLesserThan: '%systemPrefix% &cThe player count is larger than your number!'
+                NegativeNumber: '%systemPrefix% &cNumber can not lesser than 0!'
+                Maintenance: '%systemPrefix% &cMaintenance is enabled!'
+            Success:
+                SetNumber: '%systemPrefix% &7You have set the &bplayer amount &7to &3%amount%&7.'
