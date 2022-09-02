@@ -51,22 +51,19 @@ public class ConnectListener implements Listener {
             IPermissionManagement permissionManagement = CloudNetDriver.getInstance().getPermissionManagement();
 
 
-            if(mySQL.getPlayerFromIp(ip) == null){
+            if (mySQL.getPlayer(mySQL.getPlayerFromIp(ip).join().getUUID()).join() == null) {
                 event.setCancelReason(new TextComponent(englishConfiguration.getKickMaintenanceCurrently().replaceAll("%reason%", englishConfiguration.getMaintenanceReason()).replaceAll("%enddate%", englishConfiguration.getMaintenanceEndDate())));
                 return;
             }
             IPermissionUser iPermissionUser = permissionManagement.getUser(mySQL.getPlayerFromIp(ip).join().getUUID());
-            if(iPermissionUser != null) {
+            if (iPermissionUser != null) {
                 if (!(permissionManagement.hasPermission(iPermissionUser, "*"))) {
-                    switch (mySQL.getPlayerFromIp(ip).join().getLanguages()) {
-                        case GERMAN, SPANISH -> {
-
-                        }
-                        case FRENCH -> {
-
-                        }
-                        case ENGLISH  -> {
+                    switch (mySQL.getPlayer(mySQL.getPlayerFromIp(ip).join().getUUID()).join().getLanguages()) {
+                        case ENGLISH -> {
                             event.setCancelReason(new TextComponent(englishConfiguration.getKickMaintenanceCurrently().replaceAll("%reason%", englishConfiguration.getMaintenanceReason()).replaceAll("%enddate%", englishConfiguration.getMaintenanceEndDate())));
+
+                        }
+                        case GERMAN, SPANISH, FRENCH -> {
 
                         }
                     }
@@ -102,7 +99,7 @@ public class ConnectListener implements Listener {
             public void run() {
                 IPlayerManager playerManager = CloudNetDriver.getInstance().getServicesRegistry().getFirstService(IPlayerManager.class);
                 ICloudPlayer cloudPlayer = playerManager.getOnlinePlayer(player.getUniqueId());
-                if(cloudPlayer != null) {
+                if (cloudPlayer != null) {
                     updatePlayer(player, englishConfiguration.getFormatOnline().replaceAll("%server%", cloudPlayer.getConnectedService().getServiceId().getName().toUpperCase()));
                 }
             }
@@ -124,7 +121,7 @@ public class ConnectListener implements Listener {
             public void run() {
                 IPlayerManager playerManager = CloudNetDriver.getInstance().getServicesRegistry().getFirstService(IPlayerManager.class);
                 ICloudPlayer cloudPlayer = playerManager.getOnlinePlayer(player.getUniqueId());
-                if(cloudPlayer != null) {
+                if (cloudPlayer != null) {
                     updatePlayer(player, englishConfiguration.getFormatOnline().replaceAll("%server%", cloudPlayer.getConnectedService().getServiceId().getName().toUpperCase()));
                 }
             }
@@ -137,7 +134,7 @@ public class ConnectListener implements Listener {
             public void run() {
                 IPlayerManager playerManager = CloudNetDriver.getInstance().getServicesRegistry().getFirstService(IPlayerManager.class);
                 ICloudPlayer cloudPlayer = playerManager.getOnlinePlayer(player.getUniqueId());
-                if(cloudPlayer != null) {
+                if (cloudPlayer != null) {
                     tabManager = new TabManager(player, cloudPlayer.getConnectedService().getServiceId().getName(), cloudPlayer.getConnectedService().getServiceId().getTaskName());
                     tabManager.setTablist();
                 }
@@ -157,7 +154,7 @@ public class ConnectListener implements Listener {
                 for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
                     IPlayerManager playerManager = CloudNetDriver.getInstance().getServicesRegistry().getFirstService(IPlayerManager.class);
                     ICloudPlayer cloudPlayer = playerManager.getOnlinePlayer(player.getUniqueId());
-                    if(cloudPlayer != null) {
+                    if (cloudPlayer != null) {
                         tabManager = new TabManager(player, cloudPlayer.getConnectedService().getServiceId().getTaskName(), cloudPlayer.getConnectedService().getServiceId().getName());
                         tabManager.updateTablist();
                     }
@@ -256,12 +253,12 @@ public class ConnectListener implements Listener {
             JsonObject resp = new Gson().fromJson(websiteResponse, JsonObject.class);
             if (resp != null && resp.has("country")) return resp.get("country").getAsString().toUpperCase();
             return null;
-        } catch(MalformedURLException e) {
+        } catch (MalformedURLException e) {
             e.printStackTrace();
             return "Illegal URL; Internal error";
-        } catch(IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
-            return "unknown";
+            return "Unknown";
         }
     }
 }
