@@ -37,7 +37,6 @@ public class iPlayer {
      * @return boolean
      */
     public boolean hasPermission(String permission) {
-        //test alla könnte krass werden
         return false;
     }
 

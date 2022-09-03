@@ -14,6 +14,12 @@ public class SqlConfiguration {
     public File sql;
     public Configuration sqlConfiguration;
 
+    private String host;
+    private int port;
+    private String database;
+    private String user;
+    private String password;
+
     public SqlConfiguration () throws IOException {
 
         JavaInstance.put(this);
@@ -49,28 +55,51 @@ public class SqlConfiguration {
             }
 
             ConfigurationProvider.getProvider(YamlConfiguration.class).save(sqlConfiguration, sql);
+            load();
         } catch (IOException e)  {
             throw new RuntimeException(e);
         }
     }
 
+    public void load() throws IOException {
+        try {
+            sqlConfiguration = ConfigurationProvider.getProvider(YamlConfiguration.class).load(sql);
+
+            host = sqlConfiguration.getString("Sql.Host");
+            port = sqlConfiguration.getInt("Sql.Port");
+            database = sqlConfiguration.getString("Sql.Database");
+            user = sqlConfiguration.getString("Sql.User");
+            password = sqlConfiguration.getString("Sql.Password");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void reload() throws IOException {
+        try {
+            load();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     public String getHost() {
-        return sqlConfiguration.getString("Sql.Host");
+        return host;
     }
 
     public Integer getPort() {
-        return sqlConfiguration.getInt("Sql.Port");
+        return port;
     }
 
     public String getDatabase() {
-        return sqlConfiguration.getString("Sql.Database");
+        return database;
     }
 
     public String getUser() {
-        return sqlConfiguration.getString("Sql.User");
+        return user;
     }
 
     public String getPassword() {
-        return sqlConfiguration.getString("Sql.Password");
+        return password;
     }
 }
