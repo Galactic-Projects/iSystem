@@ -1,4 +1,4 @@
 name: iSystem
 version: '${project.version}'
 author: GalacticProjects
-main: net.galacticprojects.isystem.bungeecord.iProxy
+main: net.galacticprojects.bungeecord.iProxy

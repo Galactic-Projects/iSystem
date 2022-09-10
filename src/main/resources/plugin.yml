@@ -1,7 +1,7 @@
 name: iSystem
 version: '${project.version}'
 author: GalacticProjects
-main: net.galacticprojects.isystem.spigot.iServer
+main: net.galacticprojects.spigot.iServer
 api-version: 1.19
 
 commands:
