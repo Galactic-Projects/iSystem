@@ -1,7 +1,7 @@
-package net.galacticprojects.bungeecord.config.languages.command;
+package net.galacticprojects.bungeecord.command;
 
 import com.syntaxphoenix.syntaxapi.utils.java.lang.StringBuilder;
-import net.galacticprojects.bungeecord.config.languages.command.ban.BanType;
+import net.galacticprojects.bungeecord.command.ban.BanType;
 import net.galacticprojects.bungeecord.config.MainConfiguration;
 import net.galacticprojects.database.MySQL;
 import net.galacticprojects.bungeecord.config.languages.EnglishConfiguration;

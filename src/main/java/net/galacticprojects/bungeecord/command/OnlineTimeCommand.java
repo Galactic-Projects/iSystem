@@ -1,4 +1,4 @@
-package net.galacticprojects.bungeecord.config.languages.command;
+package net.galacticprojects.bungeecord.command;
 
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.permission.*;

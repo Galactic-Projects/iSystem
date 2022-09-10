@@ -3,7 +3,7 @@ package net.galacticprojects.database;
 import com.zaxxer.hikari.pool.HikariPool;
 import net.galacticprojects.bungeecord.cache.Cache;
 import net.galacticprojects.bungeecord.cache.ThreadSafeCache;
-import net.galacticprojects.bungeecord.config.languages.command.ban.BanType;
+import net.galacticprojects.bungeecord.command.ban.BanType;
 import net.galacticprojects.database.model.Ban;
 import net.galacticprojects.database.model.Player;
 import net.galacticprojects.utils.JavaInstance;

@@ -2,10 +2,10 @@ package net.galacticprojects.bungeecord;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.pool.HikariPool;
-import net.galacticprojects.bungeecord.config.languages.command.BanCommand;
-import net.galacticprojects.bungeecord.config.languages.command.MaintenanceCommand;
-import net.galacticprojects.bungeecord.config.languages.command.OnlineTimeCommand;
-import net.galacticprojects.bungeecord.config.languages.command.SystemCommand;
+import net.galacticprojects.bungeecord.command.BanCommand;
+import net.galacticprojects.bungeecord.command.MaintenanceCommand;
+import net.galacticprojects.bungeecord.command.OnlineTimeCommand;
+import net.galacticprojects.bungeecord.command.SystemCommand;
 import net.galacticprojects.bungeecord.config.*;
 import net.galacticprojects.bungeecord.config.languages.EnglishConfiguration;
 import net.galacticprojects.bungeecord.config.languages.GermanConfiguration;

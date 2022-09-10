@@ -1,6 +1,6 @@
 package net.galacticprojects.database.model;
 
-import net.galacticprojects.bungeecord.config.languages.command.ban.BanType;
+import net.galacticprojects.bungeecord.command.ban.BanType;
 
 import java.time.OffsetDateTime;
 import java.util.UUID;

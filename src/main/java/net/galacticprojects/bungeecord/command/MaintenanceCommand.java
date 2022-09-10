@@ -1,4 +1,4 @@
-package net.galacticprojects.bungeecord.config.languages.command;
+package net.galacticprojects.bungeecord.command;
 
 import net.galacticprojects.bungeecord.config.MainConfiguration;
 import net.galacticprojects.bungeecord.config.languages.EnglishConfiguration;

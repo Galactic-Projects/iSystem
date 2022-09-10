@@ -1,4 +1,4 @@
-package net.galacticprojects.bungeecord.config.languages.command.ban;
+package net.galacticprojects.bungeecord.command.ban;
 
 public enum BanType {
 
