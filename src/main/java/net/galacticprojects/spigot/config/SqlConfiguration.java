@@ -12,63 +12,70 @@ public class SqlConfiguration {
     public File sql;
     public YamlConfiguration sqlConfiguration;
 
+    private String host;
+    private int port;
+    private String database;
+    private String user;
+    private String password;
+
     public SqlConfiguration () throws IOException {
 
         JavaInstance.put(this);
 
         try {
 
-            sql = new File(iServer.getPlugin(iServer.class).getDataFolder(), "mysql.yml");
+            sql = new File(iServer.getPluginDirectory(), "mysql.yml");
 
             if (!(sql.exists())) {
                 sql.createNewFile();
             }
 
             sqlConfiguration = YamlConfiguration.loadConfiguration(sql);
-
-            if (!(sqlConfiguration.contains("Sql.Host"))) {
-                sqlConfiguration.set("Sql.Host", "localhost");
-            }
-
-            if (!(sqlConfiguration.contains("Sql.Port"))) {
-                sqlConfiguration.set("Sql.Port", 3306);
-            }
-
-            if (!(sqlConfiguration.contains("Sql.Database"))) {
-                sqlConfiguration.set("Sql.Database", "isystem");
-            }
-
-            if (!(sqlConfiguration.contains("Sql.User"))) {
-                sqlConfiguration.set("Sql.User", "root");
-            }
-
-            if (!(sqlConfiguration.contains("Sql.Password"))) {
-                sqlConfiguration.set("Sql.Password", " ");
-            }
-
+            sqlConfiguration.addDefault("Sql.Host", "localhost");
+            sqlConfiguration.addDefault("Sql.Port", 3306);
+            sqlConfiguration.addDefault("Sql.Database", "lobbysystem");
+            sqlConfiguration.addDefault("Sql.User", "root");
+            sqlConfiguration.addDefault("Sql.Password", " ");
+            sqlConfiguration.options().copyDefaults(true);
             sqlConfiguration.save(sql);
+
+            load();
         } catch (IOException e)  {
             throw new RuntimeException(e);
         }
     }
 
+    public void load() {
+        sqlConfiguration = YamlConfiguration.loadConfiguration(sql);
+
+        host = sqlConfiguration.getString("Sql.Host");
+        port = sqlConfiguration.getInt("Sql.Port");
+        database = sqlConfiguration.getString("Sql.Database");
+        user = sqlConfiguration.getString("Sql.User");
+        password = sqlConfiguration.getString("Sql.Password");
+    }
+
+    public void reload() {
+        load();
+    }
+
     public String getHost() {
-        return sqlConfiguration.getString("Sql.Host");
+        return host;
     }
 
     public Integer getPort() {
-        return sqlConfiguration.getInt("Sql.Port");
+        return port;
     }
 
     public String getDatabase() {
-        return sqlConfiguration.getString("Sql.Database");
+        return database;
     }
 
     public String getUser() {
-        return sqlConfiguration.getString("Sql.User");
+        return user;
     }
 
     public String getPassword() {
-        return sqlConfiguration.getString("Sql.Password");
+        return password;
     }
 }

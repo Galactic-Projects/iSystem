@@ -5,55 +5,56 @@ import com.zaxxer.hikari.pool.HikariPool;
 import net.galacticprojects.database.MySQL;
 import net.galacticprojects.spigot.command.SubtitleCommand;
 import net.galacticprojects.spigot.config.SqlConfiguration;
+import net.galacticprojects.spigot.listener.ConnectionListener;
 import net.galacticprojects.spigot.listener.LabyModListener;
 import net.galacticprojects.utils.JavaInstance;
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
 import java.io.IOException;
 
 public class iServer extends JavaPlugin {
 
+    private static Plugin plugin;
+
+    public PluginManager manager;
+    private static String pluginDirectory;
+    private static String pluginLangDirectory;
+
     @Override
     public void onEnable() {
         initializeConfiguration();
-        getServer().getPluginManager().registerEvents(new LabyModListener(), this);
-    }
-
-    @Override
-    public void onLoad() {
+        connectDatabase();
+        initializeListener();
+        initializeCommands();
 
     }
 
     @Override
     public void onDisable() {
-
+        JavaInstance.get(MySQL.class).shutdown();
     }
-/*
-    public void onPluginMessageReceived(String channel, Player player, byte[] message) {
-        if (!channel.equals("labymod3:main")) {
-            return;
-        }
 
-        DataInputStream in = new DataInputStream(new ByteArrayInputStream(message));
-
+    public void initializeConfiguration() {
         try {
-            ByteBuf buf = Unpooled.wrappedBuffer(message);
-            String key = LabyModProtocol.readString(buf, Short.MAX_VALUE);
-            String json = LabyModProtocol.readString(buf, Short.MAX_VALUE);
-
-            // LabyMod user joins the server
-            if(key.equals("INFO")) {
-                // Handle the json message
+            if (!(getDataFolder().exists())) {
+                getDataFolder().mkdir();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }*/
+            pluginDirectory = getDataFolder().getPath();
 
-    private void initializeConfiguration() {
-        try {
+            File languageDirectory = new File(getDataFolder().getPath() + "/languages");
+
+            if (!(languageDirectory.exists())) {
+                languageDirectory.mkdir();
+            }
+
+            pluginLangDirectory = languageDirectory.getPath();
+
             new SqlConfiguration();
-        } catch(IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
@@ -62,7 +63,7 @@ public class iServer extends JavaPlugin {
         new MySQL(() -> {
             SqlConfiguration sql = JavaInstance.get(SqlConfiguration.class);
             HikariConfig poolConfig = new HikariConfig();
-            if(sql != null) {
+            if (sql != null) {
                 poolConfig.setConnectionTimeout(7500);
                 poolConfig.setMaximumPoolSize(8);
                 poolConfig.setMinimumIdle(1);
@@ -78,8 +79,25 @@ public class iServer extends JavaPlugin {
         });
     }
 
-    private void injectCommands() {
+    public void initializeListener() {
+        manager = Bukkit.getPluginManager();
+        manager.registerEvents(new ConnectionListener(), this);
+        manager.registerEvents(new LabyModListener(), this);
+    }
+
+    public void initializeCommands() {
         getCommand("subtitle").setExecutor(new SubtitleCommand());
     }
 
+    public static Plugin getPlugin() {
+        return plugin;
+    }
+
+    public static String getPluginDirectory() {
+        return pluginDirectory;
+    }
+
+    public static String getPluginLangDirectory() {
+        return pluginLangDirectory;
+    }
 }
