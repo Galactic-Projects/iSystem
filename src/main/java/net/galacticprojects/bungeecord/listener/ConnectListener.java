@@ -166,7 +166,7 @@ public class ConnectListener implements Listener {
                 String ip = player.getAddress().getAddress().getHostAddress();
 
 
-                mySQL.createPlayer(player.getUniqueId(), player.getName(), ip, getCountry(ip), 0, Languages.ENGLISH, OffsetDateTime.now(), englishConfiguration.getFormatOnline().replaceAll("%server%", cloudPlayer.getConnectedService().getServiceId().getName().toUpperCase()), OffsetDateTime.now(), 0, false, false, false);
+                mySQL.createPlayer(player.getUniqueId(), player.getName(), ip, getCountry(ip), 0, Languages.ENGLISH, OffsetDateTime.now(), englishConfiguration.getFormatOnline().replaceAll("%server%", cloudPlayer.getConnectedService().getServiceId().getName().toUpperCase()), OffsetDateTime.now(), 0, false, false, false, false);
 
                 Player playerDB = mySQL.getPlayer(player.getUniqueId()).join();
 
@@ -176,7 +176,7 @@ public class ConnectListener implements Listener {
 
                 if (playerDB.getUUID() == player.getUniqueId()) {
                     if (playerDB.getName() != player.getName() || playerDB.getIP() != ip || playerDB.getCountry() != getCountry(ip) || !Objects.equals(playerDB.getLatestJoin(), OffsetDateTime.now())) {
-                        mySQL.updatePlayer(player.getUniqueId(), player.getName(), ip, getCountry(ip), Languages.ENGLISH, mySQL.getPlayer(player.getUniqueId()).join().getFirstJoin(), englishConfiguration.getFormatOnline().replaceAll("%server%", cloudPlayer.getConnectedService().getServiceId().getName().toUpperCase()), OffsetDateTime.now(), playerDB.getCoins(), playerDB.isReport(), playerDB.isReport(), playerDB.isShowtime());
+                        mySQL.updatePlayer(player.getUniqueId(), player.getName(), ip, getCountry(ip), Languages.ENGLISH, mySQL.getPlayer(player.getUniqueId()).join().getFirstJoin(), englishConfiguration.getFormatOnline().replaceAll("%server%", cloudPlayer.getConnectedService().getServiceId().getName().toUpperCase()), OffsetDateTime.now(), playerDB.getCoins(), playerDB.isReport(), playerDB.isReport(), playerDB.isShowtime(), playerDB.isVerified());
                     }
                 }
             }
