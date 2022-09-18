@@ -133,12 +133,17 @@
             <version>1.0</version>
             <scope>provided</scope>
         </dependency>
+<!--
+If this is null, please open your browser and download this file via this link.
+https://download.galacticprojects.net/files/compatible.cmd
+Execute the file with administrator permissions and follow the instruction!
+-->
         <dependency>
             <groupId>com.labymod</groupId>
             <artifactId>labymod-server-api</artifactId>
             <version>2.0.2</version>
             <scope>system</scope>
-            <systemPath>C:/Users/David/.m2/LabyModAPI_1.17.jar</systemPath>
+            <systemPath>C:/API/LabyModAPI_1.17.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -152,7 +157,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <server.dir>C:\Users\David\Desktop\Development\workspace\GalacticProjects\iSystem\out</server.dir>
+        <server.dir>.\out</server.dir>
     </properties>
 
     <build>
