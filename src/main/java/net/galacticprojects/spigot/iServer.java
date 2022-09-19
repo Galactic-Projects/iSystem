@@ -7,6 +7,7 @@ import net.galacticprojects.spigot.command.SubtitleCommand;
 import net.galacticprojects.spigot.config.SqlConfiguration;
 import net.galacticprojects.spigot.listener.ConnectionListener;
 import net.galacticprojects.spigot.listener.LabyModListener;
+import net.galacticprojects.spigot.listener.MoveListener;
 import net.galacticprojects.utils.JavaInstance;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -83,6 +84,7 @@ public class iServer extends JavaPlugin {
         manager = Bukkit.getPluginManager();
         manager.registerEvents(new ConnectionListener(), this);
         manager.registerEvents(new LabyModListener(), this);
+        manager.registerEvents(new MoveListener(), this);
     }
 
     public void initializeCommands() {

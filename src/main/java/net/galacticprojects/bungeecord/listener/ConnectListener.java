@@ -179,6 +179,12 @@ public class ConnectListener implements Listener {
                         mySQL.updatePlayer(player.getUniqueId(), player.getName(), ip, getCountry(ip), Languages.ENGLISH, mySQL.getPlayer(player.getUniqueId()).join().getFirstJoin(), englishConfiguration.getFormatOnline().replaceAll("%server%", cloudPlayer.getConnectedService().getServiceId().getName().toUpperCase()), OffsetDateTime.now(), playerDB.getCoins(), playerDB.isReport(), playerDB.isReport(), playerDB.isShowtime(), playerDB.isVerified());
                     }
                 }
+
+                if(!(playerDB.isVerified())) {
+
+
+                    return;
+                }
             }
         }, 1, TimeUnit.SECONDS);
     }
