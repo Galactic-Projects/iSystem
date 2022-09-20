@@ -1,9 +1,9 @@
 package net.galacticprojects.bungeecord.listener;
 
-import net.galacticprojects.database.MySQL;
-import net.galacticprojects.database.model.Ban;
-import net.galacticprojects.database.model.Player;
-import net.galacticprojects.utils.JavaInstance;
+import me.lauriichan.wildcard.systemcore.util.JavaInstance;
+import net.galacticprojects.common.databaseLegacy.MySQL;
+import net.galacticprojects.common.database.model.Ban;
+import net.galacticprojects.common.database.model.Player;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ChatEvent;
 import net.md_5.bungee.api.plugin.Listener;
@@ -28,39 +28,6 @@ public class ChatListener implements Listener {
     }
 
     public void checkBanned(ProxiedPlayer player) {
-        ban = mySQL.getBanned(player.getUniqueId()).join();
-        playerDB = mySQL.getPlayer(player.getUniqueId()).join();
 
-        if (ban == null) {
-            return;
-        }
-        if (ban.isExpired()) {
-            mySQL.deleteBan(player.getUniqueId());
-            return;
-        }
-        switch (ban.getType().name()) {
-            case "nmute" -> {
-
-                switch (Boolean.toString(ban.isPermanent())) {
-                    case "true" -> {
-
-                    }
-                    case "false" -> {
-
-                    }
-                }
-            }
-            case "smute" -> {
-
-                switch (Boolean.toString(ban.isPermanent())) {
-                    case "true" -> {
-
-                    }
-                    case "false" -> {
-
-                    }
-                }
-            }
-        }
     }
 }

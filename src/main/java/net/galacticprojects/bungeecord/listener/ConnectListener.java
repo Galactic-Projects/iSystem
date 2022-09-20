@@ -7,15 +7,16 @@ import de.dytanic.cloudnet.driver.permission.IPermissionManagement;
 import de.dytanic.cloudnet.driver.permission.IPermissionUser;
 import de.dytanic.cloudnet.ext.bridge.player.ICloudPlayer;
 import de.dytanic.cloudnet.ext.bridge.player.IPlayerManager;
+import me.lauriichan.wildcard.systemcore.inject.Inject;
+import me.lauriichan.wildcard.systemcore.util.JavaInstance;
+import net.galacticprojects.bungeecord.Messages;
 import net.galacticprojects.bungeecord.iProxy;
-import net.galacticprojects.database.model.Ban;
-import net.galacticprojects.database.model.Player;
+import net.galacticprojects.common.database.model.Ban;
+import net.galacticprojects.common.database.model.Player;
 import net.galacticprojects.bungeecord.config.MainConfiguration;
 import net.galacticprojects.bungeecord.config.languages.EnglishConfiguration;
-import net.galacticprojects.database.MySQL;
-import net.galacticprojects.utils.JavaInstance;
-import net.galacticprojects.utils.Languages;
-import net.galacticprojects.utils.TabManager;
+import net.galacticprojects.common.databaseLegacy.MySQL;
+import net.galacticprojects.bungeecord.util.TabManager;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -28,11 +29,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.OffsetDateTime;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 public class ConnectListener implements Listener {
 
-    public MySQL mySQL = JavaInstance.get(MySQL.class);
+    @Inject
+    public MySQL mySQL;
     public TabManager tabManager;
     public MainConfiguration mainConfiguration = JavaInstance.get(MainConfiguration.class);
     public EnglishConfiguration englishConfiguration = JavaInstance.get(EnglishConfiguration.class);
@@ -199,48 +202,12 @@ public class ConnectListener implements Listener {
     }
 
     public void checkBan(ProxiedPlayer player) {
-        ProxyServer.getInstance().getScheduler().schedule(iProxy.getInstance(), new Runnable() {
-            @Override
-            public void run() {
-                Ban ban = mySQL.getBanned(player.getUniqueId()).join();
-
-                if (ban == null) {
-                    return;
-                }
-                if (ban.isExpired()) {
-                    mySQL.deleteBan(player.getUniqueId());
-                    return;
-                }
-                switch (ban.getType().name()) {
-                    case "nban" -> {
-
-                        switch (Boolean.toString(ban.isPermanent())) {
-                            case "true" -> {
-
-                                break;
-                            }
-                            case "false" -> {
-
-                            }
-                        }
-
-                        break;
-                    }
-                    case "sban" -> {
-
-                        switch (Boolean.toString(ban.isPermanent())) {
-                            case "true" -> {
-
-                                break;
-                            }
-                            case "false" -> {
-
-                            }
-                        }
-                    }
-                }
-            }
-        }, 20, TimeUnit.MILLISECONDS);
+        UUID uniqueId = player.getUniqueId();
+        Ban ban = mySQL.getBan(uniqueId).join();
+        if(ban == null) {
+            return;
+        }
+        Messages.GENERAL_BAN_FORMAT.kick(player, Messages.buildBanPlaceholders(ban, false));
     }
 
     public String getCountry(String IP) {

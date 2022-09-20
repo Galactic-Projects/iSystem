@@ -1,11 +1,10 @@
 package net.galacticprojects.bungeecord.listener;
 
-import net.galacticprojects.database.MySQL;
-import net.galacticprojects.database.model.Player;
+import me.lauriichan.wildcard.systemcore.util.JavaInstance;
+import net.galacticprojects.common.databaseLegacy.MySQL;
+import net.galacticprojects.common.database.model.Player;
 import net.galacticprojects.bungeecord.config.MainConfiguration;
 import net.galacticprojects.bungeecord.config.languages.EnglishConfiguration;
-import net.galacticprojects.utils.JavaInstance;
-import net.galacticprojects.utils.Languages;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.event.ProxyPingEvent;

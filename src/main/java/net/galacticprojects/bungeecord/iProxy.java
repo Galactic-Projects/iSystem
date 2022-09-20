@@ -2,11 +2,16 @@ package net.galacticprojects.bungeecord;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.pool.HikariPool;
-import net.galacticprojects.bungeecord.command.BanCommand;
+import me.lauriichan.wildcard.systemcore.SystemCore;
+import me.lauriichan.wildcard.systemcore.data.io.Reloadable;
+import me.lauriichan.wildcard.systemcore.data.io.message.Message;
+import me.lauriichan.wildcard.systemcore.util.JavaInstance;
+import me.lauriichan.wildcard.systemcore.util.source.Resources;
 import net.galacticprojects.bungeecord.command.MaintenanceCommand;
 import net.galacticprojects.bungeecord.command.OnlineTimeCommand;
 import net.galacticprojects.bungeecord.command.SystemCommand;
 import net.galacticprojects.bungeecord.config.*;
+import net.galacticprojects.bungeecord.config.commands.BanConfiguration;
 import net.galacticprojects.bungeecord.config.languages.EnglishConfiguration;
 import net.galacticprojects.bungeecord.config.languages.GermanConfiguration;
 import net.galacticprojects.bungeecord.listener.ChatListener;
@@ -16,8 +21,7 @@ import net.galacticprojects.bungeecord.listener.ConnectListener;
 import net.galacticprojects.bungeecord.listener.PingListener;
 import net.galacticprojects.discord.Bot;
 import net.galacticprojects.log.Logger;
-import net.galacticprojects.utils.JavaInstance;
-import net.galacticprojects.database.MySQL;
+import net.galacticprojects.common.databaseLegacy.MySQL;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -31,14 +35,27 @@ public class iProxy extends Plugin {
 
     private static Plugin plugin;
 
+    private SystemCore core;
+
     public PluginManager manager;
     private static String pluginDirectory;
     private static String pluginLangDirectory;
 
     @Override
+    public void onLoad() {
+        Message.setLogger(getLogger());
+        Messages.PREFIX.getClass();
+        core = new SystemCore(this);
+        core.load();
+        createConfigs();
+        Reloadable.start();
+    }
+
+    @Override
     public void onEnable() {
         plugin = this;
         manager = ProxyServer.getInstance().getPluginManager();
+        core.enable();
         initializeConfiguration();
         connectDatabase();
         initializeApiVersion();
@@ -51,6 +68,13 @@ public class iProxy extends Plugin {
     public void onDisable() {
         JavaInstance.get(MySQL.class).shutdown();
         JavaInstance.get(Bot.class).shutdown();
+        core.disable();
+        Reloadable.shutdown();
+    }
+
+    private void createConfigs() {
+        Resources resources = core.getResources();
+        new BanConfiguration(resources);
     }
 
     public void initializeConfiguration() {
@@ -132,7 +156,6 @@ public class iProxy extends Plugin {
 
     public void initializeCommands() {
         manager.registerCommand(this, new SystemCommand());
-        manager.registerCommand(this, new BanCommand());
         manager.registerCommand(this, new OnlineTimeCommand());
         manager.registerCommand(this, new MaintenanceCommand());
     }

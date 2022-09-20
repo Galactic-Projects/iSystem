@@ -2,13 +2,18 @@ package net.galacticprojects.spigot;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.pool.HikariPool;
-import net.galacticprojects.database.MySQL;
-import net.galacticprojects.spigot.command.SubtitleCommand;
+import me.lauriichan.laylib.localization.MessageManager;
+import me.lauriichan.laylib.localization.source.AnnotationMessageSource;
+import me.lauriichan.laylib.localization.source.EnumMessageSource;
+import net.galacticprojects.common.databaseLegacy.MySQL;
+import net.galacticprojects.common.message.MessageProviderFactoryImpl;
+import net.galacticprojects.spigot.altcommand.SubtitleCommand;
 import net.galacticprojects.spigot.config.SqlConfiguration;
 import net.galacticprojects.spigot.listener.ConnectionListener;
 import net.galacticprojects.spigot.listener.LabyModListener;
 import net.galacticprojects.spigot.listener.MoveListener;
-import net.galacticprojects.utils.JavaInstance;
+import net.galacticprojects.spigot.message.CommandDescription;
+import net.galacticprojects.spigot.message.Messages;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
@@ -31,6 +36,11 @@ public class iServer extends JavaPlugin {
         connectDatabase();
         initializeListener();
         initializeCommands();
+
+        MessageManager manager = new MessageManager();
+        MessageProviderFactoryImpl factory = new MessageProviderFactoryImpl(null);
+        manager.register(new EnumMessageSource(CommandDescription.class, factory));
+        manager.register(new AnnotationMessageSource(Messages.class, factory));
 
     }
 

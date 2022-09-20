@@ -1,7 +1,6 @@
 package net.galacticprojects.spigot.listener;
 
-import net.galacticprojects.database.MySQL;
-import net.galacticprojects.utils.JavaInstance;
+import net.galacticprojects.common.databaseLegacy.MySQL;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -15,7 +14,7 @@ public class MoveListener implements Listener {
     public void onMove(PlayerMoveEvent event) {
         Player player = event.getPlayer();
 
-        net.galacticprojects.database.model.Player playerDB = mySQL.getPlayer(player.getUniqueId()).join();
+        net.galacticprojects.common.database.model.Player playerDB = mySQL.getPlayer(player.getUniqueId()).join();
 
         if (playerDB == null) {
             return;

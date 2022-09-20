@@ -2,10 +2,10 @@ package net.galacticprojects.bungeecord.command;
 
 import de.dytanic.cloudnet.driver.CloudNetDriver;
 import de.dytanic.cloudnet.driver.permission.*;
-import net.galacticprojects.database.MySQL;
+import me.lauriichan.wildcard.systemcore.util.JavaInstance;
+import net.galacticprojects.common.databaseLegacy.MySQL;
 import net.galacticprojects.bungeecord.config.languages.EnglishConfiguration;
-import net.galacticprojects.utils.JavaInstance;
-import net.galacticprojects.utils.color.Color;
+import net.galacticprojects.common.util.color.Color;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;

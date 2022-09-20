@@ -1,10 +1,10 @@
 package net.galacticprojects.bungeecord.command;
 
+import me.lauriichan.wildcard.systemcore.util.JavaInstance;
 import net.galacticprojects.bungeecord.config.MainConfiguration;
 import net.galacticprojects.bungeecord.config.languages.EnglishConfiguration;
-import net.galacticprojects.database.MySQL;
-import net.galacticprojects.utils.JavaInstance;
-import net.galacticprojects.utils.TimeHelper;
+import net.galacticprojects.common.databaseLegacy.MySQL;
+import net.galacticprojects.common.util.TimeHelper;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
