@@ -1,13 +1,7 @@
+/.idea/
 /.idea
-/.idea/artifacts
-/.idea/workspace.xml
-/.idea/vcs.xml
-/.idea/uiDesigner.xml
-/.idea/misc.xml
-/.idea/markdown.xml
-/.idea/jarRepositories.xml
-/.idea/encodings.xml
-/.idea/discord.xml
-/.idea/compiler.xml
+/.settings/
+/.project
+/.classpath
 /target
 /out

@@ -7,7 +7,6 @@ import net.galacticprojects.common.database.migration.impl.MigrationManager;
 import net.galacticprojects.common.util.cache.Cache;
 import net.galacticprojects.common.util.cache.ThreadSafeCache;
 import net.galacticprojects.common.database.migration.impl.SQLMigrationType;
-import net.galacticprojects.common.databaseLegacy.SQLTable;
 import net.galacticprojects.common.database.model.Ban;
 import net.galacticprojects.common.database.model.Player;
 import net.galacticprojects.common.util.Ref;

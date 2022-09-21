@@ -7,7 +7,6 @@ import me.lauriichan.laylib.localization.MessageManager;
 import me.lauriichan.laylib.localization.MessageProvider;
 import me.lauriichan.laylib.logger.ISimpleLogger;
 import net.galacticprojects.common.config.impl.json.JsonConfig;
-import net.galacticprojects.common.message.MessageProviderImpl;
 
 import java.io.File;
 import java.io.FilenameFilter;
