@@ -12,9 +12,11 @@ import net.galacticprojects.bungeecord.command.MaintenanceCommand;
 import net.galacticprojects.bungeecord.command.impl.BungeeCommandInjector;
 import net.galacticprojects.bungeecord.command.provider.ProxyPluginProvider;
 import net.galacticprojects.bungeecord.config.PluginConfiguration;
+import net.galacticprojects.bungeecord.message.CommandMessages;
 import net.galacticprojects.common.CommonPlugin;
 import net.galacticprojects.common.config.SQLConfiguration;
 import net.galacticprojects.common.message.MessageProviderFactoryImpl;
+import net.galacticprojects.spigot.message.CommandDescription;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
 
@@ -50,7 +52,8 @@ public class ProxyPlugin extends Plugin {
     	MessageManager messageManager = common.getMessageManager();
     	MessageProviderFactoryImpl factory = common.getMessageProviderFactory();
     	// Register messages below
-    	
+    	messageManager.register(new EnumMessageSource(CommandDescription.class, factory));
+		messageManager.register(new AnnotationMessageSource(CommandMessages.class, factory));
     }
 
 	private void createConfigurations() {
