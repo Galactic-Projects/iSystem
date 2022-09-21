@@ -7,6 +7,7 @@ import me.lauriichan.laylib.command.CommandManager;
 import me.lauriichan.laylib.localization.MessageManager;
 import me.lauriichan.laylib.localization.source.*;
 import me.lauriichan.laylib.logger.ISimpleLogger;
+import net.galacticprojects.bungeecord.command.BanCommand;
 import net.galacticprojects.bungeecord.command.MaintenanceCommand;
 import net.galacticprojects.bungeecord.command.impl.BungeeCommandInjector;
 import net.galacticprojects.bungeecord.command.provider.ProxyPluginProvider;
@@ -76,6 +77,7 @@ public class ProxyPlugin extends Plugin {
     private void registerCommands() {
     	CommandManager commandManager = common.getCommandManager();
     	commandManager.register(MaintenanceCommand.class);
+		commandManager.register(BanCommand.class);
     }
     
     /*
