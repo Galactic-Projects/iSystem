@@ -5,13 +5,14 @@ import me.lauriichan.laylib.command.annotation.Action;
 import me.lauriichan.laylib.command.annotation.Command;
 import me.lauriichan.laylib.command.annotation.Permission;
 import me.lauriichan.laylib.localization.Key;
-import net.galacticprojects.common.CommonSetup;
+import net.galacticprojects.common.CommonPlugin;
+import net.galacticprojects.common.database.SQLDatabase;
 import net.galacticprojects.common.message.MessageTranslationManager;
+import net.galacticprojects.common.util.Ref;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Command(name = "translation", description = "command.description.translation")
 public class TranslationReloadCommand {
@@ -19,13 +20,13 @@ public class TranslationReloadCommand {
     private final MessageTranslationManager messageTranslationManager;
 
     public TranslationReloadCommand(){
-        this.messageTranslationManager = CommonSetup.instance().getTranslationManager();
+        this.messageTranslationManager = CommonPlugin.instance().getTranslationManager();
     }
 
     @Action("")
     @Action("reload")
     @Permission("command.translation.reload")
-    public void reload(Actor<?> actor) {
+    public void reload(Ref<SQLDatabase> ref, Actor<?> actor) {
         actor.sendTranslatedMessage("command.translation.reload.start");
         List<String> previous = Arrays.asList(messageTranslationManager.getLanguages());
         messageTranslationManager.reload();

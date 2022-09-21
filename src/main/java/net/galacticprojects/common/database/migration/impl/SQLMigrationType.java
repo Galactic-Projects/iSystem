@@ -9,8 +9,6 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.function.Function;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import me.lauriichan.laylib.logger.ISimpleLogger;
 import me.lauriichan.minecraft.wildcard.migration.IMigrationManager;
@@ -18,7 +16,6 @@ import me.lauriichan.minecraft.wildcard.migration.MigrationTarget;
 import me.lauriichan.minecraft.wildcard.migration.MigrationType;
 import net.galacticprojects.common.database.SQLDatabase;
 import net.galacticprojects.common.database.SQLTable;
-import net.galacticprojects.common.database.migration.impl.SQLMigration;
 
 public final class SQLMigrationType extends MigrationType<SQLDatabase, SQLMigration> {
 

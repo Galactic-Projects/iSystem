@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.annotation.Annotation;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -19,7 +18,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
 
-import me.lauriichan.laylib.reflection.ClassUtil;
 import net.galacticprojects.common.util.Ref;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.file.PathUtils;
