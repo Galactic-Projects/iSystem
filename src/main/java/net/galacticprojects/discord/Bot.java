@@ -9,7 +9,6 @@ import net.galacticprojects.discord.listeners.AutoModListener;
 import net.galacticprojects.discord.listeners.CommandListener;
 import net.galacticprojects.log.LogType;
 import net.galacticprojects.log.Logger;
-import net.galacticprojects.utils.JavaInstance;
 
 import javax.security.auth.login.LoginException;
 

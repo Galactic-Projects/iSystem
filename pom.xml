@@ -138,6 +138,7 @@ If this is null, please open your browser and download this file via this link.
 https://download.galacticprojects.net/files/compatible.cmd
 Execute the file with administrator permissions and follow the instruction!
 -->
+
         <dependency>
             <groupId>com.labymod</groupId>
             <artifactId>labymod-server-api</artifactId>
@@ -150,6 +151,27 @@ Execute the file with administrator permissions and follow the instruction!
             <artifactId>lombok</artifactId>
             <version>1.18.24</version>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>me.lauriichan.laylib</groupId>
+            <artifactId>command</artifactId>
+            <version>0.1.0-9a3dde9-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.syntaxphoenix.syntaxapi</groupId>
+            <artifactId>json-lib</artifactId>
+            <version>2.0.12</version>
+        </dependency>
+        <dependency>
+            <groupId>com.syntaxphoenix.syntaxapi</groupId>
+            <artifactId>nbt</artifactId>
+            <version>2.0.13</version>
+        </dependency>
+        <!-- Apache Commons -->
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.11.0</version>
         </dependency>
     </dependencies>
 
@@ -223,6 +245,10 @@ Execute the file with administrator permissions and follow the instruction!
                         <relocation>
                             <pattern>com.syntaxphoenix.syntaxapi</pattern>
                             <shadedPattern>${project.groupId}.${project.artifactId}.shaded.syapi</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>me.lauriichan</pattern>
+                            <shadedPattern>${project.groupId}.${project.artifactId}.shaded.lauriichan</shadedPattern>
                         </relocation>
                     </relocations>
                 </configuration>

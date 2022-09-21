@@ -1,7 +1,7 @@
 package net.galacticprojects.bungeecord.config.languages;
 
+import me.lauriichan.wildcard.systemcore.util.JavaInstance;
 import net.galacticprojects.bungeecord.iProxy;
-import net.galacticprojects.utils.JavaInstance;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;

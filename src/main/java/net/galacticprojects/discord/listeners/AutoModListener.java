@@ -1,5 +1,6 @@
 package net.galacticprojects.discord.listeners;
 
+import me.lauriichan.wildcard.systemcore.util.JavaInstance;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -7,12 +8,11 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.hooks.SubscribeEvent;
 import net.galacticprojects.bungeecord.config.AutoModConfiguration;
-import net.galacticprojects.database.MySQL;
+import net.galacticprojects.common.databaseLegacy.MySQL;
 import net.galacticprojects.discord.log.DiscordLogger;
 import net.galacticprojects.discord.log.LoggerType;
 import net.galacticprojects.log.LogType;
 import net.galacticprojects.log.Logger;
-import net.galacticprojects.utils.JavaInstance;
 
 import java.util.concurrent.TimeUnit;
 

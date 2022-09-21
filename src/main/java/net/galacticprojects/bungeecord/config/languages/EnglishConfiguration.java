@@ -1,9 +1,9 @@
 package net.galacticprojects.bungeecord.config.languages;
 
+import me.lauriichan.wildcard.systemcore.util.JavaInstance;
 import net.galacticprojects.bungeecord.config.MainConfiguration;
 import net.galacticprojects.bungeecord.iProxy;
-import net.galacticprojects.utils.JavaInstance;
-import net.galacticprojects.utils.color.Color;
+import net.galacticprojects.common.util.color.Color;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;

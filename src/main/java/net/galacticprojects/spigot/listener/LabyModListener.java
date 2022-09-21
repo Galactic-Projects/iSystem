@@ -1,8 +1,7 @@
 package net.galacticprojects.spigot.listener;
 
-import net.galacticprojects.database.MySQL;
-import net.galacticprojects.spigot.utils.SubtitleAPI;
-import net.galacticprojects.utils.JavaInstance;
+import net.galacticprojects.common.databaseLegacy.MySQL;
+import net.galacticprojects.spigot.util.SubtitleAPI;
 import net.labymod.serverapi.bukkit.event.LabyModPlayerJoinEvent;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;

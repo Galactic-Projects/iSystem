@@ -1,7 +1,6 @@
 package net.galacticprojects.discord.log;
 
 import net.galacticprojects.bungeecord.config.DiscordConfiguration;
-import net.galacticprojects.utils.JavaInstance;
 
 import java.util.Objects;
 

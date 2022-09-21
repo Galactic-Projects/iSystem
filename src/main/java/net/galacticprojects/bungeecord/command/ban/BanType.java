@@ -2,12 +2,12 @@ package net.galacticprojects.bungeecord.command.ban;
 
 public enum BanType {
 
-    NBAN("nban"), SBAN("sban"), NMUTE("nmute"), SMUTE("smute");
+    NBAN, SBAN, NMUTE, SMUTE;
 
-    String name;
+    private final String name = name().toLowerCase();
 
-    BanType(String name) {
-        this.name = name;
+    public final String getName() {
+        return name;
     }
 
     public static BanType fromString(String string) {

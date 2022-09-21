@@ -1,9 +1,9 @@
 package net.galacticprojects.bungeecord.config;
 
+import me.lauriichan.wildcard.systemcore.util.JavaInstance;
 import net.dv8tion.jda.api.OnlineStatus;
 import net.dv8tion.jda.api.entities.Activity;
 import net.galacticprojects.bungeecord.iProxy;
-import net.galacticprojects.utils.JavaInstance;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
