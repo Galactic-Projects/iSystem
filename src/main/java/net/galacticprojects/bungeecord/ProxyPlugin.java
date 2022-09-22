@@ -11,10 +11,12 @@ import net.galacticprojects.bungeecord.command.BanCommand;
 import net.galacticprojects.bungeecord.command.MaintenanceCommand;
 import net.galacticprojects.bungeecord.command.impl.BungeeCommandInjector;
 import net.galacticprojects.bungeecord.command.provider.ProxyPluginProvider;
+import net.galacticprojects.bungeecord.config.BanConfiguration;
 import net.galacticprojects.bungeecord.config.PluginConfiguration;
+import net.galacticprojects.bungeecord.entity.CommandPlayer;
 import net.galacticprojects.bungeecord.message.CommandMessages;
 import net.galacticprojects.common.CommonPlugin;
-import net.galacticprojects.common.config.SQLConfiguration;
+import net.galacticprojects.common.database.model.Ban;
 import net.galacticprojects.common.message.MessageProviderFactoryImpl;
 import net.galacticprojects.spigot.message.CommandDescription;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -25,6 +27,7 @@ public class ProxyPlugin extends Plugin {
 	private CommonPlugin common;
 	
 	private PluginConfiguration pluginConfiguration;
+	private BanConfiguration banConfiguration;
 
 	@Override
 	public void onLoad() {
@@ -43,6 +46,7 @@ public class ProxyPlugin extends Plugin {
     	// Other stuff after this
     	createConfigurations();
     	reloadConfigurations();
+		registerEntity();
     	registerListeners();
     	registerArgumentTypes();
     	registerCommands();
@@ -61,10 +65,16 @@ public class ProxyPlugin extends Plugin {
 		File dataFolder = getDataFolder();
 		// Create configs below
 		pluginConfiguration = new PluginConfiguration(logger, dataFolder);
+		banConfiguration = new BanConfiguration(logger, dataFolder);
 	}
 
 	public void reloadConfigurations() {
 		pluginConfiguration.reload();
+		banConfiguration.reload();
+	}
+
+	private void registerEntity() {
+		new CommandPlayer(this);
 	}
 
     private void registerListeners() {
@@ -101,5 +111,8 @@ public class ProxyPlugin extends Plugin {
     public PluginConfiguration getPluginConfiguration() {
 		return pluginConfiguration;
 	}
+	public BanConfiguration getBanConfiguration() {return banConfiguration;}
+
+	public CommonPlugin getCommonPlugin() {return common;}
 
 }

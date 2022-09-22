@@ -2,6 +2,7 @@ package net.galacticprojects.bungeecord.command.impl;
 
 import java.util.UUID;
 
+import net.galacticprojects.bungeecord.entity.CommandPlayer;
 import net.galacticprojects.common.util.ComponentParser;
 
 import me.lauriichan.laylib.command.Action;
@@ -38,6 +39,17 @@ public class BungeeActor<P extends CommandSender> extends Actor<P> {
             return entity.getName();
         }
         return handle.getName();
+    }
+
+    @Override
+    public String getLanguage() {
+        CommandPlayer commandPlayer;
+        if(getId() != null) {
+            commandPlayer = new CommandPlayer(getId());
+            return commandPlayer.getLanguage();
+        }
+        commandPlayer = new CommandPlayer(handle.getName());
+        return commandPlayer.getLanguage();
     }
 
     @Override
