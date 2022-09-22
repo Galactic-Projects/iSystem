@@ -65,16 +65,15 @@ public final class SQLDatabase implements IMigrationSource {
 
     private final Timer timer;
 
-    private final Cache<UUID, Ban> banCache = newCache(UUID.class, 300);
-    private final Cache<UUID, Player> playerCache = newCache(UUID.class, 300);
-
+    private final Ref<List<Cache<?, ?>>> caches = Ref.of(new ArrayList<>());
     private final ExecutorService service = Executors.newCachedThreadPool();
 
-    private final Ref<List<Cache<?, ?>>> caches = Ref.of(new ArrayList<>());
-
+    private final Cache<UUID, Ban> banCache = newCache(UUID.class, 300);
+    private final Cache<UUID, Player> playerCache = newCache(UUID.class, 300);
     private final ISimpleLogger logger;
 
     public SQLDatabase(final ISimpleLogger logger, final IPoolProvider provider) {
+        caches.get();
         this.logger = logger;
         this.pool = Objects.requireNonNull(provider, "Provider can't be null").createPool();
         this.timer = new Timer();
