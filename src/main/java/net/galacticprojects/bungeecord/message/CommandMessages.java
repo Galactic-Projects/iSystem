@@ -20,5 +20,26 @@ public final class CommandMessages {
 			"$#command.maintenance.off"
 	})
 	public static MessageProvider COMMAND_MAINTENANCE_IDK;
-	
+
+	@Message(id = "generic.command.ban-player-not-found", content = {
+			" //to get Player '$player'"
+	})
+	public static MessageProvider COMMAND_BAN_PLAYER_NOT_FOUND;
+
+	@Message(id = "generic.command.ban-player-already-banned", content = {
+			" //to get Player '$player'"
+	})
+	public static MessageProvider COMMAND_BAN_PLAYER_ALREADY_BANNED;
+
+	@Message(id = "generic.command.ban-id-not-found", content = {
+			""
+	})
+	public static MessageProvider COMMAND_BAN_ID_NOT_FOUND;
+
+	@Message(id = "generic.command.ban-player-successfully", content = {
+			" //to get Reason '$reason'",
+			" //to get Player '$player'",
+			" //to get Time '$time'"
+	})
+	public static MessageProvider COMMAND_BAN_PLAYER_SUCCESSFULLY;
 }

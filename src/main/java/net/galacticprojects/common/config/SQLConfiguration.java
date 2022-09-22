@@ -29,7 +29,7 @@ public final class SQLConfiguration extends BaseConfiguration {
         }
         int port = config.getValueOrDefault("database.port", 3306).intValue();
         String host = config.getValueOrDefault("database.host", "localhost");
-        String database = config.getValueOrDefault("database.database", "root");
+        String database = config.getValueOrDefault("database.datenbank", "root");
         String username = config.getValueOrDefault("database.username", "root");
         String password = config.getValueOrDefault("database.password", "password");
         try {
