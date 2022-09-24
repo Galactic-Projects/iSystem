@@ -3,11 +3,14 @@ package net.galacticprojects.common;
 import me.lauriichan.laylib.command.ArgumentRegistry;
 import me.lauriichan.laylib.command.CommandManager;
 import me.lauriichan.laylib.localization.MessageManager;
+import me.lauriichan.laylib.localization.source.AnnotationMessageSource;
 import me.lauriichan.laylib.localization.source.EnumMessageSource;
 import me.lauriichan.laylib.logger.ISimpleLogger;
 import me.lauriichan.laylib.logger.JavaSimpleLogger;
 import net.galacticprojects.common.command.TranslationReloadCommand;
 import net.galacticprojects.common.command.message.CommandDescription;
+import net.galacticprojects.common.command.message.CommandManagerMessages;
+import net.galacticprojects.common.command.message.CommandMessages;
 import net.galacticprojects.common.command.provider.CommonPluginProvider;
 import net.galacticprojects.common.command.provider.SQLProvider;
 import net.galacticprojects.common.config.SQLConfiguration;
@@ -100,6 +103,8 @@ public final class CommonPlugin {
 	
 	private void registerMessages() {
 		messageManager.register(new EnumMessageSource(CommandDescription.class, messageProviderFactory));
+		messageManager.register(new EnumMessageSource(CommandManagerMessages.class, messageProviderFactory));
+		messageManager.register(new AnnotationMessageSource(CommandMessages.class, messageProviderFactory));
 	}
 
 	private void createConfigurations() {

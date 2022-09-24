@@ -123,7 +123,6 @@ public final class SQLDatabase implements IMigrationSource {
                 return player;
             } catch (SQLException e) {
                 logger.warning("A few SQL things went wrong while creating Player", e);
-                e.printStackTrace();
                 return null;
             }
 
@@ -152,7 +151,6 @@ public final class SQLDatabase implements IMigrationSource {
                 return null;
             }catch(SQLException e) {
                 logger.warning("A few SQL things went wrong while get Player", e);
-                e.printStackTrace();
                 return null;
             }
         }, service);
@@ -167,7 +165,6 @@ public final class SQLDatabase implements IMigrationSource {
                 return true;
             }catch (SQLException e) {
                 logger.warning("A few SQL things went wrong while delete Player", e);
-                e.printStackTrace();
                 return false;
             }
         }, service);
@@ -183,13 +180,12 @@ public final class SQLDatabase implements IMigrationSource {
                 statement.setString(4, reason);
                 statement.setString(5, TimeHelper.toString(time));
                 statement.setString(6, TimeHelper.toString(creationTime));
-                statement.execute();
+                statement.executeUpdate();
                 Ban ban = new Ban(uniqueId, owner, id, reason, time, creationTime);
                 banCache.put(uniqueId, ban);
                 return ban;
             } catch(SQLException e) {
                 logger.warning("A few SQL things went wrong while ban Player", e);
-                e.printStackTrace();
                 return null;
             }
         }, service);
@@ -207,7 +203,6 @@ public final class SQLDatabase implements IMigrationSource {
                 return true;
             } catch (SQLException e) {
                 logger.warning("A few SQL things went wrong while delete ban", e);
-                e.printStackTrace();
                 return false;
             }
         }, service);
@@ -235,7 +230,6 @@ public final class SQLDatabase implements IMigrationSource {
                 return null;
             } catch (SQLException e) {
                 logger.warning("A few SQL things went wrong while get ban", e);
-                e.printStackTrace();
                 return null;
             }
         }, service);

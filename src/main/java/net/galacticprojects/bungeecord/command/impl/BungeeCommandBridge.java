@@ -1,6 +1,7 @@
 package net.galacticprojects.bungeecord.command.impl;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import me.lauriichan.laylib.command.CommandManager;
@@ -35,10 +36,10 @@ public final class BungeeCommandBridge extends Command implements TabExecutor {
 	public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
 		Triple<NodeCommand, Node, String> triple = commandManager.findNode(name, args);
 		if (triple == null) {
-			return null;
+			return Collections.emptyList();
 		}
 		if (!triple.getB().hasChildren()) {
-			return null;
+			return Collections.emptyList();
 		}
 		return Arrays.asList(triple.getB().getNames());
 	}

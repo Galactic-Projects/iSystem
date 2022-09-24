@@ -2,6 +2,8 @@ package net.galacticprojects.bungeecord.command.impl;
 
 import java.util.UUID;
 
+import me.lauriichan.laylib.localization.Key;
+import me.lauriichan.laylib.localization.MessageProvider;
 import net.galacticprojects.bungeecord.entity.CommandPlayer;
 import net.galacticprojects.common.util.ComponentParser;
 
@@ -39,6 +41,11 @@ public class BungeeActor<P extends CommandSender> extends Actor<P> {
             return entity.getName();
         }
         return handle.getName();
+    }
+
+    @Override
+    public void sendTranslatedMessage(MessageProvider provider, Key... placeholders) {
+        sendMessage(messageManager.translate(provider, getLanguage(), placeholders));
     }
 
     @Override
