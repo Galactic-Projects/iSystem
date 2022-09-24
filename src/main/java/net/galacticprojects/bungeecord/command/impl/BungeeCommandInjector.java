@@ -17,6 +17,7 @@ public final class BungeeCommandInjector implements ICommandInjector {
     private final MessageManager messageManager;
     
     private final PluginManager pluginManager;
+    private final Plugin plugin;
     
     private final ConcurrentHashMap<String, BungeeCommandBridge> commands = new ConcurrentHashMap<>();
 
@@ -24,6 +25,7 @@ public final class BungeeCommandInjector implements ICommandInjector {
         this.listener = new BungeeCommandListener(commandManager, messageManager);
         this.messageManager = messageManager;
         this.commandManager = commandManager;
+        this.plugin = plugin;
         this.pluginManager = plugin.getProxy().getPluginManager();
         pluginManager.registerListener(plugin, listener);
     }
@@ -35,6 +37,7 @@ public final class BungeeCommandInjector implements ICommandInjector {
     	}
     	BungeeCommandBridge command = new BungeeCommandBridge(commandManager, messageManager, nodeCommand.getName(), nodeCommand.getAliases());
         commands.put(nodeCommand.getName(), command);
+        pluginManager.registerCommand(plugin, command);
     }
     
     @Override

@@ -8,12 +8,15 @@ import me.lauriichan.laylib.localization.MessageManager;
 import me.lauriichan.laylib.localization.source.*;
 import me.lauriichan.laylib.logger.ISimpleLogger;
 import net.galacticprojects.bungeecord.command.BanCommand;
+import net.galacticprojects.bungeecord.command.BungeeHelpCommand;
 import net.galacticprojects.bungeecord.command.MaintenanceCommand;
 import net.galacticprojects.bungeecord.command.impl.BungeeCommandInjector;
 import net.galacticprojects.bungeecord.command.provider.ProxyPluginProvider;
 import net.galacticprojects.bungeecord.config.BanConfiguration;
 import net.galacticprojects.bungeecord.config.PluginConfiguration;
 import net.galacticprojects.bungeecord.entity.CommandPlayer;
+import net.galacticprojects.bungeecord.listener.ConnectListener;
+import net.galacticprojects.bungeecord.message.BanMessage;
 import net.galacticprojects.bungeecord.message.CommandMessages;
 import net.galacticprojects.common.CommonPlugin;
 import net.galacticprojects.common.database.model.Ban;
@@ -28,11 +31,11 @@ public class ProxyPlugin extends Plugin {
 	
 	private PluginConfiguration pluginConfiguration;
 	private BanConfiguration banConfiguration;
+	private static ProxyPlugin plugin;
 
 	@Override
 	public void onLoad() {
-		common = new CommonPlugin(getLogger(), getDataFolder());
-		common.getCommandManager().setInjector(new BungeeCommandInjector(common.getCommandManager(), common.getMessageManager(), this));
+		common = new CommonPlugin(getLogger(), getDataFolder(), getFile());
 	}
 	
 	/*
@@ -41,12 +44,13 @@ public class ProxyPlugin extends Plugin {
 	
     @Override
     public void onEnable() {
-    	registerMessages();
+		plugin = this;
+		registerMessages();
+		common.getCommandManager().setInjector(new BungeeCommandInjector(common.getCommandManager(), common.getMessageManager(), this));
     	common.start();
     	// Other stuff after this
     	createConfigurations();
     	reloadConfigurations();
-		registerEntity();
     	registerListeners();
     	registerArgumentTypes();
     	registerCommands();
@@ -56,6 +60,7 @@ public class ProxyPlugin extends Plugin {
     	MessageManager messageManager = common.getMessageManager();
     	MessageProviderFactoryImpl factory = common.getMessageProviderFactory();
     	// Register messages below
+		messageManager.register(new EnumMessageSource(BanMessage.class, factory));
     	messageManager.register(new EnumMessageSource(CommandDescription.class, factory));
 		messageManager.register(new AnnotationMessageSource(CommandMessages.class, factory));
     }
@@ -73,13 +78,9 @@ public class ProxyPlugin extends Plugin {
 		banConfiguration.reload();
 	}
 
-	private void registerEntity() {
-		new CommandPlayer(this);
-	}
-
     private void registerListeners() {
         PluginManager manager = getProxy().getPluginManager();
-        
+        manager.registerListener(this, new ConnectListener(this));
     }
     
     private void registerArgumentTypes() {
@@ -89,6 +90,7 @@ public class ProxyPlugin extends Plugin {
     
     private void registerCommands() {
     	CommandManager commandManager = common.getCommandManager();
+		commandManager.register(BungeeHelpCommand.class);
     	commandManager.register(MaintenanceCommand.class);
 		commandManager.register(BanCommand.class);
     }
@@ -99,8 +101,7 @@ public class ProxyPlugin extends Plugin {
 
     @Override
     public void onDisable() {
-    	
-    	// Other stuff before this
+		pluginConfiguration.save();
     	common.stop();
     }
     
@@ -114,5 +115,9 @@ public class ProxyPlugin extends Plugin {
 	public BanConfiguration getBanConfiguration() {return banConfiguration;}
 
 	public CommonPlugin getCommonPlugin() {return common;}
+
+	public static ProxyPlugin getInstance() {
+return plugin;
+	}
 
 }

@@ -21,12 +21,8 @@ public class CommandPlayer {
 
     UUID uniqueId;
 
-    ProxyPlugin plugin;
+    ProxyPlugin plugin = ProxyPlugin.getInstance();
     String name;
-
-    public CommandPlayer(ProxyPlugin plugin) {
-        this.plugin = plugin;
-    }
 
     public CommandPlayer(ProxiedPlayer player) {
         this.uniqueId = player.getUniqueId();
@@ -35,61 +31,11 @@ public class CommandPlayer {
     public CommandPlayer(UUID uniqueId) {
         this.uniqueId = uniqueId;
     }
-
     public CommandPlayer(Actor<?> sender) {
         this.name = sender.getName();
     }
     public CommandPlayer(String name) {
         this.name = name;
-    }
-
-    /**
-     * bans the player and kicks him if he is online
-     *
-     * @return the Ban information
-     */
-    public Ban banPlayer(final UUID owner, final String reason, final OffsetDateTime time, final OffsetDateTime creationTime) {
-        if(uniqueId == null) {
-            this.uniqueId = MojangProfileService.getUniqueId(name);
-        }
-            if(getBan() != null) {
-                return null;
-            }
-            ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uniqueId);
-            if(player != null) {
-                player.disconnect(new TextComponent(plugin.getCommonPlugin().getMessageManager().translate("generic.player.ban.kick", "en-uk", Key.of("reason", reason))));
-            }
-            SQLDatabase database = plugin.getCommonPlugin().getDatabaseRef().get();
-            return database.banPlayer(uniqueId, owner, reason, time, creationTime).join();
-    }
-
-    /**
-     * Gets the ban information from the player if it exists
-     *
-     * @return the Ban information
-     */
-    public Ban getBan() {
-        if(uniqueId == null) {
-            this.uniqueId = MojangProfileService.getUniqueId(name);
-        }
-        SQLDatabase database = plugin.getCommonPlugin().getDatabaseRef().get();
-        return database.getBan(uniqueId).join();
-    }
-
-    /**
-     * Deletes the ban of the player if he is banned
-     *
-     * @return true or false
-     */
-    public boolean deleteBan() {
-        if(uniqueId == null) {
-            this.uniqueId = MojangProfileService.getUniqueId(name);
-        }
-        if(getBan() == null) {
-            return false;
-        }
-        SQLDatabase database = plugin.getCommonPlugin().getDatabaseRef().get();
-        return database.deleteBan(uniqueId).join();
     }
 
     public String getLanguage() {

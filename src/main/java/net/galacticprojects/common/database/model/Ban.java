@@ -12,14 +12,15 @@ public class Ban {
 
     private final UUID player;
     private final UUID owner;
-
+    private final int id;
     private final String reason;
     private final OffsetDateTime time;
     private final OffsetDateTime creationTime;
 
-    public Ban(final UUID player, final UUID owner, final String reason, final OffsetDateTime time, final OffsetDateTime creationTime) {
+    public Ban(final UUID player, final UUID owner, final int id, final String reason, final OffsetDateTime time, final OffsetDateTime creationTime) {
         this.player = player;
         this.owner = owner;
+        this.id = id;
         this.reason = reason;
         this.time = time;
         this.creationTime = creationTime;
@@ -76,4 +77,7 @@ public class Ban {
         return creationTime;
     }
 
+    public int getId() {
+        return id;
+    }
 }

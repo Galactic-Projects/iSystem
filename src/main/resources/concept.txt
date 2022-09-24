@@ -19,7 +19,6 @@ _ ban system (CHOOSABLE REASON)
         - 1 Cheating/Unauthorized client modification
         - 2 Racism
         - 3 National Socialism
-_ teamchat login/logout saved via. database
 _ Clansystem (saved via. Database | max. 50)
 _ friendsystem (saved via. Database | Unlimited)
 _ partysystem (saved via. Database)

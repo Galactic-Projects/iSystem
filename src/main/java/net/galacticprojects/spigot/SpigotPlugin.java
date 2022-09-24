@@ -3,6 +3,7 @@ package net.galacticprojects.spigot;
 import net.galacticprojects.bungeecord.config.PluginConfiguration;
 import net.galacticprojects.common.CommonPlugin;
 import net.galacticprojects.common.message.MessageProviderFactoryImpl;
+import net.galacticprojects.spigot.command.HelpCommand;
 import net.galacticprojects.spigot.command.SubtitleCommand;
 import net.galacticprojects.spigot.command.impl.BukkitCommandInjector;
 import net.galacticprojects.spigot.command.provider.SpigotPluginProvider;
@@ -30,7 +31,7 @@ public class SpigotPlugin extends JavaPlugin {
 
 	@Override
 	public void onLoad() {
-		common = new CommonPlugin(getLogger(), getDataFolder());
+		common = new CommonPlugin(getLogger(), getDataFolder(), getFile());
 		common.getCommandManager().setInjector(new BukkitCommandInjector(common.getCommandManager(), common.getMessageManager(), this));
 	}
 	
@@ -81,6 +82,7 @@ public class SpigotPlugin extends JavaPlugin {
     
     private void registerCommands() {
     	CommandManager commandManager = common.getCommandManager();
+		commandManager.register(HelpCommand.class);
     	commandManager.register(SubtitleCommand.class);
     }
     

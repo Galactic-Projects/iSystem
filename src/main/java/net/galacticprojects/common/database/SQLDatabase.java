@@ -54,7 +54,7 @@ public final class SQLDatabase implements IMigrationSource {
     public static final String SELECT_PLAYER_BAN = String.format("SELECT * FROM `%s` WHERE Player = ?", SQLTable.BAN_TABLE);
     public static final String DELETE_PLAYER_BAN = String.format("DELETE FROM `%s` WHERE Player = ?", SQLTable.BAN_TABLE);
     public static final String INSERT_PLAYER_BAN = String
-            .format("INSERT INTO `%s` (Player, Owner, Reason, Time, CreationTime) VALUES (?,?,?,?,?)", SQLTable.BAN_TABLE);
+            .format("INSERT INTO `%s` (Player, Owner, Id, Reason, Time, CreationTime) VALUES (?,?,?,?,?,?)", SQLTable.BAN_TABLE);
 
     public static final String SELECT_PLAYER = String.format("SELECT * FROM `%s` WHERE Player = ?", SQLTable.PLAYER_TABLE);
     public static final String DELETE_PLAYER = String.format("DELETE FROM `%s` WHERE Player = ?", SQLTable.PLAYER_TABLE);
@@ -123,7 +123,6 @@ public final class SQLDatabase implements IMigrationSource {
                 return player;
             } catch (SQLException e) {
                 logger.warning("A few SQL things went wrong while creating Player", e);
-                e.printStackTrace();
                 return null;
             }
 
@@ -152,7 +151,6 @@ public final class SQLDatabase implements IMigrationSource {
                 return null;
             }catch(SQLException e) {
                 logger.warning("A few SQL things went wrong while get Player", e);
-                e.printStackTrace();
                 return null;
             }
         }, service);
@@ -167,28 +165,27 @@ public final class SQLDatabase implements IMigrationSource {
                 return true;
             }catch (SQLException e) {
                 logger.warning("A few SQL things went wrong while delete Player", e);
-                e.printStackTrace();
                 return false;
             }
         }, service);
     }
 
-    public CompletableFuture<Ban> banPlayer(final UUID uniqueId, final UUID owner, final String reason, final OffsetDateTime time, final OffsetDateTime creationTime) {
+    public CompletableFuture<Ban> banPlayer(final UUID uniqueId, final UUID owner, final int id, final String reason, final OffsetDateTime time, final OffsetDateTime creationTime) {
         return CompletableFuture.supplyAsync(() -> {
             try (Connection connection = pool.getConnection()) {
                 PreparedStatement statement = connection.prepareStatement(INSERT_PLAYER_BAN);
                 statement.setString(1, uniqueId.toString());
                 statement.setString(2, owner.toString());
-                statement.setString(3, reason);
-                statement.setString(4, TimeHelper.toString(time));
-                statement.setString(5, TimeHelper.toString(creationTime));
-                statement.execute();
-                Ban ban = new Ban(uniqueId, owner, reason, time, creationTime);
+                statement.setInt(3, id);
+                statement.setString(4, reason);
+                statement.setString(5, TimeHelper.toString(time));
+                statement.setString(6, TimeHelper.toString(creationTime));
+                statement.executeUpdate();
+                Ban ban = new Ban(uniqueId, owner, id, reason, time, creationTime);
                 banCache.put(uniqueId, ban);
                 return ban;
             } catch(SQLException e) {
                 logger.warning("A few SQL things went wrong while ban Player", e);
-                e.printStackTrace();
                 return null;
             }
         }, service);
@@ -206,7 +203,6 @@ public final class SQLDatabase implements IMigrationSource {
                 return true;
             } catch (SQLException e) {
                 logger.warning("A few SQL things went wrong while delete ban", e);
-                e.printStackTrace();
                 return false;
             }
         }, service);
@@ -223,17 +219,17 @@ public final class SQLDatabase implements IMigrationSource {
                 ResultSet set = statement.executeQuery();
                 if(set.next()) {
                     UUID owner = UUID.fromString(set.getString("Owner"));
+                    int id = set.getInt("Id");
                     String reason = set.getString("Reason");
                     OffsetDateTime time = TimeHelper.fromString(set.getString("Time"));
                     OffsetDateTime creationTime = TimeHelper.fromString(set.getString("CreationTime"));
-                    Ban ban = new Ban(uniqueId, owner, reason, time, creationTime);
+                    Ban ban = new Ban(uniqueId, owner, id, reason, time, creationTime);
                     banCache.put(uniqueId, ban);
                     return ban;
                 }
                 return null;
             } catch (SQLException e) {
                 logger.warning("A few SQL things went wrong while get ban", e);
-                e.printStackTrace();
                 return null;
             }
         }, service);
