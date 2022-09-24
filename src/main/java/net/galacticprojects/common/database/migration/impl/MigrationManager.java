@@ -26,6 +26,8 @@ import net.galacticprojects.common.util.source.Resources;
 
 public final class MigrationManager implements IMigrationManager {
 
+    private static final Object[] EMPTY = new Object[0];
+
     private static final Ref<MigrationManager> MIGRATION_MANAGER = Ref.of();
 
     public static MigrationManager manager() {
@@ -43,6 +45,9 @@ public final class MigrationManager implements IMigrationManager {
         }
         MIGRATION_MANAGER.set(this).lock();
         this.logger = logger;
+        Object[] loggerParams = new Object[]{
+                logger
+        };
         try (BufferedReader reader = new BufferedReader(
                 resources.pathIntern(MigrationProcessor.MIGRATION_RESOURCE).openReader())) {
             String line;
@@ -68,9 +73,15 @@ public final class MigrationManager implements IMigrationManager {
                 }
                 MigrationType<?, ?> type = types.get(typeClazz);
                 if (!types.isRegistered(typeClazz)) {
+                    Constructor<?> constructor = ClassUtil.getConstructor(typeClazz, ISimpleLogger.class);
+                    Object[] params =loggerParams;
+                    if(constructor == null) {
+                        constructor = ClassUtil.getConstructor(typeClazz);
+                        params = EMPTY;
+                    }
                     try {
-                        type = (MigrationType<?, ?>) JavaAccess.instance(typeClazz.asSubclass(MigrationType.class));
-                    } catch (final Exception e) {
+                        type = (MigrationType<?, ?>) JavaAccess.instanceThrows(constructor, params);
+                    } catch (final Throwable e) {
                         logger.warning("Failed to create instance of migration type '{0}'!", e, typeClazz.getSimpleName());
                         continue;
                     }

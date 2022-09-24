@@ -27,6 +27,11 @@ public final class BungeeCommandBridge extends Command implements TabExecutor {
 	}
 
 	@Override
+	public void execute(CommandSender sender, String[] args) {
+		commandManager.createProcess(new BungeeActor<>(sender, messageManager), name, args);
+	}
+
+	@Override
 	public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
 		Triple<NodeCommand, Node, String> triple = commandManager.findNode(name, args);
 		if (triple == null) {
@@ -36,11 +41,6 @@ public final class BungeeCommandBridge extends Command implements TabExecutor {
 			return null;
 		}
 		return Arrays.asList(triple.getB().getNames());
-	}
-
-	@Override
-	public void execute(CommandSender sender, String[] args) {
-		commandManager.createProcess(new BungeeActor<>(sender, messageManager), name, args);
 	}
 
 }

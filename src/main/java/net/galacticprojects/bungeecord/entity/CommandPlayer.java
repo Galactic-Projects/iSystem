@@ -21,12 +21,8 @@ public class CommandPlayer {
 
     UUID uniqueId;
 
-    ProxyPlugin plugin;
+    ProxyPlugin plugin = ProxyPlugin.getInstance();
     String name;
-
-    public CommandPlayer(ProxyPlugin plugin) {
-        this.plugin = plugin;
-    }
 
     public CommandPlayer(ProxiedPlayer player) {
         this.uniqueId = player.getUniqueId();
@@ -35,7 +31,6 @@ public class CommandPlayer {
     public CommandPlayer(UUID uniqueId) {
         this.uniqueId = uniqueId;
     }
-
     public CommandPlayer(Actor<?> sender) {
         this.name = sender.getName();
     }
@@ -48,7 +43,7 @@ public class CommandPlayer {
      *
      * @return the Ban information
      */
-    public Ban banPlayer(final UUID owner, final String reason, final OffsetDateTime time, final OffsetDateTime creationTime) {
+    public Ban banPlayer(final UUID owner, final String reason, final int id, final OffsetDateTime time, final OffsetDateTime creationTime) {
         if(uniqueId == null) {
             this.uniqueId = MojangProfileService.getUniqueId(name);
         }
@@ -60,7 +55,7 @@ public class CommandPlayer {
                 player.disconnect(new TextComponent(plugin.getCommonPlugin().getMessageManager().translate("generic.player.ban.kick", "en-uk", Key.of("reason", reason))));
             }
             SQLDatabase database = plugin.getCommonPlugin().getDatabaseRef().get();
-            return database.banPlayer(uniqueId, owner, reason, time, creationTime).join();
+            return database.banPlayer(uniqueId, owner, id, reason, time, creationTime).join();
     }
 
     /**

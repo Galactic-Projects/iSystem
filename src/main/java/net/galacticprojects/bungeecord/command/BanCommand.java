@@ -19,7 +19,7 @@ import java.util.UUID;
 @Command(name = "ban", description = "command.description.ban")
 public class BanCommand {
 
-    @Action("create")
+    @Action("")
     @Permission("system.ban")
     public void banCreate(Actor<?> actor, ProxyPlugin plugin, @Argument(name = "player") String name, @Argument(index = 1, params = {
             @Param(type = 3, name = "min", intValue = 1),
@@ -49,13 +49,13 @@ public class BanCommand {
         }
         OffsetDateTime creation = OffsetDateTime.now();
         OffsetDateTime time = info.getHours() == 0 ? null : creation.plusHours(info.getHours());
-        commandPlayer.banPlayer(actor.getId(), info.getReason(), time, creation);
+        commandPlayer.banPlayer(actor.getId(), info.getReason(), banId, time, creation);
         sender.sendMessage(new TextComponent(senderActor.getTranslatedMessageAsString("generic.command.ban-player-successfully", Key.of("player", name), Key.of("time", info.getHours() == 0 ? null : creation.plusHours(info.getHours())), Key.of("reason", info.getReason()))));
     }
 
     @Action("delete")
     @Permission("system.ban")
-    public void banDelete(Actor<?> actor, @Argument(name = "player") String name) {
+    public void banDelete(Actor<?> actor, ProxyPlugin plugin, @Argument(name = "player") String name) {
         Actor<CommandSender> senderActor = actor.as(CommandSender.class);
         if(!senderActor.isValid()) {
             return;

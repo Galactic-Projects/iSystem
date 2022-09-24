@@ -14,6 +14,7 @@ import net.galacticprojects.bungeecord.command.provider.ProxyPluginProvider;
 import net.galacticprojects.bungeecord.config.BanConfiguration;
 import net.galacticprojects.bungeecord.config.PluginConfiguration;
 import net.galacticprojects.bungeecord.entity.CommandPlayer;
+import net.galacticprojects.bungeecord.listener.ConnectListener;
 import net.galacticprojects.bungeecord.message.CommandMessages;
 import net.galacticprojects.common.CommonPlugin;
 import net.galacticprojects.common.database.model.Ban;
@@ -28,11 +29,11 @@ public class ProxyPlugin extends Plugin {
 	
 	private PluginConfiguration pluginConfiguration;
 	private BanConfiguration banConfiguration;
+	private static ProxyPlugin plugin;
 
 	@Override
 	public void onLoad() {
-		common = new CommonPlugin(getLogger(), getDataFolder());
-		common.getCommandManager().setInjector(new BungeeCommandInjector(common.getCommandManager(), common.getMessageManager(), this));
+		common = new CommonPlugin(getLogger(), getDataFolder(), getFile());
 	}
 	
 	/*
@@ -41,12 +42,13 @@ public class ProxyPlugin extends Plugin {
 	
     @Override
     public void onEnable() {
-    	registerMessages();
+		plugin = this;
+		registerMessages();
+		common.getCommandManager().setInjector(new BungeeCommandInjector(common.getCommandManager(), common.getMessageManager(), this));
     	common.start();
     	// Other stuff after this
     	createConfigurations();
     	reloadConfigurations();
-		registerEntity();
     	registerListeners();
     	registerArgumentTypes();
     	registerCommands();
@@ -73,13 +75,9 @@ public class ProxyPlugin extends Plugin {
 		banConfiguration.reload();
 	}
 
-	private void registerEntity() {
-		new CommandPlayer(this);
-	}
-
     private void registerListeners() {
         PluginManager manager = getProxy().getPluginManager();
-        
+        manager.registerListener(this, new ConnectListener(this));
     }
     
     private void registerArgumentTypes() {
@@ -114,5 +112,9 @@ public class ProxyPlugin extends Plugin {
 	public BanConfiguration getBanConfiguration() {return banConfiguration;}
 
 	public CommonPlugin getCommonPlugin() {return common;}
+
+	public static ProxyPlugin getInstance() {
+return plugin;
+	}
 
 }
