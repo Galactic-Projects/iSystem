@@ -2,9 +2,12 @@ package net.galacticprojects.bungeecord.listener;
 
 import me.lauriichan.laylib.localization.Key;
 import net.galacticprojects.bungeecord.ProxyPlugin;
+import net.galacticprojects.bungeecord.message.BanMessage;
+import net.galacticprojects.bungeecord.message.CommandMessages;
 import net.galacticprojects.common.database.SQLDatabase;
 import net.galacticprojects.common.database.model.Ban;
 import net.galacticprojects.common.database.model.Player;
+import net.galacticprojects.common.util.TimeHelper;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.LoginEvent;
@@ -39,7 +42,8 @@ public class ConnectListener implements Listener {
         if(ban == null) {
             return;
         }
-        player.disconnect(new TextComponent(plugin.getCommonPlugin().getMessageManager().translate("command.ban.id." + ban.getId(), playerData.getLanguage(), Key.of("$time", ban.getTime()))));
+        BanMessage message = BanMessage.valueOf("COMMAND_BAN_ID_" + ban.getId());
+        player.disconnect(new TextComponent(plugin.getCommonPlugin().getMessageManager().translate(CommandMessages.COMMAND_PLAYER_BANNED, playerData.getLanguage(), Key.of("time", TimeHelper.BAN_TIME_FORMATTER.format(ban.getTime())), Key.of("reason", message))));
     }
 
 }
