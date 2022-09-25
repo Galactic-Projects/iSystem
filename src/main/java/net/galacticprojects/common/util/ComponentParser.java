@@ -18,13 +18,14 @@ public final class ComponentParser {
         throw new UnsupportedOperationException();
     }
 
+
     public static BaseComponent[] parse(final String richString) {
         return parse(richString, DEFAULT_COLOR, null, null);
     }
 
     public static BaseComponent[] parse(final String richString, final ChatColor defaultColor) {
         return parse(richString, defaultColor == null || defaultColor.getColor() == null ? DEFAULT_COLOR : defaultColor.getColor(), null,
-            null);
+                null);
     }
 
     public static BaseComponent[] parse(final String richString, final Color defaultColor) {
