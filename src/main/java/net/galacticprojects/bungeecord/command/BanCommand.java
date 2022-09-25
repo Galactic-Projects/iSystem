@@ -9,7 +9,6 @@ import net.galacticprojects.bungeecord.ProxyPlugin;
 import net.galacticprojects.bungeecord.command.impl.BungeeActor;
 import net.galacticprojects.bungeecord.config.BanConfiguration;
 import net.galacticprojects.bungeecord.config.info.BanInfo;
-import net.galacticprojects.bungeecord.entity.CommandPlayer;
 import net.galacticprojects.bungeecord.message.BanMessage;
 import net.galacticprojects.bungeecord.message.CommandMessages;
 import net.galacticprojects.common.CommonPlugin;
@@ -31,25 +30,24 @@ public class BanCommand {
 
     @Action("create")
     @Permission("system.ban")
-    public void banCreate(Actor<?> actor, CommonPlugin common, ProxyPlugin plugin, @Argument(name = "player") String name, @Argument(name = "ban id", params = {
+    public void banCreate(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin, @Argument(name = "player") String name, @Argument(name = "ban id", params = {
             @Param(type = 3, name = "minimum", intValue = 1),
             @Param(type = 3,name = "maximum", intValue = 99)
     }) int banId) {
 
-        Actor<CommandSender> senderActor = actor.as(CommandSender.class);
-        if(!senderActor.isValid()) {
+        if(!actor.isValid()) {
             return;
         }
-        CommandSender sender = senderActor.getHandle();
+        CommandSender sender = actor.getHandle();
         UUID uniqueId = MojangProfileService.getUniqueId(name.startsWith("!") ? name.substring(1) : name);
         if(uniqueId == null) {
-            senderActor.sendTranslatedMessage(CommandMessages.COMMAND_GENERAL_PLAYER_NOT_FOUND, Key.of("player", name));
+            actor.sendTranslatedMessage(CommandMessages.COMMAND_GENERAL_PLAYER_NOT_FOUND, Key.of("player", name));
             return;
         }
         BanConfiguration banConfiguration = plugin.getBanConfiguration();
         BanInfo info = banConfiguration.getInfo(banId);
         if(info == null) {
-            senderActor.sendTranslatedMessage(CommandMessages.COMMAND_BAN_ID_NOT_FOUND, Key.of("id", banId));
+            actor.sendTranslatedMessage(CommandMessages.COMMAND_BAN_ID_NOT_FOUND, Key.of("id", banId));
             return;
         }
         SQLDatabase database = common.getDatabaseRef().get();
@@ -59,12 +57,12 @@ public class BanCommand {
         }
         database.getBan(uniqueId).thenAccept(existingBan -> {
             if(existingBan != null) {
-                senderActor.sendTranslatedMessage(CommandMessages.COMMAND_BAN_CREATE_ALREADY_BANNED, Key.of("player", name));
+                actor.sendTranslatedMessage(CommandMessages.COMMAND_BAN_CREATE_ALREADY_BANNED, Key.of("player", name));
                 return;
             }
             OffsetDateTime creation = OffsetDateTime.now();
             OffsetDateTime time = info.getHours() == 0 ? null : creation.plusHours(info.getHours());
-            database.banPlayer(uniqueId, senderActor.getId(), banId, info.getReason(), time, creation).thenAccept(ban -> {
+            database.banPlayer(uniqueId, actor.getId(), banId, info.getReason(), time, creation).thenAccept(ban -> {
                 if(ban == null){
                     // TODO: Ban unsuccessful
                     return;
@@ -72,12 +70,14 @@ public class BanCommand {
 
                 BanMessage message = BanMessage.valueOf("COMMAND_BAN_ID_" + banId);
 
-                String message1 = common.getMessageManager().getMessage(message.id(), senderActor.getLanguage()).value();
-                senderActor.sendTranslatedMessage(CommandMessages.COMMAND_BAN_CREATE_SUCCESS, Key.of("player", name), Key.of("time", TimeHelper.BAN_TIME_FORMATTER.format(creation.plusHours(info.getHours()))), Key.of("reason", message1));
-                ProxiedPlayer proxiedPlayer = plugin.getProxy().getPlayer(uniqueId);
-                if(proxiedPlayer != null) {
-                    proxiedPlayer.disconnect(ComponentParser.parse(new BungeeActor<ProxiedPlayer>(proxiedPlayer, common.getMessageManager()).getTranslatedMessageAsString(CommandMessages.COMMAND_PLAYER_BANNED.getId(), Key.of("reason", message.id()), Key.of("time", TimeHelper.BAN_TIME_FORMATTER.format(time)))));
-                }
+                String message1 = common.getMessageManager().translate(message.id(), actor.getLanguage());
+                    actor.sendTranslatedMessage(CommandMessages.COMMAND_BAN_CREATE_SUCCESS, common, Key.of("player", name), Key.of("time", TimeHelper.BAN_TIME_FORMATTER.format(creation.plusHours(info.getHours()))), Key.of("reason", message1));
+                    ProxiedPlayer proxiedPlayer = plugin.getProxy().getPlayer(uniqueId);
+                    if(proxiedPlayer != null) {
+                        database.getPlayer(uniqueId).thenAccept(players -> {
+                            proxiedPlayer.disconnect(ComponentParser.parse(new BungeeActor<ProxiedPlayer>(proxiedPlayer, common.getMessageManager()).getTranslatedMessageAsString(CommandMessages.COMMAND_PLAYER_BANNED.getId(), players.getLanguage(), Key.of("reason", message.id()), Key.of("time", TimeHelper.BAN_TIME_FORMATTER.format(time)))));
+                        });
+                    }
             });
         });
     }

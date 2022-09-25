@@ -57,9 +57,11 @@ public final class SQLDatabase implements IMigrationSource {
             .format("INSERT INTO `%s` (Player, Owner, Id, Reason, Time, CreationTime) VALUES (?,?,?,?,?,?)", SQLTable.BAN_TABLE);
 
     public static final String SELECT_PLAYER = String.format("SELECT * FROM `%s` WHERE Player = ?", SQLTable.PLAYER_TABLE);
+    public static final String SELECT_IP_PLAYER = String.format("SELECT * FROM `%s` WHERE Ip = ?", SQLTable.PLAYER_TABLE);
     public static final String DELETE_PLAYER = String.format("DELETE FROM `%s` WHERE Player = ?", SQLTable.PLAYER_TABLE);
     public static final String INSERT_PLAYER = String
             .format("INSERT INTO `%s` (Player, Ip, Coins, Level, Language, OnlineTime) VALUES (?, ?, ?, ?, ?, ?)", SQLTable.PLAYER_TABLE);
+    public static final String UPDATE_PLAYER = String.format("UPDATE `%s` SET Ip = ?, Coins = ?, Level = ?, Language = ?, OnlineTime = ? WHERE Player = ?", SQLTable.PLAYER_TABLE);
 
     private final HikariPool pool;
 
@@ -70,6 +72,7 @@ public final class SQLDatabase implements IMigrationSource {
 
     private final Cache<UUID, Ban> banCache = newCache(UUID.class, 300);
     private final Cache<UUID, Player> playerCache = newCache(UUID.class, 300);
+    private final Cache<String, Player> playerIpCache = newCache(String.class, 300);
     private final ISimpleLogger logger;
 
     public SQLDatabase(final ISimpleLogger logger, final IPoolProvider provider) {
@@ -156,6 +159,33 @@ public final class SQLDatabase implements IMigrationSource {
         }, service);
     }
 
+    public CompletableFuture<Player> getPlayer(String ip) {
+        return CompletableFuture.supplyAsync(() -> {
+            if(playerIpCache.has(ip)) {
+                return playerIpCache.get(ip);
+            }
+            try(Connection connection = pool.getConnection()) {
+                PreparedStatement statement = connection.prepareStatement(SELECT_IP_PLAYER);
+                statement.setString(1, ip);
+                ResultSet set = statement.executeQuery();
+                if(set.next()) {
+                    UUID uniqueId = UUID.fromString(set.getString("Player"));
+                    int coins = set.getInt("Coins");
+                    int level = set.getInt("Level");
+                    String language = set.getString("Language");
+                    long onlineTime = set.getLong("OnlineTime");
+                    Player player = new Player(uniqueId, ip, onlineTime, coins, language, level);
+                    playerIpCache.put(ip, player);
+                    return player;
+                }
+                return null;
+            }catch(SQLException e) {
+                logger.warning("A few SQL things went wrong while get Player", e);
+                return null;
+            }
+        }, service);
+    }
+
     public CompletableFuture<Boolean> deletePlayer(UUID uniqueId) {
         return CompletableFuture.supplyAsync(() -> {
             try(Connection connection = pool.getConnection()) {
@@ -166,6 +196,30 @@ public final class SQLDatabase implements IMigrationSource {
             }catch (SQLException e) {
                 logger.warning("A few SQL things went wrong while delete Player", e);
                 return false;
+            }
+        }, service);
+    }
+
+    public CompletableFuture<Player> updatePlayer(UUID uniqueId, String ip, int coins, int level, String language, long onlineTime) {
+        return CompletableFuture.supplyAsync(() -> {
+            try(Connection connection = pool.getConnection()) {
+                PreparedStatement statement = connection.prepareStatement(UPDATE_PLAYER);
+                statement.setString(1, ip);
+                statement.setInt(2, coins);
+                statement.setInt(3, level);
+                statement.setString(4, language);
+                statement.setLong(5, onlineTime);
+                statement.setString(6, uniqueId.toString());
+                statement.executeUpdate();
+                if(playerCache.has(uniqueId)) {
+                    playerCache.remove(uniqueId);
+                }
+                Player player = new Player(uniqueId, ip, onlineTime, coins, language, level);
+                playerCache.put(uniqueId, player);
+                return player;
+            }catch (SQLException e) {
+                logger.warning("A few SQL things went wrong while delete Player", e);
+                return null;
             }
         }, service);
     }

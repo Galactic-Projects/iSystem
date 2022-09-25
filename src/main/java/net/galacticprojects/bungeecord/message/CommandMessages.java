@@ -42,6 +42,9 @@ public final class CommandMessages {
 	@Message(id = "command.ban.delete.success", content = "$#plugin.prefix The ban of $player was successfully deleted")
 	public static MessageProvider COMMAND_BAN_DELETE_SUCCESS;
 
+	@Message(id = "command.language.changed", content = "$#plugin.prefix Your language has been successfully changed to $language")
+	public static MessageProvider COMMAND_LANGUAGE_CHANGED;
+
 	@Message(id = "command.player.banned", content = {
 			"&8「 &5&lGALACTIC&d&lPROJECTS &8」",
 			"&r",
@@ -52,4 +55,7 @@ public final class CommandMessages {
 			"&7If you think that you were banned wrongly, or you want to apologize for your actions, you can submit a ban request in the Discord support or on the website."
 	})
 	public static MessageProvider COMMAND_PLAYER_BANNED;
+
+	@Message(id = "command.onlinetime.success", content = "$#plugin.prefix Your &bonline-time &7is &c$daystime Day(s)&7, &c$hourtime Hour(s)&7 and &c$minutetime Minute(s)&7.")
+	public static MessageProvider COMMAND_ONLINETIME_SUCCESS;
 }

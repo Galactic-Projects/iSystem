@@ -1,10 +1,14 @@
 package net.galacticprojects.bungeecord.command.impl;
 
+import java.sql.SQLData;
 import java.util.UUID;
 
 import me.lauriichan.laylib.localization.Key;
 import me.lauriichan.laylib.localization.MessageProvider;
-import net.galacticprojects.bungeecord.entity.CommandPlayer;
+import net.galacticprojects.bungeecord.ProxyPlugin;
+import net.galacticprojects.common.CommonPlugin;
+import net.galacticprojects.common.database.SQLDatabase;
+import net.galacticprojects.common.database.model.Player;
 import net.galacticprojects.common.util.ComponentParser;
 
 import me.lauriichan.laylib.command.Action;
@@ -12,11 +16,13 @@ import me.lauriichan.laylib.command.ActionMessage;
 import me.lauriichan.laylib.command.Actor;
 import me.lauriichan.laylib.localization.MessageManager;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.HoverEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.chat.hover.content.Text;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.plugin.Plugin;
 
 public class BungeeActor<P extends CommandSender> extends Actor<P> {
 
@@ -43,20 +49,21 @@ public class BungeeActor<P extends CommandSender> extends Actor<P> {
         return handle.getName();
     }
 
-    @Override
-    public void sendTranslatedMessage(MessageProvider provider, Key... placeholders) {
+    public void sendTranslatedMessage(MessageProvider provider, CommonPlugin plugin, Key... placeholders) {
         sendMessage(messageManager.translate(provider, getLanguage(), placeholders));
     }
 
-    @Override
-    public String getLanguage() {
-        CommandPlayer commandPlayer;
-        if(getId() != null) {
-            commandPlayer = new CommandPlayer(getId());
-            return commandPlayer.getLanguage();
+    public String getTranslatedMessageAsString(String messageId, String language, Key... placeholders) {
+        return this.messageManager.translate(messageId, language, placeholders);
+    }
+
+    public String getLanguage(CommonPlugin plugin) {
+        SQLDatabase database = plugin.getDatabaseRef().get();
+        if(database != null) {
+        Player player = database.getPlayer(getId()).join();
+        return player.getLanguage();
         }
-        commandPlayer = new CommandPlayer(handle.getName());
-        return commandPlayer.getLanguage();
+        return "en-uk";
     }
 
     @Override

@@ -7,23 +7,26 @@ import me.lauriichan.laylib.command.CommandManager;
 import me.lauriichan.laylib.localization.MessageManager;
 import me.lauriichan.laylib.localization.source.*;
 import me.lauriichan.laylib.logger.ISimpleLogger;
-import net.galacticprojects.bungeecord.command.BanCommand;
-import net.galacticprojects.bungeecord.command.BungeeHelpCommand;
-import net.galacticprojects.bungeecord.command.MaintenanceCommand;
+import net.galacticprojects.bungeecord.command.*;
 import net.galacticprojects.bungeecord.command.impl.BungeeCommandInjector;
 import net.galacticprojects.bungeecord.command.provider.ProxyPluginProvider;
 import net.galacticprojects.bungeecord.config.BanConfiguration;
 import net.galacticprojects.bungeecord.config.PluginConfiguration;
-import net.galacticprojects.bungeecord.entity.CommandPlayer;
 import net.galacticprojects.bungeecord.listener.ConnectListener;
+import net.galacticprojects.bungeecord.listener.PingListener;
 import net.galacticprojects.bungeecord.message.BanMessage;
 import net.galacticprojects.bungeecord.message.CommandMessages;
+import net.galacticprojects.bungeecord.message.SystemMessage;
+import net.galacticprojects.bungeecord.message.TimeMessage;
+import net.galacticprojects.bungeecord.util.OnlineTime;
+import net.galacticprojects.bungeecord.util.TablistManager;
 import net.galacticprojects.common.CommonPlugin;
 import net.galacticprojects.common.database.model.Ban;
 import net.galacticprojects.common.message.MessageProviderFactoryImpl;
 import net.galacticprojects.spigot.message.CommandDescription;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
+import org.checkerframework.checker.units.qual.A;
 
 public class ProxyPlugin extends Plugin {
 	
@@ -54,6 +57,7 @@ public class ProxyPlugin extends Plugin {
     	registerListeners();
     	registerArgumentTypes();
     	registerCommands();
+		new OnlineTime(this);
     }
     
     private void registerMessages() {
@@ -62,7 +66,9 @@ public class ProxyPlugin extends Plugin {
     	// Register messages below
 		messageManager.register(new EnumMessageSource(BanMessage.class, factory));
     	messageManager.register(new EnumMessageSource(CommandDescription.class, factory));
+		messageManager.register(new AnnotationMessageSource(TimeMessage.class, factory));
 		messageManager.register(new AnnotationMessageSource(CommandMessages.class, factory));
+		messageManager.register(new AnnotationMessageSource(SystemMessage.class, factory));
     }
 
 	private void createConfigurations() {
@@ -81,6 +87,7 @@ public class ProxyPlugin extends Plugin {
     private void registerListeners() {
         PluginManager manager = getProxy().getPluginManager();
         manager.registerListener(this, new ConnectListener(this));
+		manager.registerListener(this, new PingListener(this));
     }
     
     private void registerArgumentTypes() {
@@ -93,6 +100,8 @@ public class ProxyPlugin extends Plugin {
 		commandManager.register(BungeeHelpCommand.class);
     	commandManager.register(MaintenanceCommand.class);
 		commandManager.register(BanCommand.class);
+		commandManager.register(LanguageCommand.class);
+		commandManager.register(OnlineTimeCommand.class);
     }
     
     /*
