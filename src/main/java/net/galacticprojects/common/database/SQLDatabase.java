@@ -12,7 +12,6 @@ import net.galacticprojects.common.database.migration.impl.SQLMigrationType;
 import net.galacticprojects.common.database.model.Ban;
 import net.galacticprojects.common.database.model.Player;
 import net.galacticprojects.common.util.Ref;
-import org.h2.util.DateTimeUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
