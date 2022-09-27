@@ -14,10 +14,12 @@ import net.galacticprojects.bungeecord.message.CommandMessages;
 import net.galacticprojects.common.CommonPlugin;
 import net.galacticprojects.common.database.SQLDatabase;
 import net.galacticprojects.common.database.model.Ban;
+import net.galacticprojects.common.database.model.Player;
 import net.galacticprojects.common.util.ComponentParser;
 import net.galacticprojects.common.util.MojangProfileService;
 import net.galacticprojects.common.util.TimeHelper;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
@@ -69,15 +71,12 @@ public class BanCommand {
                 }
 
                 BanMessage message = BanMessage.valueOf("COMMAND_BAN_ID_" + banId);
-
                 String message1 = common.getMessageManager().translate(message.id(), actor.getLanguage());
-                    actor.sendTranslatedMessage(CommandMessages.COMMAND_BAN_CREATE_SUCCESS, common, Key.of("player", name), Key.of("time", TimeHelper.BAN_TIME_FORMATTER.format(creation.plusHours(info.getHours()))), Key.of("reason", message1));
-                    ProxiedPlayer proxiedPlayer = plugin.getProxy().getPlayer(uniqueId);
-                    if(proxiedPlayer != null) {
-                        database.getPlayer(uniqueId).thenAccept(players -> {
-                            proxiedPlayer.disconnect(ComponentParser.parse(new BungeeActor<ProxiedPlayer>(proxiedPlayer, common.getMessageManager()).getTranslatedMessageAsString(CommandMessages.COMMAND_PLAYER_BANNED.getId(), players.getLanguage(), Key.of("reason", message.id()), Key.of("time", TimeHelper.BAN_TIME_FORMATTER.format(time)))));
-                        });
-                    }
+
+                actor.sendTranslatedMessage(CommandMessages.COMMAND_BAN_CREATE_SUCCESS, common, Key.of("player", name), Key.of("time", TimeHelper.BAN_TIME_FORMATTER.format(creation.plusHours(info.getHours()))), Key.of("reason", message1));
+                assert time != null;
+                ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(uniqueId);
+                proxiedPlayer.disconnect(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.COMMAND_PLAYER_BANNED.getId(), "en-uk", Key.of("reason", message.id()), Key.of("time", TimeHelper.BAN_TIME_FORMATTER.format(time)))));
             });
         });
     }

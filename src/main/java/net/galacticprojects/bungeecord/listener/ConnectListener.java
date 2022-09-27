@@ -38,7 +38,6 @@ public class ConnectListener implements Listener {
         this.plugin = plugin;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
     public void onConnect(PostLoginEvent event) {
         ProxiedPlayer player = event.getPlayer();
         UUID uniqueId = player.getUniqueId();
@@ -53,10 +52,14 @@ public class ConnectListener implements Listener {
 
         if(configuration.isMaintenance()) {
             if(!(player.hasPermission("system.maintenance.bypass") || player.hasPermission("system.maintenance.*"))) {
-                Key reason = Key.of("reason",  commonPlugin.getMessageManager().translate(SystemMessage.SYSTEM_MAINTENANCE_KICK_REASON, language, Key.of("reason", configuration.getMaintenanceReason())));
+               /* Key reason = Key.of("reason",  commonPlugin.getMessageManager().translate(SystemMessage.SYSTEM_MAINTENANCE_KICK_REASON, language, Key.of("reason", configuration.getMaintenanceReason())));
                 Key enddate = Key.of("enddate", net.galacticprojects.bungeecord.util.TimeHelper.BAN_TIME_FORMATTER.format(TimeHelper.fromString(configuration.getDays())));
-                String finalLanguage = language;
-                player.disconnect(ComponentParser.parse(commonPlugin.getMessageManager().translate(SystemMessage.SYSTEM_MAINTENACE_KICK_CURRENTLY, finalLanguage, enddate, reason)));
+                String finalLanguage = language;*/
+                //player.disconnect(ComponentParser.parse(commonPlugin.getMessageManager().translate(SystemMessage.SYSTEM_MAINTENACE_KICK_CURRENTLY, finalLanguage, enddate, reason)));
+                //int taskId = ProxyServer.getInstance().getScheduler().schedule(plugin, () -> {
+                    player.disconnect((BaseComponent) new TextComponent("das ist ein Test wenn du gekickt wurdest ist die Maintenance an"));
+                //}, 1L, 1L, TimeUnit.SECONDS).getId();
+                //ProxyServer.getInstance().getScheduler().cancel(taskId);
             }
         }
 
