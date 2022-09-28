@@ -3,13 +3,17 @@ package net.galacticprojects.bungeecord.listener;
 import me.lauriichan.laylib.localization.Key;
 import net.galacticprojects.bungeecord.ProxyPlugin;
 import net.galacticprojects.bungeecord.config.PluginConfiguration;
+import net.galacticprojects.bungeecord.message.BanMessage;
+import net.galacticprojects.bungeecord.message.CommandMessages;
 import net.galacticprojects.bungeecord.message.SystemMessage;
 import net.galacticprojects.bungeecord.util.TablistManager;
 import net.galacticprojects.bungeecord.util.TimeHelper;
 import net.galacticprojects.common.CommonPlugin;
 import net.galacticprojects.common.database.SQLDatabase;
+import net.galacticprojects.common.database.model.Ban;
 import net.galacticprojects.common.database.model.Player;
 import net.galacticprojects.common.util.ComponentParser;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
@@ -53,16 +57,19 @@ public class ConnectListener implements Listener {
             }
         }
 
-        if (playerData == null) {
+        if (playerData.getUUID() == null) {
             database.createPlayer(uniqueId, player.getAddress().getAddress().getHostAddress().toString(), 1000, 1, "en-uk", 0L).isDone();
             return;
         }
-        /*Ban ban = database.getBan(uniqueId).join();
+        Ban ban = database.getBan(uniqueId).join();
         if (ban != null) {
+            if (ban.isExpired()) {
+                database.deleteBan(ban.getPlayer()).join();
+                return;
+            }
             BanMessage message = BanMessage.valueOf("COMMAND_BAN_ID_" + ban.getId());
-            player.disconnect(new TextComponent(ComponentParser.parse(plugin.getCommonPlugin().getMessageManager().translate(CommandMessages.COMMAND_PLAYER_BANNED, playerData.getLanguage(), Key.of("time", TimeHelper.BAN_TIME_FORMATTER.format(ban.getTime())), Key.of("reason", message)))));
-        }*/
-
+            player.disconnect(ComponentParser.parse(plugin.getCommonPlugin().getMessageManager().translate(CommandMessages.COMMAND_PLAYER_BANNED, playerData.getLanguage(), Key.of("time", TimeHelper.BAN_TIME_FORMATTER.format(ban.getTime())), Key.of("reason", message))));
+        }
     }
 
 }

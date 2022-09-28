@@ -63,7 +63,7 @@ public class BanCommand {
                 return;
             }
             OffsetDateTime creation = OffsetDateTime.now();
-            OffsetDateTime time = info.getHours() == 0 ? null : creation.plusHours(info.getHours());
+            OffsetDateTime time = OffsetDateTime.now().plusHours(info.getHours());
             database.banPlayer(uniqueId, actor.getId(), banId, info.getReason(), time, creation).thenAccept(ban -> {
                 if(ban == null){
                     // TODO: Ban unsuccessful
@@ -72,11 +72,11 @@ public class BanCommand {
 
                 BanMessage message = BanMessage.valueOf("COMMAND_BAN_ID_" + banId);
                 String message1 = common.getMessageManager().translate(message.id(), actor.getLanguage());
-
-                actor.sendTranslatedMessage(CommandMessages.COMMAND_BAN_CREATE_SUCCESS, common, Key.of("player", name), Key.of("time", TimeHelper.BAN_TIME_FORMATTER.format(creation.plusHours(info.getHours()))), Key.of("reason", message1));
-                assert time != null;
                 ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(uniqueId);
-                proxiedPlayer.disconnect(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.COMMAND_PLAYER_BANNED.getId(), "en-uk", Key.of("reason", message.id()), Key.of("time", TimeHelper.BAN_TIME_FORMATTER.format(time)))));
+                actor.sendTranslatedMessage(CommandMessages.COMMAND_BAN_CREATE_SUCCESS, common, Key.of("player", name), Key.of("time", TimeHelper.BAN_TIME_FORMATTER.format(time)), Key.of("reason", message1));
+                if(proxiedPlayer != null) {
+                    proxiedPlayer.disconnect(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.COMMAND_PLAYER_BANNED.getId(), "en-uk", Key.of("reason", message.id()), Key.of("time", TimeHelper.BAN_TIME_FORMATTER.format(time)))));
+                }
             });
         });
     }

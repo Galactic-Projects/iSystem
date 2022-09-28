@@ -41,18 +41,12 @@ public class BanConfiguration extends BaseConfiguration {
         infos.clear();
         JsonArray array = (JsonArray) config.get("bans", ValueType.ARRAY);
         if (array == null) {
-            JsonArray s = new JsonArray();
-            s.add(1);
-            config.set("bans", s);
+            config.set("bans", new JsonArray());
             return;
         }
-        int index = 0;
         for (JsonValue<?> value : array) {
             if (value == null || !value.hasType(ValueType.OBJECT)) {
                 continue;
-            }
-            if (index >= 100) {
-                break;
             }
             JsonObject object = (JsonObject) value;
             JsonValue<?> rawReason = object.get("reason");

@@ -102,6 +102,8 @@ public class ProxyPlugin extends Plugin {
 		commandManager.register(BanCommand.class);
 		commandManager.register(LanguageCommand.class);
 		commandManager.register(OnlineTimeCommand.class);
+		commandManager.register(FriendCommand.class);
+		commandManager.register(PartyCommand.class);
     }
     
     /*
