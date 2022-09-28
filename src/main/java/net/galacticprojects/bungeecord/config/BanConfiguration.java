@@ -60,6 +60,7 @@ public class BanConfiguration extends BaseConfiguration {
             JsonValue<?> rawHours = object.get("hours");
             int day = (rawDays == null ? 0 : ((JsonNumber<?>) rawDays).getValue().intValue());
             long hours = (rawHours == null ? 0 : ((JsonNumber<?>) rawHours).getValue().longValue());
+            hours = hours + (day * 24L);
             String reason = (rawReason == null ? "N/A" : rawReason.getValue().toString());
             infos.add(new BanInfo(reason, hours));
         }
