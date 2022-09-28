@@ -3,7 +3,7 @@ package net.galacticprojects.common.database;
 public enum SQLTable {
 
     BAN_TABLE("PlayerBans"), PLAYER_TABLE("Player"), PARTY_TABLE("Party"),
-    FRIENDS_TABLE("Friends"), REPORT_TABLE("report")
+    FRIENDS_TABLE("Friends"), REPORT_TABLE("Report")
     ;
 
     private final String defaultTableName;
