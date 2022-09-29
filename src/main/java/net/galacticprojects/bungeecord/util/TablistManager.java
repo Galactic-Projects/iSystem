@@ -38,13 +38,20 @@ public class TablistManager {
         ProxyServer.getInstance().getScheduler().schedule(plugin, new Runnable() {
             @Override
             public void run() {
+                if(ProxyServer.getInstance().getPlayers().size() == 0) {
+                    return;
+                }
 
                 String language = "en-uk";
 
                 if (playerData.getLanguage() != null) {
                     language = playerData.getLanguage();
                 }
-                ICloudPlayer cloudPlayer = BridgePlayerManager.getInstance().getOnlinePlayer(player.getUniqueId());
+                ICloudPlayer cloudPlayer = CloudNetDriver.getInstance().getServicesRegistry().getFirstService(IPlayerManager.class).getOnlinePlayer(player.getUniqueId());
+
+                if(cloudPlayer == null) {
+                    return;
+                }
 
                 Key server = Key.of("server", cloudPlayer.getConnectedService().getTaskName());
                 Key players = Key.of("online", plugin.getProxy().getOnlineCount());
