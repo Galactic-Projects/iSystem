@@ -1,6 +1,7 @@
 package net.galacticprojects.bungeecord;
 
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 
 import me.lauriichan.laylib.command.ArgumentRegistry;
 import me.lauriichan.laylib.command.CommandManager;
@@ -13,17 +14,21 @@ import net.galacticprojects.bungeecord.command.provider.ProxyPluginProvider;
 import net.galacticprojects.bungeecord.config.BanConfiguration;
 import net.galacticprojects.bungeecord.config.PluginConfiguration;
 import net.galacticprojects.bungeecord.listener.ConnectListener;
+import net.galacticprojects.bungeecord.listener.DisconnectListener;
 import net.galacticprojects.bungeecord.listener.PingListener;
+import net.galacticprojects.bungeecord.listener.ServerSwitchListener;
 import net.galacticprojects.bungeecord.message.BanMessage;
 import net.galacticprojects.bungeecord.message.CommandMessages;
 import net.galacticprojects.bungeecord.message.SystemMessage;
 import net.galacticprojects.bungeecord.message.TimeMessage;
+import net.galacticprojects.bungeecord.util.Countdown;
 import net.galacticprojects.bungeecord.util.OnlineTime;
 import net.galacticprojects.bungeecord.util.TablistManager;
 import net.galacticprojects.common.CommonPlugin;
 import net.galacticprojects.common.database.model.Ban;
 import net.galacticprojects.common.message.MessageProviderFactoryImpl;
 import net.galacticprojects.spigot.message.CommandDescription;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
 import org.checkerframework.checker.units.qual.A;
@@ -57,6 +62,7 @@ public class ProxyPlugin extends Plugin {
     	registerListeners();
     	registerArgumentTypes();
     	registerCommands();
+		Countdown.setupCountdown();
 		new OnlineTime(this);
     }
     
@@ -88,6 +94,8 @@ public class ProxyPlugin extends Plugin {
         PluginManager manager = getProxy().getPluginManager();
         manager.registerListener(this, new ConnectListener(this));
 		manager.registerListener(this, new PingListener(this));
+		manager.registerListener(this, new ServerSwitchListener());
+		manager.registerListener(this, new DisconnectListener());
     }
     
     private void registerArgumentTypes() {
@@ -105,6 +113,14 @@ public class ProxyPlugin extends Plugin {
 		commandManager.register(FriendCommand.class);
 		commandManager.register(PartyCommand.class);
     }
+
+	public void countDown() {
+		ProxyServer.getInstance().getScheduler().schedule(this, () -> {
+
+
+
+		}, 1L, 1L, TimeUnit.SECONDS);
+	}
     
     /*
      * Shutdown

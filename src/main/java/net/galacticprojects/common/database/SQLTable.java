@@ -2,8 +2,13 @@ package net.galacticprojects.common.database;
 
 public enum SQLTable {
 
+<<<<<<< Updated upstream
     BAN_TABLE("PlayerBans"), PLAYER_TABLE("Player"), PARTY_TABLE("Party"),
     FRIENDS_TABLE("Friends"), REPORT_TABLE("Report")
+=======
+    BAN_TABLE("PlayerBans"), PLAYER_TABLE("Player"),
+    FRIENDS_TABLE("Friends"), REPORT_TABLE("report")
+>>>>>>> Stashed changes
     ;
 
     private final String defaultTableName;
