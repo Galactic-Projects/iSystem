@@ -16,6 +16,8 @@ public class Countdown {
 
     private static ProxyPlugin PLUGIN;
 
+    private static int taskId;
+
     public static void setupCountdown(ProxyPlugin plugin) {
         countdown = new HashMap<>();
         PLUGIN = plugin;
@@ -25,8 +27,20 @@ public class Countdown {
         double delay = System.currentTimeMillis() + (seconds * 1000);
         countdown.put(player, delay);
         taskId = ProxyServer.getInstance().getScheduler().schedule(PLUGIN, () -> {
-
             if(!checkCountdown(player)) {
+
+                if(party.getLeader() == player) {
+                    party.deleteParty();
+                    ProxyServer.getInstance().getScheduler().cancel(taskId);
+                    return;
+                }
+                party.removeMember(player);
+                ProxiedPlayer leader = ProxyServer.getInstance().getPlayer(party.getLeader());
+                leader.sendMessage();
+                for(UUID members : party.getMember()) {
+                    ProxiedPlayer member = ProxyServer.getInstance().getPlayer(members);
+                    member.sendMessage();
+                }
                 ProxyServer.getInstance().getScheduler().cancel(taskId);
             }
         }, 1L, 1L, TimeUnit.SECONDS).getId();

@@ -1,5 +1,6 @@
 package net.galacticprojects.bungeecord.party;
 
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.ArrayList;
@@ -24,6 +25,18 @@ public class Party {
         this.member = member;
         this.moderator = null;
         this.name = name;
+    }
+
+    public void deleteParty() {
+        for (UUID uniqueId : member) {
+            ProxiedPlayer player = ProxyServer.getInstance().getPlayer(uniqueId);
+            if(player != null) {
+                player.sendMessage("");
+            }
+        }
+        member.clear();
+        moderator = null;
+        leader = null;
     }
 
     public String getName() {
