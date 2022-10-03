@@ -62,7 +62,7 @@ public class ProxyPlugin extends Plugin {
     	registerListeners();
     	registerArgumentTypes();
     	registerCommands();
-		Countdown.setupCountdown();
+		Countdown.setupCountdown(this);
 		new OnlineTime(this);
     }
     

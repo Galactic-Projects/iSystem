@@ -19,7 +19,7 @@ public class DisconnectListener implements Listener {
         if(party == null) {
             return;
         }
-        Countdown.setCountdown(player.getUniqueId(), 60*5);
+        Countdown.setCountdown(player.getUniqueId(), party, 60 * 5);
     }
 
 }
