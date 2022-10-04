@@ -10,6 +10,7 @@ import net.galacticprojects.bungeecord.message.CommandMessages;
 import net.galacticprojects.bungeecord.party.Party;
 import net.galacticprojects.bungeecord.party.PartyManager;
 import net.galacticprojects.common.CommonPlugin;
+import net.galacticprojects.common.database.model.Player;
 import net.galacticprojects.common.util.ComponentParser;
 import net.galacticprojects.common.util.MojangProfileService;
 import net.md_5.bungee.api.ProxyServer;
@@ -31,11 +32,17 @@ public class PartyCommand {
 
         ProxiedPlayer player = actor.as(ProxiedPlayer.class).getHandle();
         Party party;
+        PartyManager manager = new PartyManager(player);
+        if(manager.getParty() != null) {
+
+            return;
+        }
         if(name == null || name.equals("") || name.equals(" ")) {
             party = new Party(player, new ArrayList<>());
         } else {
             party = new Party(player, new ArrayList<>(), name);
         }
+        new PartyManager(party);
         commonPlugin.getDatabaseRef().asOptional().ifPresent(sql -> {
             sql.getPlayer(player.getUniqueId()).thenAccept(playerData -> {
                 player.sendMessage(ComponentParser.parse(commonPlugin.getMessageManager().translate(CommandMessages.COMMAND_PARTY_CREATED, playerData.getLanguage(), Key.of("party", party.getName()))));
@@ -47,15 +54,16 @@ public class PartyCommand {
     @Action("invite")
     public void invite(BungeeActor<?> actor, CommonPlugin commonPlugin, ProxyPlugin plugin, @Argument(name = "player") String name) {
         ProxiedPlayer player = ProxyServer.getInstance().getPlayer(MojangProfileService.getUniqueId(name));
+        ProxiedPlayer leader = actor.as(ProxiedPlayer.class).getHandle();
         if(player == null) {
             commonPlugin.getDatabaseRef().asOptional().ifPresent(sql -> {
-                sql.getPlayer(actor.getId()).thenAccept(playerData -> {
-                    actor.as(ProxiedPlayer.class).getHandle().sendMessage(ComponentParser.parse(commonPlugin.getMessageManager().translate(CommandMessages.COMMAND_GENERAL_PLAYER_NOT_FOUND, playerData.getLanguage())));
+                sql.getPlayer(leader.getUniqueId()).thenAccept(playerData -> {
+                    leader.sendMessage(ComponentParser.parse(commonPlugin.getMessageManager().translate(CommandMessages.COMMAND_GENERAL_PLAYER_NOT_FOUND, playerData.getLanguage())));
                 });
             });
             return;
         }
-        PartyManager manager = new PartyManager(actor.as(ProxiedPlayer.class).getHandle());
+        PartyManager manager = new PartyManager(leader);
         if(manager.getParty() == null) {
             commonPlugin.getDatabaseRef().asOptional().ifPresent(sql -> {
                 sql.getPlayer(player.getUniqueId()).thenAccept(playerData -> {
@@ -64,7 +72,7 @@ public class PartyCommand {
             });
             return;
         }
-        if(manager.getParty().getModerator() != actor.getId() || manager.getParty().getLeader() != actor.getId()) {
+        if(manager.getParty().getLeader() != leader.getUniqueId()) {
             commonPlugin.getDatabaseRef().asOptional().ifPresent(sql -> {
                 sql.getPlayer(player.getUniqueId()).thenAccept(playerData -> {
                     player.sendMessage(ComponentParser.parse(commonPlugin.getMessageManager().translate(CommandMessages.COMMAND_PARTY_NOT_LEADER, playerData.getLanguage())));
@@ -75,66 +83,61 @@ public class PartyCommand {
         String partyName = manager.getParty().getName();
         invite.put(player.getUniqueId(), manager.getParty());
         commonPlugin.getDatabaseRef().asOptional().ifPresent(sql -> {
-            sql.getPlayer(player.getUniqueId()).thenAccept(playerData -> {
-                sql.getPlayer(actor.as(ProxiedPlayer.class).getHandle().getUniqueId()).thenAccept(leaderData -> {
-                            actor.as(ProxiedPlayer.class).getHandle().sendMessage(ComponentParser.parse(commonPlugin.getMessageManager().translate(CommandMessages.COMMAND_PARTY_INVITE, leaderData.getLanguage(), Key.of("player", player.getDisplayName()))));
-                        });
-                TextComponent component = new TextComponent(ComponentParser.parse(commonPlugin.getMessageManager().translate("command.party.accept", playerData.getLanguage(), Key.of("party", partyName))));
-                component.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "party accept"));
-                TextComponent component1 = new TextComponent(ComponentParser.parse(commonPlugin.getMessageManager().translate("command.party.decline", playerData.getLanguage(), Key.of("party", partyName))));
-                component1.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "party decline"));
-                component.addExtra(" " + component1);
-                player.sendMessage(ComponentParser.parse(commonPlugin.getMessageManager().translate(CommandMessages.COMMAND_PARTY_INVITED, playerData.getLanguage(), Key.of("party", partyName), Key.of("component", component))));
-            });
+            Player playerData = sql.getPlayer(player.getAddress().getAddress().getHostAddress()).join();
+            Player leaderData = sql.getPlayer(leader.getAddress().getAddress().getHostAddress()).join();
+            String language = playerData.getLanguage();
+            if(language == null) {
+                language = "en-uk";
+            }
+            String leaderLanguage = leaderData.getLanguage();
+            if(leaderLanguage == null) {
+                leaderLanguage = "en-uk";
+            }
+                player.sendMessage(ComponentParser.parse(commonPlugin.getMessageManager().translate(CommandMessages.COMMAND_PARTY_INVITED, language, Key.of("party", partyName))));
+            leader.sendMessage(ComponentParser.parse(commonPlugin.getMessageManager().translate(CommandMessages.COMMAND_PARTY_INVITE, leaderLanguage, Key.of("player", player.getDisplayName()))));
         });
     }
 
     @Action("accept")
     public void accept(BungeeActor<?> actor, CommonPlugin commonPlugin, ProxyPlugin plugin) {
-        if(!invite.containsKey(actor.getId())) {
+        ProxiedPlayer player = actor.as(ProxiedPlayer.class).getHandle();
+        if(!invite.containsKey(player.getUniqueId())) {
             commonPlugin.getDatabaseRef().asOptional().ifPresent(sql -> {
-                ProxiedPlayer player = actor.as(ProxiedPlayer.class).getHandle();
                 sql.getPlayer(player.getUniqueId()).thenAccept(playerData -> {
                     player.sendMessage(ComponentParser.parse(commonPlugin.getMessageManager().translate(CommandMessages.COMMAND_PARTY_NOT_INVITED, playerData.getLanguage())));
                 });
             });
             return;
         }
-        Party party = invite.get(actor.getId());
-        party.addMember(actor.getId());
-        invite.remove(actor.getId());
-        ProxiedPlayer player = actor.as(ProxiedPlayer.class).getHandle();
+        Party party = invite.get(player.getUniqueId());
+        party.addMember(player.getUniqueId());
+        invite.remove(player.getUniqueId());
         commonPlugin.getDatabaseRef().asOptional().ifPresent(sql -> {
-            sql.getPlayer(player.getUniqueId()).thenAccept(playerData -> {
-                sql.getPlayer(actor.as(ProxiedPlayer.class).getHandle().getUniqueId()).thenAccept(leaderData -> {
-                            ProxyServer.getInstance().getPlayer(party.getLeader()).sendMessage(ComponentParser.parse(commonPlugin.getMessageManager().translate(CommandMessages.COMMAND_PARTY_ACCEPT_LEADER, leaderData.getLanguage(), Key.of("party", party.getName()), Key.of("player", player.getDisplayName()))));
-                        });
+            Player playerData = sql.getPlayer(player.getUniqueId()).join();
+            Player leaderData = sql.getPlayer(party.getLeader()).join();
+            ProxyServer.getInstance().getPlayer(party.getLeader()).sendMessage(ComponentParser.parse(commonPlugin.getMessageManager().translate(CommandMessages.COMMAND_PARTY_ACCEPT_LEADER, leaderData.getLanguage(), Key.of("party", party.getName()), Key.of("player", player.getDisplayName()))));
                 player.sendMessage(ComponentParser.parse(commonPlugin.getMessageManager().translate(CommandMessages.COMMAND_PARTY_ACCEPT_TARGET, playerData.getLanguage(), Key.of("party", party.getName()))));
-            });
         });
     }
 
     @Action("decline")
     public void decline(BungeeActor<?> actor, CommonPlugin commonPlugin, ProxyPlugin plugin) {
-        if(!invite.containsKey(actor.getId())) {
+        ProxiedPlayer player = actor.as(ProxiedPlayer.class).getHandle();
+        if(!invite.containsKey(player.getUniqueId())) {
             commonPlugin.getDatabaseRef().asOptional().ifPresent(sql -> {
-                ProxiedPlayer player = actor.as(ProxiedPlayer.class).getHandle();
                 sql.getPlayer(player.getUniqueId()).thenAccept(playerData -> {
                     player.sendMessage(ComponentParser.parse(commonPlugin.getMessageManager().translate(CommandMessages.COMMAND_PARTY_NOT_INVITED, playerData.getLanguage())));
                 });
             });
             return;
         }
-        Party party = invite.get(actor.getId());
-        invite.remove(actor.getId());
-        ProxiedPlayer player = actor.as(ProxiedPlayer.class).getHandle();
+        Party party = invite.get(player.getUniqueId());
+        invite.remove(player.getUniqueId());
         commonPlugin.getDatabaseRef().asOptional().ifPresent(sql -> {
-            sql.getPlayer(player.getUniqueId()).thenAccept(playerData -> {
-                sql.getPlayer(actor.as(ProxiedPlayer.class).getHandle().getUniqueId()).thenAccept(leaderData -> {
-                            ProxyServer.getInstance().getPlayer(party.getLeader()).sendMessage(ComponentParser.parse(commonPlugin.getMessageManager().translate(CommandMessages.COMMAND_PARTY_DECLINE_LEADER, leaderData.getLanguage(), Key.of("party", party.getName()), Key.of("player", player.getDisplayName()))));
-                        });
+            Player playerData = sql.getPlayer(player.getUniqueId()).join();
+            Player leaderData = sql.getPlayer(party.getLeader()).join();
+                    ProxyServer.getInstance().getPlayer(party.getLeader()).sendMessage(ComponentParser.parse(commonPlugin.getMessageManager().translate(CommandMessages.COMMAND_PARTY_DECLINE_LEADER, leaderData.getLanguage(), Key.of("party", party.getName()), Key.of("player", player.getDisplayName()))));
                 player.sendMessage(ComponentParser.parse(commonPlugin.getMessageManager().translate(CommandMessages.COMMAND_PARTY_DECLINE_TARGET, playerData.getLanguage(), Key.of("party", party.getName()))));
-            });
         });
     }
 
@@ -197,12 +200,13 @@ public class PartyCommand {
         commonPlugin.getDatabaseRef().asOptional().ifPresent(sql -> {
             sql.getPlayer(player.getUniqueId()).thenAccept(playerData -> {
                 player.sendMessage(ComponentParser.parse(commonPlugin.getMessageManager().translate(CommandMessages.COMMAND_PARTY_DELETED, playerData.getLanguage(), Key.of("party", manager.getParty().getName()))));
-            });
+
             for(UUID uniqueId : manager.getParty().getMember()) {
-                sql.getPlayer(uniqueId).thenAccept(playerData -> {
-                        ProxyServer.getInstance().getPlayer(uniqueId).sendMessage(ComponentParser.parse(commonPlugin.getMessageManager().translate(CommandMessages.COMMAND_PARTY_DELETED, playerData.getLanguage(), Key.of("party", manager.getParty().getName()))));
+                sql.getPlayer(uniqueId).thenAccept(playerDatas -> {
+                        ProxyServer.getInstance().getPlayer(uniqueId).sendMessage(ComponentParser.parse(commonPlugin.getMessageManager().translate(CommandMessages.COMMAND_PARTY_DELETED, playerDatas.getLanguage(), Key.of("party", manager.getParty().getName()))));
                     });
                 }
+            });
         });
         manager.getParty().deleteParty();
     }
