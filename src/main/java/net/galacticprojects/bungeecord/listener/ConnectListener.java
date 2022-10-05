@@ -1,11 +1,14 @@
 package net.galacticprojects.bungeecord.listener;
 
+import de.dytanic.cloudnet.driver.CloudNetDriver;
+import de.dytanic.cloudnet.ext.bridge.player.IPlayerManager;
 import me.lauriichan.laylib.localization.Key;
 import net.galacticprojects.bungeecord.ProxyPlugin;
 import net.galacticprojects.bungeecord.config.PluginConfiguration;
 import net.galacticprojects.bungeecord.message.BanMessage;
 import net.galacticprojects.bungeecord.message.CommandMessages;
 import net.galacticprojects.bungeecord.message.SystemMessage;
+import net.galacticprojects.bungeecord.util.Countdown;
 import net.galacticprojects.bungeecord.util.TablistManager;
 import net.galacticprojects.bungeecord.util.TimeHelper;
 import net.galacticprojects.common.CommonPlugin;
@@ -43,6 +46,10 @@ public class ConnectListener implements Listener {
         String language = "en-uk";
         if (playerData.getLanguage() != null) {
             language = playerData.getLanguage();
+        }
+
+        if(!Countdown.online.contains(player.getUniqueId())) {
+            Countdown.online.add(player.getUniqueId());
         }
 
         new TablistManager(plugin, player);

@@ -6,6 +6,7 @@ import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.bukkit.block.data.type.Bed;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -13,6 +14,7 @@ import java.util.concurrent.TimeUnit;
 public class Countdown {
 
     public static HashMap<UUID, Double> countdown;
+    public static ArrayList<UUID> online = new ArrayList<>();
 
     private static ProxyPlugin PLUGIN;
 
@@ -27,6 +29,15 @@ public class Countdown {
         double delay = System.currentTimeMillis() + (seconds * 1000);
         countdown.put(player, delay);
         taskId = ProxyServer.getInstance().getScheduler().schedule(PLUGIN, () -> {
+            if(countdown.get(player) != 0) {
+                if(online.contains(player)) {
+                    countdown.remove(player, countdown.get(player));
+                    online.remove(player);
+                    ProxyServer.getInstance().getScheduler().cancel(taskId);
+                    return;
+                }
+                return;
+            }
             if(!checkCountdown(player)) {
 
                 if(party.getLeader() == player) {

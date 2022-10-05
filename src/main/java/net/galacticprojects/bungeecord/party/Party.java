@@ -1,9 +1,11 @@
 package net.galacticprojects.bungeecord.party;
 
+import net.galacticprojects.bungeecord.util.HashMaps;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.UUID;
 
 public class Party {
@@ -34,6 +36,7 @@ public class Party {
                 player.sendMessage("");
             }
         }
+        HashMaps.partyHashMap.remove(leader);
         member.clear();
         moderator = null;
         leader = null;
@@ -53,18 +56,28 @@ public class Party {
 
     public void setLeader(UUID leader) {
         this.leader = leader;
+        if(HashMaps.partyHashMap.get(leader) != null) {
+            HashMaps.partyHashMap.remove(leader, this);
+        }
+        HashMaps.partyHashMap.put(leader, this);
     }
 
     public void addMember(UUID member) {
         this.member.add(member);
+        HashMaps.partyHashMap.remove(leader, this);
+        HashMaps.partyHashMap.put(leader, this);
     }
 
     public void removeMember(UUID member) {
         this.member.remove(member);
+        HashMaps.partyHashMap.remove(leader, this);
+        HashMaps.partyHashMap.put(leader, this);
     }
 
     public void setModerator(UUID moderator) {
         this.moderator = moderator;
+        HashMaps.partyHashMap.remove(leader, this);
+        HashMaps.partyHashMap.put(leader, this);
     }
 
     public UUID getModerator() {
@@ -73,6 +86,8 @@ public class Party {
 
     public void setName(String name) {
         this.name = name;
+        HashMaps.partyHashMap.remove(leader, this);
+        HashMaps.partyHashMap.put(leader, this);
     }
 
 }

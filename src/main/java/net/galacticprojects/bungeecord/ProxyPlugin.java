@@ -94,8 +94,8 @@ public class ProxyPlugin extends Plugin {
         PluginManager manager = getProxy().getPluginManager();
         manager.registerListener(this, new ConnectListener(this));
 		manager.registerListener(this, new PingListener(this));
-		manager.registerListener(this, new ServerSwitchListener());
-		manager.registerListener(this, new DisconnectListener());
+		manager.registerListener(this, new ServerSwitchListener(this));
+		manager.registerListener(this, new DisconnectListener(this));
     }
     
     private void registerArgumentTypes() {

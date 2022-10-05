@@ -63,4 +63,22 @@ public class SystemMessage {
             " &7"
     })
     public static MessageProvider SYSTEM_TABLIST_FOOTER;
+
+    @Message(id = "system.party.action.kick", content = "he will be kicked out of the party")
+    public static MessageProvider SYSTEM_PARTY_ACTION_KICK;
+    @Message(id = "system.party.action.kick", content = "the party will be deleted")
+    public static MessageProvider SYSTEM_PARTY_ACTION_DELETE;
+    @Message(id = "system.party.action.kick", content = "Leader")
+    public static MessageProvider SYSTEM_PARTY_LEADER;
+    @Message(id = "system.party.action.kick", content = "Moderator")
+    public static MessageProvider SYSTEM_PARTY_MODERATOR;
+    @Message(id = "system.party.action.kick", content = "Member")
+    public static MessageProvider SYSTEM_PARTY_MEMBER;
+    @Message(id = "system.party.member.leave", content = {
+            " $party.prefix ",
+            "&7The $member $player left the Server",
+            "He/She has now 5 minutes time otherwise $action",
+            " $party.prefix "
+    })
+    public static MessageProvider SYSTEM_PARTY_MEMBER_LEAVE;
 }
