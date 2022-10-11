@@ -1,29 +1,55 @@
 package net.galacticprojects.bungeecord.command;
 
 import me.lauriichan.laylib.command.annotation.Action;
+import me.lauriichan.laylib.command.annotation.Argument;
 import me.lauriichan.laylib.command.annotation.Command;
 import me.lauriichan.laylib.localization.Key;
 import net.galacticprojects.bungeecord.ProxyPlugin;
 import net.galacticprojects.bungeecord.command.impl.BungeeActor;
+import net.galacticprojects.bungeecord.message.CommandMessages;
 import net.galacticprojects.common.CommonPlugin;
-import net.galacticprojects.common.command.message.CommandMessages;
 import net.galacticprojects.common.database.SQLDatabase;
 import net.galacticprojects.common.database.model.Player;
+import net.galacticprojects.common.util.MojangProfileService;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+import java.util.UUID;
 
-@Command(name = "onlinetime", description = " ")
+
+@Command(name = "onlinetime", description = "See your onlinetime!")
 public class OnlineTimeCommand {
 
     @Action("")
-    public void onlineTime(BungeeActor<?> bungeeActor, ProxyPlugin plugin, CommonPlugin common) {
-        ProxiedPlayer player = plugin.getProxy().getPlayer(bungeeActor.getId());
+    public void onlineTime(BungeeActor<?> bungeeActor, ProxyPlugin plugin, CommonPlugin common, @Argument(name = "player", optional = true) String target) {
+        ProxiedPlayer player = bungeeActor.as(ProxiedPlayer.class).getHandle();
 
-        if (player == null) {
-            bungeeActor.sendTranslatedMessage(CommandMessages.COMMAND_HELP_TREE$EXECUTABLE, common);
+        UUID uuid = player.getUniqueId();
+
+        if(target != null) {
+            UUID uniqueId = MojangProfileService.getUniqueId(target);
+
+            common.getDatabaseRef().asOptional().ifPresent(sqlDatabase -> {
+                sqlDatabase.getPlayer(uniqueId).thenAccept(playerData -> {
+                    long time = playerData.getOnlineTime();
+                    long minute = (time % 3600) / 60;
+                    long hours = (time % 86400) / 3600;
+                    long days = (time % 2629746) / 86400;
+
+                    String language = "en-uk";
+                    if(playerData.getLanguage() != null) {
+                        language = playerData.getLanguage();
+                    }
+
+
+                    common.getMessageManager().translate(CommandMessages.COMMAND_ONLINETIME_SUCCESS_OTHERS, playerData.getLanguage(),
+                            Key.of("player", MojangProfileService.getName(uniqueId))  ,Key.of("daystime", days), Key.of("hourtime", hours), Key.of("minutetime", minute));
+                });
+            });
+            return;
         }
+
         common.getDatabaseRef().asOptional().ifPresent(sqlDatabase -> {
-            sqlDatabase.getPlayer(player.getUniqueId()).thenAccept(playerData -> {
+            sqlDatabase.getPlayer(uuid).thenAccept(playerData -> {
                 long time = playerData.getOnlineTime();
                 long minute = (time % 3600) / 60;
                 long hours = (time % 86400) / 3600;
@@ -38,30 +64,6 @@ public class OnlineTimeCommand {
                 bungeeActor.sendTranslatedMessage(net.galacticprojects.bungeecord.message.CommandMessages.COMMAND_ONLINETIME_SUCCESS, common, 
                         Key.of("daystime", days), Key.of("hourtime", hours), Key.of("minutetime", minute));
             });
-        });
-    }
-
-    @Action("player")
-    public void onlineTimePlayer(BungeeActor<?> actor, CommonPlugin common) {
-        SQLDatabase database = common.getDatabaseRef().get();
-
-        if (database == null) {
-            common.getLogger().error(new Throwable("Database is unavailable"));
-            return;
-        }
-        /* Maths HANS GET SE FLAMETHROWER
-             seconds / 31556952; - YEAR
-             seconds % 31556952 / 2629746; - MONTH
-             seconds % 2629746 / 86400; - DAY
-             seconds % 86400 / 3600; - HOUR
-             seconds % 3600 / 60; - MINUTE
-         */
-        database.getPlayer(actor.getId()).thenAccept(player -> {
-            long time = player.getOnlineTime();
-            long minute = (time % 3600) / 60;
-            long hours = (time % 86400) / 3600;
-            long days = (time % 2629746) / 86400;
-
         });
     }
 }

@@ -63,7 +63,6 @@ public class SystemMessage {
             " &7"
     })
     public static MessageProvider SYSTEM_TABLIST_FOOTER;
-
     @Message(id = "system.party.action.kick", content = "he will be kicked out of the party")
     public static MessageProvider SYSTEM_PARTY_ACTION_KICK;
     @Message(id = "system.party.action.kick", content = "the party will be deleted")
@@ -81,4 +80,7 @@ public class SystemMessage {
             " $party.prefix "
     })
     public static MessageProvider SYSTEM_PARTY_MEMBER_LEAVE;
+
+    @Message(id = "system.no.permission", content = "You do not have permission to execute this command!")
+    public static MessageProvider SYSTEM_NO_PERMISSION;
 }
