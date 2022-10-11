@@ -3,18 +3,23 @@ package net.galacticprojects.common;
 import me.lauriichan.laylib.command.ArgumentRegistry;
 import me.lauriichan.laylib.command.CommandManager;
 import me.lauriichan.laylib.localization.MessageManager;
+import me.lauriichan.laylib.localization.source.AnnotationMessageSource;
 import me.lauriichan.laylib.localization.source.EnumMessageSource;
 import me.lauriichan.laylib.logger.ISimpleLogger;
 import me.lauriichan.laylib.logger.JavaSimpleLogger;
 import net.galacticprojects.common.command.TranslationReloadCommand;
 import net.galacticprojects.common.command.message.CommandDescription;
+import net.galacticprojects.common.command.message.CommandManagerMessages;
+import net.galacticprojects.common.command.message.CommandMessages;
 import net.galacticprojects.common.command.provider.CommonPluginProvider;
 import net.galacticprojects.common.command.provider.SQLProvider;
 import net.galacticprojects.common.config.SQLConfiguration;
 import net.galacticprojects.common.database.SQLDatabase;
+import net.galacticprojects.common.database.migration.impl.MigrationManager;
 import net.galacticprojects.common.message.MessageProviderFactoryImpl;
 import net.galacticprojects.common.message.MessageTranslationManager;
 import net.galacticprojects.common.util.Ref;
+import net.galacticprojects.common.util.source.Resources;
 
 import java.io.File;
 import java.util.logging.Logger;
@@ -34,21 +39,33 @@ public final class CommonPlugin {
 	private final MessageProviderFactoryImpl messageProviderFactory;
 	
 	private final MessageTranslationManager translationManager;
+	private final MigrationManager migrationManager;
 
 	private final File dataFolder;
+	private final Resources resources;
 	private SQLConfiguration sqlConfiguration;
 
-	public CommonPlugin(final Logger logger, final File dataFolder) {
+	public CommonPlugin(final Logger logger, final File dataFolder, File jarFile) {
 		if (COMMON.isPresent()) {
 			throw new UnsupportedOperationException("Instance already exists");
 		}
 		COMMON.set(this);
 		this.dataFolder = dataFolder;
 		this.logger = new JavaSimpleLogger(logger);
+		this.resources = new Resources(dataFolder, jarFile, logger);
 		this.commandManager = new CommandManager(this.logger);
 		this.messageManager = new MessageManager();
 		this.messageProviderFactory = new MessageProviderFactoryImpl(this.logger);
 		this.translationManager = new MessageTranslationManager(messageManager, this.logger, dataFolder);
+		this.migrationManager = new MigrationManager(this.logger, resources);
+	}
+
+	public MigrationManager getMigrationManager() {
+		return migrationManager;
+	}
+
+	public Resources getResources() {
+		return resources;
 	}
 
 	public ISimpleLogger getLogger() {
@@ -86,6 +103,8 @@ public final class CommonPlugin {
 	
 	private void registerMessages() {
 		messageManager.register(new EnumMessageSource(CommandDescription.class, messageProviderFactory));
+		messageManager.register(new EnumMessageSource(CommandManagerMessages.class, messageProviderFactory));
+		messageManager.register(new AnnotationMessageSource(CommandMessages.class, messageProviderFactory));
 	}
 
 	private void createConfigurations() {

@@ -2,7 +2,8 @@ package net.galacticprojects.common.database;
 
 public enum SQLTable {
 
-    BAN_TABLE("PlayerBans"),
+    BAN_TABLE("PlayerBans"), PLAYER_TABLE("Player"),
+    FRIENDS_TABLE("Friends"), REPORT_TABLE("report")
     ;
 
     private final String defaultTableName;

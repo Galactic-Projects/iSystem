@@ -1,5 +1,6 @@
 package net.galacticprojects.common.config;
 
+import com.syntaxphoenix.syntaxapi.utils.java.Files;
 import me.lauriichan.laylib.logger.ISimpleLogger;
 import net.galacticprojects.common.config.impl.json.JsonConfig;
 

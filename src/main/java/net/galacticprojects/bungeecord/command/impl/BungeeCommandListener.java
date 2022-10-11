@@ -9,6 +9,7 @@ import me.lauriichan.laylib.command.CommandManager;
 import me.lauriichan.laylib.command.CommandProcess;
 import me.lauriichan.laylib.localization.MessageManager;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.Connection;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.ChatEvent;
@@ -18,10 +19,13 @@ import net.md_5.bungee.event.EventPriority;
 
 public final class BungeeCommandListener implements Listener {
 
+	private final CommonPlugin common;
+
 	private final CommandManager commandManager;
 	private final MessageManager messageManager;
 
-	public BungeeCommandListener(final CommandManager commandManager, final MessageManager messageManager) {
+	public BungeeCommandListener(final CommonPlugin common, final CommandManager commandManager, final MessageManager messageManager) {
+		this.common = common;
 		this.commandManager = commandManager;
 		this.messageManager = messageManager;
 	}
@@ -39,8 +43,8 @@ public final class BungeeCommandListener implements Listener {
 				return;
 			}
 			event.setCancelled(true);
+			BungeeActor<ProxiedPlayer> actor = new BungeeActor<>(player, common, messageManager);
 			if (event.isCommand()) {
-				BungeeActor<ProxiedPlayer> actor = new BungeeActor<>(player, messageManager);
 				String[] args = event.getMessage().split(" ");
 				if (args[0].equalsIgnoreCase("/cancel")) {
 					commandManager.cancelProcess(actor);
@@ -58,7 +62,7 @@ public final class BungeeCommandListener implements Listener {
 				commandManager.handleProcessInput(actor, process, event.getMessage());
 				return;
 			}
-			commandManager.handleProcessInput(new BungeeActor<>(player, messageManager), process, event.getMessage());
+			commandManager.handleProcessInput(actor, process, event.getMessage());
 			return;
 		}
 		CommandProcess process = commandManager.getProcess(Actor.IMPL_ID);
@@ -66,7 +70,7 @@ public final class BungeeCommandListener implements Listener {
 			return;
 		}
 		event.setCancelled(true);
-		BungeeActor<CommandSender> actor = new BungeeActor<>(sender, messageManager);
+		BungeeActor<CommandSender> actor = new BungeeActor<>(sender, common, messageManager);
 		String[] args = event.getMessage().split(" ");
 		if (args[0].equalsIgnoreCase("/cancel")) {
 			commandManager.cancelProcess(actor);

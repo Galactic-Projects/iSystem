@@ -1,6 +1,7 @@
 package net.galacticprojects.bungeecord.command.impl;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import me.lauriichan.laylib.command.CommandManager;
@@ -14,11 +15,13 @@ import net.md_5.bungee.api.plugin.TabExecutor;
 
 public final class BungeeCommandBridge extends Command implements TabExecutor {
 
+	private final CommonPlugin common;
+
 	private final CommandManager commandManager;
 	private final MessageManager messageManager;
 	private final String name;
 
-	public BungeeCommandBridge(final CommandManager commandManager, final MessageManager messageManager,
+	public BungeeCommandBridge(final CommonPlugin common, final CommandManager commandManager, final MessageManager messageManager,
 			final String name, final List<String> aliases) {
 		super(name, null, aliases.toArray(String[]::new));
 		this.commandManager = commandManager;
@@ -27,20 +30,20 @@ public final class BungeeCommandBridge extends Command implements TabExecutor {
 	}
 
 	@Override
-	public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
-		Triple<NodeCommand, Node, String> triple = commandManager.findNode(name, args);
-		if (triple == null) {
-			return null;
-		}
-		if (!triple.getB().hasChildren()) {
-			return null;
-		}
-		return Arrays.asList(triple.getB().getNames());
+	public void execute(CommandSender sender, String[] args) {
+		commandManager.createProcess(new BungeeActor<>(sender, messageManager), name, args);
 	}
 
 	@Override
-	public void execute(CommandSender sender, String[] args) {
-		commandManager.createProcess(new BungeeActor<>(sender, messageManager), name, args);
+	public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
+		Triple<NodeCommand, Node, String> triple = commandManager.findNode(name, args);
+		if (triple == null) {
+			return Collections.emptyList();
+		}
+		if (!triple.getB().hasChildren()) {
+			return Collections.emptyList();
+		}
+		return Arrays.asList(triple.getB().getNames());
 	}
 
 }
