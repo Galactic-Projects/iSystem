@@ -43,28 +43,27 @@ public class ChatListener implements Listener {
             return;
         }
 
-        String ip = event.getSender().getAddress().getAddress().getHostAddress();
+        if(event.getSender() instanceof ProxiedPlayer player) {
+            if (event.getMessage().startsWith("/") || commandManager.getProcess(player.getUniqueId()) != null) {
+                return;
+            }
 
-        commonPlugin.getDatabaseRef().asOptional().ifPresent(sql -> {
-            sql.getPlayer(ip).thenAccept(playerData -> {
-                ICloudPlayer cloudPlayer = CloudNetDriver.getInstance().getServicesRegistry().getFirstService(IPlayerManager.class).getOnlinePlayer(playerData.getUUID());
+            commonPlugin.getDatabaseRef().asOptional().ifPresent(sql -> {
+                    ICloudPlayer cloudPlayer = CloudNetDriver.getInstance().getServicesRegistry().getFirstService(IPlayerManager.class).getOnlinePlayer(player.getUniqueId());
 
-                if (cloudPlayer == null) {
-                    return;
-                }
+                    if (cloudPlayer == null) {
+                        return;
+                    }
 
-                if (event.getMessage().startsWith("/") || commandManager.getProcess(playerData.getUUID()) != null) {
-                    return;
-                }
+                    UUID uniqueId = player.getUniqueId();
+                    String name = player.getName();
+                    String ip  = player.getAddress().getAddress().getHostAddress();
+                    String server = cloudPlayer.getConnectedService().getServiceId().getName();
+                    String timestamp = TimeHelper.toString(OffsetDateTime.now());
 
-                UUID uniqueId = playerData.getUUID();
-                String name = MojangProfileService.getName(playerData.getUUID());
-                String server = cloudPlayer.getConnectedService().getServiceId().getName();
-                String timestamp = TimeHelper.toString(OffsetDateTime.now());
-
-                Chatlog chatlog = new Chatlog(uniqueId, name, ip, server, timestamp, event.getMessage());
-                sql.createChatlog(chatlog);
+                    Chatlog chatlog = new Chatlog(uniqueId, name, ip, server, timestamp, event.getMessage());
+                    sql.createChatlog(chatlog);
             });
-        });
+        }
     }
 }

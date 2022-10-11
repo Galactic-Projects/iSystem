@@ -1,6 +1,7 @@
 package net.galacticprojects.bungeecord.command;
 
 
+import me.lauriichan.laylib.command.Actor;
 import me.lauriichan.laylib.command.annotation.Action;
 import me.lauriichan.laylib.command.annotation.Argument;
 import me.lauriichan.laylib.command.annotation.Command;
@@ -31,31 +32,25 @@ import java.util.UUID;
 public class FriendCommand {
 
     @Action("toggle")
-    public void toggle(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin, @Argument(name = "on/off", params = {
-            @Param(type = 0, name = "minimum", stringValue = "off"),
-            @Param(type = 0, name = "maximum", stringValue = "on")
-    }) String name) {
+    public void toggle(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin) {
+            Actor<ProxiedPlayer> playerActor = actor.as(ProxiedPlayer.class);
 
-        ProxiedPlayer playerA = actor.as(ProxiedPlayer.class).getHandle();
-        UUID uniqueId = playerA.getUniqueId();
+            if(!playerActor.isValid()){
+            return;
+            }
+
+            ProxiedPlayer playerA = playerActor.getHandle();
+            UUID uniqueId = playerActor.getId();
 
 
         common.getDatabaseRef().asOptional().ifPresent(sql -> {
             sql.getPlayer(uniqueId).thenAccept(playerData -> {
                 FriendSettings friendSettings = sql.getFriendSettings(uniqueId).join();
 
-                if (name.equalsIgnoreCase("off")) {
-                    if (!(sql.getFriendSettings(uniqueId).join().isRequests())) {
-                        playerA.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_TOGGLE_ALREADY_REQUESTS_OFF, playerData.getLanguage())));
-                        return;
-                    }
+                if (sql.getFriendSettings(uniqueId).join().isRequests()) {
                     sql.updateFriendSettings(uniqueId, friendSettings.isJump(), friendSettings.isMessages(), false);
                     playerA.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_TOGGLE_REQUESTS_OFF, playerData.getLanguage())));
-                } else if (name.equalsIgnoreCase("on")) {
-                    if (sql.getFriendSettings(uniqueId).join().isRequests()) {
-                        playerA.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_TOGGLE_ALREADY_REQUESTS_ON, playerData.getLanguage())));
-                        return;
-                    }
+                } else {
                     sql.updateFriendSettings(uniqueId, friendSettings.isJump(), friendSettings.isMessages(), true);
                     playerA.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_TOGGLE_REQUESTS_ON, playerData.getLanguage())));
                 }
@@ -64,32 +59,27 @@ public class FriendCommand {
     }
 
     @Action("togglemessage")
-    public void toggleMessage(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin, @Argument(name = "on/off", params = {
-            @Param(type = 0, name = "value", stringValue = "off"),
-            @Param(type = 0, name = "value", stringValue = "on")
-    }) String name) {
+    public void toggleMessage(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin) {
+        Actor<ProxiedPlayer> playerActor = actor.as(ProxiedPlayer.class);
 
-        ProxiedPlayer playerA = actor.as(ProxiedPlayer.class).getHandle();
-        UUID uniqueId = playerA.getUniqueId();
+        if(!playerActor.isValid()){
+            return;
+        }
+
+        ProxiedPlayer playerA = playerActor.getHandle();
+        UUID uniqueId = playerActor.getId();
 
         common.getDatabaseRef().asOptional().ifPresent(sql -> {
             sql.getPlayer(uniqueId).thenAccept(playerData -> {
                 FriendSettings friendSettings = sql.getFriendSettings(uniqueId).join();
 
-                if (name.equalsIgnoreCase("off")) {
-                    if (!(sql.getFriendSettings(uniqueId).join().isMessages())) {
-                        playerA.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_TOGGLE_ALREADY_MESSAGES_OFF, playerData.getLanguage())));
-                        return;
-                    }
+                if (sql.getFriendSettings(uniqueId).join().isMessages()) {
+
                     sql.updateFriendSettings(uniqueId, friendSettings.isJump(), false, friendSettings.isRequests());
                     playerA.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_TOGGLE_MESSAGES_OFF, playerData.getLanguage())));
-                } else if (name.equalsIgnoreCase("on")) {
-                    if (sql.getFriendSettings(uniqueId).join().isMessages()) {
-                        playerA.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_TOGGLE_ALREADY_MESSAGES_ON, playerData.getLanguage())));
-                        return;
-                    }
+                } else {
                     sql.updateFriendSettings(uniqueId, friendSettings.isJump(), true, friendSettings.isRequests());
-                    playerA.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_TOGGLE_MESSAGES_ON, playerData.getLanguage())));
+                    playerActor.sendTranslatedMessage(CommandMessages.FRIEND_TOGGLE_MESSAGES_ON, Key.of(playerData.getLanguage()));
                 }
 
             });
@@ -97,29 +87,24 @@ public class FriendCommand {
     }
 
     @Action("togglejump")
-    public void toggleJump(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin, @Argument(name = "on/off", params = {
-            @Param(type = 0, name = "minimum", stringValue = "off"),
-            @Param(type = 0, name = "maximum", stringValue = "on")
-    }) String name) {
-        ProxiedPlayer playerA = actor.as(ProxiedPlayer.class).getHandle();
-        UUID uniqueId = playerA.getUniqueId();
+    public void toggleJump(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin) {
+        Actor<ProxiedPlayer> playerActor = actor.as(ProxiedPlayer.class);
+
+        if(!playerActor.isValid()){
+            return;
+        }
+
+        ProxiedPlayer playerA = playerActor.getHandle();
+        UUID uniqueId = playerActor.getId();
 
         common.getDatabaseRef().asOptional().ifPresent(sql -> {
             sql.getPlayer(uniqueId).thenAccept(playerData -> {
                 FriendSettings friendSettings = sql.getFriendSettings(uniqueId).join();
 
-                if(name.equalsIgnoreCase("off")) {
-                    if(!(sql.getFriendSettings(uniqueId).join().isJump())){
-                        playerA.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_TOGGLE_ALREADY_JUMP_OFF, playerData.getLanguage())));
-                        return;
-                    }
+                if (sql.getFriendSettings(uniqueId).join().isJump()) {
                     sql.updateFriendSettings(uniqueId, false, friendSettings.isMessages(), friendSettings.isRequests());
                     playerA.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_TOGGLE_JUMP_OFF, playerData.getLanguage())));
-                } else if(name.equalsIgnoreCase("on")) {
-                    if(sql.getFriendSettings(uniqueId).join().isJump()){
-                        playerA.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_TOGGLE_ALREADY_JUMP_ON, playerData.getLanguage())));
-                        return;
-                    }
+                } else {
                     sql.updateFriendSettings(uniqueId, true, friendSettings.isMessages(), friendSettings.isRequests());
                     playerA.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_TOGGLE_JUMP_ON, playerData.getLanguage())));
                 }
