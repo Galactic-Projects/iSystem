@@ -14,6 +14,8 @@ import net.galacticprojects.bungeecord.util.TimeHelper;
 import net.galacticprojects.common.CommonPlugin;
 import net.galacticprojects.common.database.SQLDatabase;
 import net.galacticprojects.common.database.model.Ban;
+import net.galacticprojects.common.database.model.FriendRequest;
+import net.galacticprojects.common.database.model.FriendSettings;
 import net.galacticprojects.common.database.model.Player;
 import net.galacticprojects.common.util.ComponentParser;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -42,8 +44,12 @@ public class ConnectListener implements Listener {
         SQLDatabase database = plugin.getCommonPlugin().getDatabaseRef().get();
         PluginConfiguration configuration = plugin.getPluginConfiguration();
         CommonPlugin commonPlugin = plugin.getCommonPlugin();
-        Player playerData = database.getPlayer(uniqueId).join();
         String language = "en-uk";
+        if (!database.checkPlayer(uniqueId)) {
+            database.createPlayer(uniqueId, player.getAddress().getAddress().getHostAddress().toString(), 1000, 1, "en-uk", 0L).join();
+        }
+        Player playerData = database.getPlayer(uniqueId).join();
+
         if (playerData.getLanguage() != null) {
             language = playerData.getLanguage();
         }
@@ -64,10 +70,12 @@ public class ConnectListener implements Listener {
             }
         }
 
-        if (playerData.getUUID() == null) {
-            database.createPlayer(uniqueId, player.getAddress().getAddress().getHostAddress().toString(), 1000, 1, "en-uk", 0L).isDone();
+        FriendSettings friendSettings = database.getFriendSettings(uniqueId).join();
+        if(friendSettings == null) {
+            friendSettings = database.createFriendSettings(uniqueId).join();
             return;
         }
+
         Ban ban = database.getBan(uniqueId).join();
         if (ban != null) {
             if (ban.isExpired()) {

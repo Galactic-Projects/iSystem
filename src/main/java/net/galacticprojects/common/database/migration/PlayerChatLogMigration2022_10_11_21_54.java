@@ -13,15 +13,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 @Migration(source = SQLDatabase.class, type = SQLMigrationType.class)
-public class BanMigration2022_09_22_18_38 extends MySQLMigration {
+public class PlayerChatLogMigration2022_10_11_21_54 extends MySQLMigration {
 
-    public BanMigration2022_09_22_18_38() {
-        super(SQLTable.BAN_TABLE);
-    }
-
-    @Override
-    protected long getDate() {
-        return Date.of(18, 38, 22, 9, 2022);
+    public PlayerChatLogMigration2022_10_11_21_54() {
+        super(SQLTable.PLAYER_CHATLOG);
     }
 
     @Override
@@ -31,7 +26,7 @@ public class BanMigration2022_09_22_18_38 extends MySQLMigration {
 
     @Override
     public String getNewFormat() {
-        return "Player VARCHAR(36) NOT NULL, Owner VARCHAR(36), Reason VARCHAR(128) NOT NULL, Time VARCHAR(64), CreationTime VARCHAR(64) NOT NULL, PRIMARY KEY (Player)";
+        return "ID INT AUTO_INCREMENT, UUID VARCHAR(36) NOT NULL, NAME VARCHAR(18) NOT NULL, IP VARCHAR(16) NOT NULL, SERVER VARCHAR(32) NOT NULL, TIMESTAMP VARCHAR(64) NOT NULL, MESSAGE LONGTEXT, PRIMARY KEY (ID)";
     }
 
     @Override
@@ -42,5 +37,10 @@ public class BanMigration2022_09_22_18_38 extends MySQLMigration {
     @Override
     public void migrateBatch(PreparedStatement statement, ResultSet entry) throws SQLException {
 
+    }
+
+    @Override
+    protected long getDate() {
+        return Date.of(21, 54, 11, 10, 2022);
     }
 }

@@ -43,7 +43,6 @@ public class TablistManager {
                 }
 
                 String language = "en-uk";
-
                 if (playerData.getLanguage() != null) {
                     language = playerData.getLanguage();
                 }

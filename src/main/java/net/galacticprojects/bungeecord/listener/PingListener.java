@@ -39,34 +39,23 @@ public class PingListener implements Listener {
             commonPlugin.getLogger().error("Database is not available!");
             return;
         }
+        String language = "en-uk";
         String ip = event.getConnection().getAddress().getAddress().getHostAddress();
-        if(ip == null) {
-            return;
-        }
         Player player = database.getPlayer(ip).join();
-        if(player == null) {
-            return;
-        }
         ServerPing ping = event.getResponse();
-        if(ping == null) {
-            return;
-        }
         ServerPing.Players players = ping.getPlayers();
         ServerPing.Protocol protocol = ping.getVersion();
 
-        String language = "en-uk";
-        if(player.getLanguage() != null) {
-            language = player.getLanguage();
+        if(player != null) {
+            if(player.getLanguage() != null) {
+                language = player.getLanguage();
+            }
         }
 
         String motdM1 = commonPlugin.getMessageManager().translate("system.maintenance.1", language) + " \n" + commonPlugin.getMessageManager().translate("system.maintenance.2", language);
         TextComponent motdM = new TextComponent(ComponentParser.parse(motdM1));
         String motd1 = commonPlugin.getMessageManager().translate("system.motd.1", language) + " \n" + commonPlugin.getMessageManager().translate("system.motd.2", language);
         TextComponent motd = new TextComponent(ComponentParser.parse(motd1));
-
-        if(commonPlugin.getMessageManager().translate("system.maintenance.version", language) == null) {
-            return;
-        }
 
         String version = commonPlugin.getMessageManager().translate("system.maintenance.version", language);
 

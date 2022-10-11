@@ -3,9 +3,10 @@ package net.galacticprojects.common.database;
 public enum SQLTable {
 
     BAN_TABLE("PlayerBans"), PLAYER_TABLE("Player"),
-    FRIENDS_TABLE("Friends"), REPORT_TABLE("report")
+    PLAYER_HISTORY("PlayerHistory"), PLAYER_CHATLOG("PlayerChatLog"),
+    FRIENDS_TABLE("Friends"), FRIENDSREQUEST_TABLE("FriendsRequest"),
+    FRIENDS_SETTINGS("FriendsSettings"), REPORT_TABLE("Report")
     ;
-
     private final String defaultTableName;
     private String tableName;
 

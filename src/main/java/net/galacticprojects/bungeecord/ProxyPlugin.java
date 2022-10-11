@@ -13,10 +13,7 @@ import net.galacticprojects.bungeecord.command.impl.BungeeCommandInjector;
 import net.galacticprojects.bungeecord.command.provider.ProxyPluginProvider;
 import net.galacticprojects.bungeecord.config.BanConfiguration;
 import net.galacticprojects.bungeecord.config.PluginConfiguration;
-import net.galacticprojects.bungeecord.listener.ConnectListener;
-import net.galacticprojects.bungeecord.listener.DisconnectListener;
-import net.galacticprojects.bungeecord.listener.PingListener;
-import net.galacticprojects.bungeecord.listener.ServerSwitchListener;
+import net.galacticprojects.bungeecord.listener.*;
 import net.galacticprojects.bungeecord.message.BanMessage;
 import net.galacticprojects.bungeecord.message.CommandMessages;
 import net.galacticprojects.bungeecord.message.SystemMessage;
@@ -26,6 +23,7 @@ import net.galacticprojects.bungeecord.util.OnlineTime;
 import net.galacticprojects.bungeecord.util.TablistManager;
 import net.galacticprojects.common.CommonPlugin;
 import net.galacticprojects.common.database.model.Ban;
+import net.galacticprojects.common.database.model.Chatlog;
 import net.galacticprojects.common.message.MessageProviderFactoryImpl;
 import net.galacticprojects.spigot.message.CommandDescription;
 import net.md_5.bungee.api.ProxyServer;
@@ -96,6 +94,7 @@ public class ProxyPlugin extends Plugin {
 		manager.registerListener(this, new PingListener(this));
 		manager.registerListener(this, new ServerSwitchListener(this));
 		manager.registerListener(this, new DisconnectListener(this));
+		manager.registerListener(this, new ChatListener(this));
     }
     
     private void registerArgumentTypes() {
@@ -112,6 +111,9 @@ public class ProxyPlugin extends Plugin {
 		commandManager.register(OnlineTimeCommand.class);
 		commandManager.register(FriendCommand.class);
 		commandManager.register(PartyCommand.class);
+		commandManager.register(TeamChatCommand.class);
+		commandManager.register(CoinsCommand.class);
+		commandManager.register(LevelCommand.class);
     }
 
 	public void countDown() {
