@@ -26,8 +26,12 @@ import net.md_5.bungee.api.plugin.Plugin;
 
 public class BungeeActor<P extends CommandSender> extends Actor<P> {
 
-    public BungeeActor(final P handle, final MessageManager messageManager) {
+    private final CommonPlugin common;
+    private String language;
+
+    public BungeeActor(final P handle, final CommonPlugin common, final MessageManager messageManager) {
         super(handle, messageManager);
+        this.common = common;
     }
 
     @Override
@@ -49,21 +53,33 @@ public class BungeeActor<P extends CommandSender> extends Actor<P> {
         return handle.getName();
     }
 
-    public void sendTranslatedMessage(MessageProvider provider, CommonPlugin plugin, Key... placeholders) {
-        sendMessage(messageManager.translate(provider, getLanguage(), placeholders));
-    }
-
-    public String getTranslatedMessageAsString(String messageId, String language, Key... placeholders) {
-        return this.messageManager.translate(messageId, language, placeholders);
-    }
-
-    public String getLanguage(CommonPlugin plugin) {
-        SQLDatabase database = plugin.getDatabaseRef().get();
-        if(database != null) {
-        Player player = database.getPlayer(getId()).join();
-        return player.getLanguage();
+    @Override
+    public String getLanguage() {
+        if(language != null) {
+            return language;
         }
-        return "en-uk";
+        SQLDatabase database = common.getDatabaseRef().get();
+        if(database == null) {
+            return super.getLanguage();
+        }
+        Player player = database.getPlayer(getId()).join();
+        if(player == null) {
+            return language = super.getLanguage();
+        }
+        return language = player.getLanguage();
+    }
+
+    public void setLanguage(String language) {
+        this.language = language;
+        common.getDatabaseRef().ifPresent(sql -> {
+            database.getPlayer(getId()).thenAccept(player -> {
+                if(player == null){
+                    player = database.createPlayer(getId()).join();
+                }
+                player.setLanguage(language);
+                database.updatePlayer(player);
+            });
+        });
     }
 
     @Override

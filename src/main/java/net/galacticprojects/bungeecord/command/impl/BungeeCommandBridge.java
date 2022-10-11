@@ -15,11 +15,13 @@ import net.md_5.bungee.api.plugin.TabExecutor;
 
 public final class BungeeCommandBridge extends Command implements TabExecutor {
 
+	private final CommonPlugin common;
+
 	private final CommandManager commandManager;
 	private final MessageManager messageManager;
 	private final String name;
 
-	public BungeeCommandBridge(final CommandManager commandManager, final MessageManager messageManager,
+	public BungeeCommandBridge(final CommonPlugin common, final CommandManager commandManager, final MessageManager messageManager,
 			final String name, final List<String> aliases) {
 		super(name, null, aliases.toArray(String[]::new));
 		this.commandManager = commandManager;
