@@ -37,7 +37,8 @@ public class OnlineTime {
                                 long onlineTime = playerData.getOnlineTime();
                                 onlineTime = onlineTime + 60;
                                 time.put(player.getUniqueId(), onlineTime);
-                                sqlDatabase.updatePlayer(player.getUniqueId(), playerData.getIP(), playerData.getCoins(), playerData.getLevel(), playerData.getLanguage(), time.get(player.getUniqueId()));
+                                playerData.setOnlineTime(onlineTime);
+                                sqlDatabase.updatePlayer(playerData);
                                 time.remove(player.getUniqueId());
                             });
                         });

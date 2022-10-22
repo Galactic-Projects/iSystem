@@ -26,7 +26,7 @@ public class BanMigration2022_10_11_21_48 extends MySQLMigration {
 
     @Override
     public String getNewFormat() {
-        return "Player VARCHAR(36) NOT NULL, Owner VARCHAR(36), Id VARCHAR(3), Reason VARCHAR(128) NOT NULL, Time VARCHAR(64), CreationTime VARCHAR(64) NOT NULL, PRIMARY KEY (Player)";
+        return "ID INT AUTO_INCREMENT, UUID VARCHAR(36) NOT NULL, STAFF VARCHAR(36), REASON VARCHAR(128) NOT NULL, TIME VARCHAR(64), CREATIONTIME VARCHAR(64) NOT NULL, PRIMARY KEY (ID)";
     }
 
     @Override

@@ -11,6 +11,7 @@ import net.galacticprojects.bungeecord.config.BanConfiguration;
 import net.galacticprojects.bungeecord.config.info.BanInfo;
 import net.galacticprojects.bungeecord.message.BanMessage;
 import net.galacticprojects.bungeecord.message.CommandMessages;
+import net.galacticprojects.bungeecord.util.Type;
 import net.galacticprojects.common.CommonPlugin;
 import net.galacticprojects.common.database.SQLDatabase;
 import net.galacticprojects.common.database.model.Ban;
@@ -54,7 +55,7 @@ public class BanCommand {
         }
         SQLDatabase database = common.getDatabaseRef().get();
         if(database == null){
-            // TODO: DB not availble
+            common.getLogger().error(new Throwable("Database ist unavailable"));
             return;
         }
         database.getBan(uniqueId).thenAccept(existingBan -> {
@@ -64,16 +65,18 @@ public class BanCommand {
             }
             OffsetDateTime creation = OffsetDateTime.now();
             OffsetDateTime time = OffsetDateTime.now().plusHours(info.getHours());
-            database.banPlayer(uniqueId, actor.getId(), banId, info.getReason(), time, creation).thenAccept(ban -> {
+            database.banPlayer(uniqueId, actor.getId(), info.getReason(), time, creation).thenAccept(ban -> {
                 if(ban == null){
                     // TODO: Ban unsuccessful
                     return;
                 }
+                database.createHistory(uniqueId, actor.getId(), Type.BAN, info.getReason(), time, creation);
+
 
                 BanMessage message = BanMessage.valueOf("COMMAND_BAN_ID_" + banId);
                 String message1 = common.getMessageManager().translate(message.id(), actor.getLanguage());
                 ProxiedPlayer proxiedPlayer = ProxyServer.getInstance().getPlayer(uniqueId);
-                actor.sendTranslatedMessage(CommandMessages.COMMAND_BAN_CREATE_SUCCESS, common, Key.of("player", name), Key.of("time", TimeHelper.BAN_TIME_FORMATTER.format(time)), Key.of("reason", message1));
+                actor.sendTranslatedMessage(CommandMessages.COMMAND_BAN_CREATE_SUCCESS, Key.of("player", name), Key.of("time", TimeHelper.BAN_TIME_FORMATTER.format(time)), Key.of("reason", message1));
                 if(proxiedPlayer != null) {
                     proxiedPlayer.disconnect(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.COMMAND_PLAYER_BANNED.getId(), "en-uk", Key.of("reason", message.id()), Key.of("time", TimeHelper.BAN_TIME_FORMATTER.format(time)))));
                 }
@@ -105,6 +108,7 @@ public class BanCommand {
                 return;
             }
             database.deleteBan(uniqueId);
+            database.createHistory(uniqueId, actor.getId(), Type.UNBAN,"-/-", OffsetDateTime.now(), OffsetDateTime.now());
             senderActor.sendTranslatedMessage(CommandMessages.COMMAND_BAN_DELETE_SUCCESS, Key.of("player", name));
         });
     }

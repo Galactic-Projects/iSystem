@@ -45,10 +45,15 @@ public class ConnectListener implements Listener {
         PluginConfiguration configuration = plugin.getPluginConfiguration();
         CommonPlugin commonPlugin = plugin.getCommonPlugin();
         String language = "en-uk";
-        if (!database.checkPlayer(uniqueId)) {
-            database.createPlayer(uniqueId, player.getAddress().getAddress().getHostAddress().toString(), 1000, 1, "en-uk", 0L).join();
-        }
         Player playerData = database.getPlayer(uniqueId).join();
+
+        for(int i = 0; i != 99; i++){
+            player.sendMessage(ComponentParser.parse(""));
+        }
+
+        if(playerData == null) {
+            playerData = database.createPlayer(uniqueId, player.getAddress().getAddress().getHostAddress().toString(), 1000, 1, "en-uk", 0L).join();
+        }
 
         if (playerData.getLanguage() != null) {
             language = playerData.getLanguage();

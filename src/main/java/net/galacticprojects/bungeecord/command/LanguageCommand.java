@@ -25,14 +25,14 @@ public class LanguageCommand {
         SQLDatabase database = common.getDatabaseRef().get();
         if(language.toLowerCase().equals("deutsch")) {
             database.getPlayer(senderActor.getId()).thenAccept(player -> {
-                database.updatePlayer(player.getUUID(), player.getIP(), player.getCoins(), player.getLevel(), "de-de", player.getOnlineTime()).isDone();
+                actor.setLanguage("de-de");
                 senderActor.sendMessage(common.getMessageManager().translate("command.language.changed", "de-de", Key.of("language", "Deutsch")));
             });
             return;
         }
         if(language.toLowerCase().equals("english")) {
             database.getPlayer(senderActor.getId()).thenAccept(player -> {
-                database.updatePlayer(player.getUUID(), player.getIP(), player.getCoins(), player.getLevel(), "en-uk", player.getOnlineTime()).isDone();
+                actor.setLanguage("en-uk");
                 senderActor.sendMessage(common.getMessageManager().translate("command.language.changed", "en-uk", Key.of("language", "English")));
             });
             return;

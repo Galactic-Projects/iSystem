@@ -26,7 +26,7 @@ public class PlayerHistoryMigration2022_10_11_22_02 extends MySQLMigration {
 
     @Override
     public String getNewFormat() {
-        return "ID INT AUTO_INCREMENT, Player VARCHAR(36) NOT NULL, Owner VARCHAR(36), Type VARCHAR(32), Reason VARCHAR(128) NOT NULL, Time VARCHAR(64), CreationTime VARCHAR(64) NOT NULL, PRIMARY KEY (ID)";
+        return "ID INT AUTO_INCREMENT, UUID VARCHAR(36) NOT NULL, INFORMATION LONGTEXT, PRIMARY KEY (ID)";
     }
 
     @Override

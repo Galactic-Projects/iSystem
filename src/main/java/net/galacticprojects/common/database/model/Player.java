@@ -6,12 +6,12 @@ import java.util.UUID;
 public class Player {
 
     private final UUID uuid;
-    private final String ip;
-    private final long onlineTime;
+    private String ip;
+    private long onlineTime;
 
-    private final int coins;
-    private final String language;
-    private final int level;
+    private int coins;
+    private String language;
+    private int level;
 
     public Player (UUID uuid, String ip, long onlineTime, int coins, String language, int level) {
         this.uuid = uuid;
@@ -39,4 +39,24 @@ public class Player {
 
     public String getLanguage() {return language;}
     public int getLevel() {return level;}
+
+    public void setLanguage(String language) {
+        this.language = language;
+    }
+
+    public void setOnlineTime(long onlineTime) {
+        this.onlineTime = onlineTime;
+    }
+
+    public void setCoins(int coins) {
+        this.coins = coins;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public void setLevel(int level) {
+        this.level = level;
+    }
 }
