@@ -59,10 +59,10 @@ public final class CommandMessages {
 	})
 	public static MessageProvider COMMAND_PLAYER_BANNED;
 
-	@Message(id = "command.onlinetime.success", content = "$#plugin.prefix Your &bonline-time &7is &c$daystime Day(s)&7, &c$hourtime Hour(s)&7 and &c$minutetime Minute(s)&7.")
+	@Message(id = "command.onlinetime.success.self", content = "$#plugin.prefix Your &bonline-time &7is &c$daystime Day(s)&7, &c$hourtime Hour(s)&7 and &c$minutetime Minute(s)&7.")
 	public static MessageProvider COMMAND_ONLINETIME_SUCCESS;
 
-	@Message(id = "command.onlinetime.success", content = "$#plugin.prefix The &bonline-time &7by &b$player&7is &7is &c$daystime Day(s)&7, &c$hourtime Hour(s)&7 and &c$minutetime Minute(s)&7.")
+	@Message(id = "command.onlinetime.success.others", content = "$#plugin.prefix The &bonline-time &7by &b$player &7is &c$daystime Day(s)&7, &c$hourtime Hour(s)&7 and &c$minutetime Minute(s)&7.")
 	public static MessageProvider COMMAND_ONLINETIME_SUCCESS_OTHERS;
 
 	@Message(id = "party.name", content = "&b&lParty")
@@ -111,46 +111,30 @@ public final class CommandMessages {
 
 	@Message(id = "teamchat.prefix", content = "&8&l「 &9&lTEAMCHAT &8&l」&7")
 	public static MessageProvider TEAMCHAT_PREFIX;
-	@Message(id = "command.teamchat.left", content = "$#teamchat.prefix Joa nh bisch halt raus")
+	@Message(id = "command.teamchat.left", content = "$#teamchat.prefix &7You &cleft &7the &bteamchat&7.")
 	public static MessageProvider COMMAND_TEAMCHAT_LEFT;
-	@Message(id = "command.teamchat.join", content = "$#teamchat.prefix Joa bisch drin")
+	@Message(id = "command.teamchat.join", content = "$#teamchat.prefix &7You &aentered &7the &bteamchat&7.")
 	public static MessageProvider COMMAND_TEAMCHAT_JOIN;
+
+	@Message(id = "command.teamchat.format", content = "$#teamchat.prefix &b$player &7» &f$message")
+	public static MessageProvider COMMAND_TEAMCHAT_FORMAT;
 
 	@Message(id = "friend.prefix", content = "&8&l「 &e&lFRIEND &8&l」&7")
 	public static MessageProvider FRIEND_PREFIX;
 
 	@Message(id = "command.friend.toggle.requests.off", content = "$#friend.prefix &7You &asuccessfully &7switched your &4friend requests &7to &coff&7.")
 	public static MessageProvider FRIEND_TOGGLE_REQUESTS_OFF;
-
-	@Message(id = "command.friend.toggle.requests.already.off", content = "$#friend.prefix &cThe &4friend requests &care already &4off&c.")
-	public static MessageProvider FRIEND_TOGGLE_ALREADY_REQUESTS_OFF;
 	@Message(id = "command.friend.toggle.requests.on", content = "$#friend.prefix &7You &asuccessfully &7switched your &4friend requests &7to &con&7.")
 	public static MessageProvider FRIEND_TOGGLE_REQUESTS_ON;
-
-	@Message(id = "command.friend.toggle.requests.already.on", content = "$#friend.prefix &cThe &4friend requests &care already &4on&c.")
-	public static MessageProvider FRIEND_TOGGLE_ALREADY_REQUESTS_ON;
-
 	@Message(id = "command.friend.toggle.messages.off", content = "$#friend.prefix &7You &asuccessfully &7switched your &4friend private messages &7to &coff&c.")
 	public static MessageProvider FRIEND_TOGGLE_MESSAGES_OFF;
-
-	@Message(id = "command.friend.toggle.requests.already.off", content = "$#friend.prefix &cThe &4friend private messages &care already &4off&c.")
-	public static MessageProvider FRIEND_TOGGLE_ALREADY_MESSAGES_OFF;
 	@Message(id = "command.friend.toggle.messages.on", content = "$#friend.prefix &7You &asuccessfully &7switched your &4friend private messages &7to &con&7.")
 	public static MessageProvider FRIEND_TOGGLE_MESSAGES_ON;
 
-	@Message(id = "command.friend.toggle.requests.already.on", content = "$#friend.prefix &cThe &4friend private messages &care already &4on&c.")
-	public static MessageProvider FRIEND_TOGGLE_ALREADY_MESSAGES_ON;
-
 	@Message(id = "command.friend.toggle.jump.off", content = "$#friend.prefix &7You &asuccessfully &7switched your &4friend jump &7to &coff&7.")
 	public static MessageProvider FRIEND_TOGGLE_JUMP_OFF;
-
-	@Message(id = "command.friend.toggle.jump.already.off", content = "$#friend.prefix &cThe &4friend jump &care already &4off&c.")
-	public static MessageProvider FRIEND_TOGGLE_ALREADY_JUMP_OFF;
 	@Message(id = "command.friend.toggle.jump.on", content = "$#friend.prefix &7You &asuccessfully &7switched your &4friend jump &7to &con&7.")
 	public static MessageProvider FRIEND_TOGGLE_JUMP_ON;
-
-	@Message(id = "command.friend.toggle.jump.already.on", content = "$#friend.prefix &cThe &4friend jump &care already &4on&c.")
-	public static MessageProvider FRIEND_TOGGLE_ALREADY_JUMP_ON;
 
 	@Message(id = "command.friend.request.accept", content = "&a&lACCEPT")
 	public static MessageProvider FRIEND_REQUEST_ACCEPT;
@@ -158,49 +142,214 @@ public final class CommandMessages {
 	@Message(id = "command.friend.request.deny", content = "&c&lDENY")
 	public static MessageProvider FRIEND_REQUEST_DENY;
 
-	@Message(id = "command.friend.pending.requests.list", content = {
-			"$#friend.prefix &7Your currently pending requests to other players&7:",
-			"$input"
-	})
+	@Message(id = "command.friend.pending.requests.list", content = "$#friend.prefix &7Your currently pending requests to other players&7:")
 	public static MessageProvider FRIEND_PENDING_REQUEST_LIST;
 
-	@Message(id = "command.friend.requests.list", content = {
-			"$#friend.prefix &7Your currently friend requests&7:",
-			"$input"
-	})
+	@Message(id = "command.friend.requests.list", content = "$#friend.prefix &7Your currently friend requests&7:")
 	public static MessageProvider FRIEND_REQUESTS_LIST;
 
-	@Message(id =  "command.friend.pending.requests.no", content = "$#friend.prefix &cYou haven't sent any requests to other players!")
+	@Message(id = "command.friend.pending.requests.no", content = "$#friend.prefix &cYou didn't send any requests to other players!")
 	public static MessageProvider FRIEND_PENDING_REQUEST_NO;
 
-	@Message(id =  "command.friend.requests.none", content = "$#friend.prefix &cYou haven't any friend requests!")
+	@Message(id = "command.friend.requests.none", content = "$#friend.prefix &cYou didn't any friend requests!")
 	public static MessageProvider FRIEND_NONE_REQUEST;
 
-	@Message(id =  "command.friend.requests.disabled", content = "$#friend.prefix &cThis player disabled friend requests!")
+	@Message(id = "command.friend.requests.disabled", content = "$#friend.prefix &cThis player disabled friend requests!")
 	public static MessageProvider FRIEND_REQUEST_DISABLED;
 
-	@Message(id =  "command.friend.requests.already", content = "$#friend.prefix &cYou sent already a friend requests!")
+	@Message(id = "command.friend.requests.already", content = "$#friend.prefix &cYou already sent a friend requests!")
 	public static MessageProvider FRIEND_REQUEST_ALREADY;
 
-	@Message(id =  "command.friend.requests.sent", content = "$#friend.prefix &7You &3sent &7a &cfriend request &7to &b$target&7.")
+	@Message(id = "command.friend.requests.sent", content = "$#friend.prefix &7You &3sent &7a &cfriend request &7to &b$target&7.")
 	public static MessageProvider FRIEND_REQUEST_SENT;
 
-	@Message(id =  "command.friend.requests.sent.target", content = {
-			"$#friend.prefix &7You have a new friend request:",
-			"$input"
-	})
+	@Message(id = "command.friend.requests.sent.both", content = "$#friend.prefix &7You both &3sended &7a &cfriend request&7, now you are &bfriends&7.")
+	public static MessageProvider FRIEND_BOTH_SENDED;
+
+	@Message(id = "command.friend.requests.sent.target", content = "$#friend.prefix &7You have a new friend request:")
 	public static MessageProvider FRIEND_REQUEST_SENT_TARGET;
 
-	@Message(id =  "command.friend.request.notsent", content = "$#friend.prefix &cYou didn't send this player a friend request.")
+	@Message(id = "command.friend.request.notsent", content = "$#friend.prefix &cYou didn't send this player a friend request.")
 	public static MessageProvider FRIEND_REQUEST_NOTSENT;
 
-	@Message(id =  "command.friend.request.deleted", content = "$#friend.prefix &cYou deleted the friend request from &4$player&7.")
+	@Message(id = "command.friend.request.deleted", content = "$#friend.prefix &7You &3deleted &7the &cfriend request &7from &b$player&7.")
 	public static MessageProvider FRIEND_REQUEST_DELETED;
 
-	@Message(id =  "command.friend.request.deny.notsent", content = "$#friend.prefix &cThis player didn't send you a friend request.")
+	@Message(id = "command.friend.request.deleted.all", content = "$#friend.prefix &7You &3deleted &ball &7your &cfriend requests&7.")
+	public static MessageProvider FRIEND_REQUEST_DELETED_ALL;
+
+	@Message(id = "command.friend.request.norequests", content = "$#friend.prefix &cYou haven't any friend requests!")
+	public static MessageProvider FRIEND_REQUEST_NO_REQUESTS;
+
+	@Message(id = "command.friend.request.deny.notsent", content = "$#friend.prefix &cThis player didn't send you a friend request.")
 	public static MessageProvider FRIEND_REQUEST_DENY_NOTSENT;
 
-	@Message(id =  "command.friend.request.deny.removed", content = "$#friend.prefix &7You &3denied &7the friend request from &b$player&7.")
+	@Message(id = "command.friend.request.deny.removed", content = "$#friend.prefix &7You &3denied &7the friend request from &b$player&7.")
 	public static MessageProvider FRIEND_REQUEST_REMOVED;
 
+	@Message(id = "command.friend.request.accept.single", content = "$#friend.prefix &7You &3accepted &7the &cfriend requests&7 from &b$player&7.")
+	public static MessageProvider FRIEND_REQUEST_ACCEPT_SINGLE;
+
+	@Message(id = "command.friend.request.accept.target", content = "$#friend.prefix &7&b$player&7 have &3accepted &7your &cfriend request&7.")
+	public static MessageProvider FRIEND_REQUEST_ACCEPT_TARGET;
+
+	@Message(id = "command.friend.request.accept.all", content = "$#friend.prefix &7You &3accepted &ball &7your &cfriend requests&7.")
+	public static MessageProvider FRIEND_REQUEST_ACCEPT_ALL;
+
+	@Message(id = "command.friend.main.already", content = "$#friend.prefix &cThis player is already your friend!")
+	public static MessageProvider FRIEND_ALREADY;
+
+	@Message(id = "command.friend.main.none", content = "$#friend.prefix &cThis player isn't your friend!")
+	public static MessageProvider FRIEND_NONE;
+
+	@Message(id = "command.friend.main.list.none", content = "$#friend.prefix &cYou haven't any friends!")
+	public static MessageProvider FRIEND_NONE_LIST;
+
+	@Message(id = "command.friend.main.deleted", content = "$#friend.prefix &7You &3deleted &7the &cfriendship &7with &b$player&7.")
+	public static MessageProvider FRIEND_DELETE;
+
+	@Message(id = "command.friend.main.list.cleared.accept", content = "$#friend.prefix &7Your &cfriend list &3has been cleared &7by &3yourself&7.")
+	public static MessageProvider FRIEND_LIST_CLEARED;
+
+	@Message(id = "command.friend.main.list.cleared.deny", content = "$#friend.prefix &cYou canceled to want clear your &4friend list&c.")
+	public static MessageProvider FRIEND_LIST_CLEARED_DENY;
+
+	@Message(id = "command.friend.main.list", content = "$#friend.prefix &7Your friends:")
+	public static MessageProvider FRIEND_LIST;
+
+	@Message(id = "coins.prefix", content = "&8&l「 &9&lCOINS &8&l」&7")
+	public static MessageProvider COINS_PREFIX;
+
+	@Message(id = "command.coins.errors.negative", content = "$#coins.prefix &cThe amount must be over zero!")
+	public static MessageProvider COINS_ERRORS_NEGATIVE;
+
+	@Message(id = "command.coins.errors.enough", content = "$#coins.prefix &cNot enough coins!")
+	public static MessageProvider COINS_ERRORS_ENOUGH;
+
+	@Message(id = "command.coins.errors.already", content = "$#coins.prefix &cThis player has already the amount that you want to set!")
+	public static MessageProvider COINS_ERRORS_ALREADY;
+	@Message(id = "command.coins.errors.number", content = "$#coins.prefix &cFormat must be a number!")
+	public static MessageProvider COINS_ERRORS_NUMBER;
+
+	@Message(id = "command.coins.errors.small", content = "$#level.prefix &cYou can't remove this amount from the player coins, because it will be smaller than 0!")
+	public static MessageProvider COINS_ERRORS_SMALL;
+
+	@Message(id = "command.coins.errors.number", content = "$#coins.prefix &cYou can't send yourself coins!")
+	public static MessageProvider COINS_ERRORS_SELF;
+
+	@Message(id = "command.coins.name", content = "Galactic Credits")
+	public static MessageProvider COINS_NAME;
+
+	@Message(id = "command.coins.show.single", content = "$#coins.prefix &7Your &3coins &7are &b$input $#command.coins.name&7.")
+	public static MessageProvider COINS_SHOW;
+
+	@Message(id = "command.coins.show.others", content = "$#coins.prefix &7The &3coins &7by &c$player &7is &b$input $#command.coins.name&7.")
+	public static MessageProvider COINS_SHOW_OTHERS;
+
+	@Message(id = "command.coins.pay.sent.player", content = "$#coins.prefix &7You &3sent &c$player &b$amount $#command.coins.name&7.")
+	public static MessageProvider COINS_OTHERS_SENT_PLAYER;
+
+	@Message(id = "command.coins.pay.sent.target", content = "$#coins.prefix &b$player &csent &7you &3$amount $#command.coins.name&7.")
+	public static MessageProvider COINS_OTHERS_SENT_TARGET;
+
+	@Message(id = "command.coins.set.player", content = "$#coins.prefix &7You &7set &b$player &7a new amount of &ccoins &7from &3$oldamount &7to &3$amount $#command.coins.name&7.")
+	public static MessageProvider COINS_OTHERS_SET_PLAYER;
+
+	@Message(id = "command.coins.set.target", content = "$#coins.prefix &b$player &7set you a new amount of &ccoins &7from &3$oldamount &7to &3$amount $#command.coins.name&7.")
+	public static MessageProvider COINS_OTHERS_SET_TARGET;
+
+	@Message(id = "command.coins.add.player", content = "$#coins.prefix &7You &7added &b$player &7an amount of &ccoins &7from &3$oldamount &7to &3$amount $#command.coins.name&7.")
+	public static MessageProvider COINS_OTHERS_ADD_PLAYER;
+
+	@Message(id = "command.coins.add.target", content = "$#coins.prefix &b$player &7added you an amount of &ccoins &7from &3$oldamount &7to &3$amount $#command.coins.name&7.")
+	public static MessageProvider COINS_OTHERS_ADD_TARGET;
+
+	@Message(id = "command.coins.remove.player", content = "$#coins.prefix &7You &7removed &b$player &7an amount of &ccoins &7from &3$oldamount &7to &3$amount $#command.coins.name&7.")
+	public static MessageProvider COINS_OTHERS_REMOVE_PLAYER;
+
+	@Message(id = "command.coins.remove.target", content = "$#coins.prefix &b$player &7removed you an amount of &ccoins &7from &3$oldamount &7to &3$amount $#command.coins.name&7.")
+	public static MessageProvider COINS_OTHERS_REMOVE_TARGET;
+
+	@Message(id = "level.prefix", content = "&8&l「 &5&lLEVEL &8&l」&7")
+	public static MessageProvider LEVEL_PREFIX;
+
+	@Message(id = "command.level.errors.negative", content = "$#level.prefix &cThe amount must be over zero!")
+	public static MessageProvider LEVEL_ERRORS_NEGATIVE;
+
+	@Message(id = "command.level.errors.already", content = "$#level.prefix &cThis player has already the amount that you want to set!")
+	public static MessageProvider LEVEL_ERRORS_ALREADY;
+
+	@Message(id = "command.level.errors.number", content = "$#level.prefix &cFormat must be a number!")
+	public static MessageProvider LEVEL_ERRORS_NUMBER;
+
+	@Message(id = "command.level.errors.small", content = "$#level.prefix &cYou can't remove this amount from the player level, because it will be smaller than 1!")
+	public static MessageProvider LEVEL_ERRORS_SMALL;
+
+	@Message(id = "command.level.errors.big", content = "$#level.prefix &cYou can't give yourself a level that is over Level 100!")
+	public static MessageProvider LEVEL_ERRORS_BIG;
+
+	@Message(id = "command.level.show.single", content = "$#level.prefix &7Your &3level &7are &bLevel $input&7.")
+	public static MessageProvider LEVEL_SHOW;
+
+	@Message(id = "command.level.show.others", content = "$#level.prefix &7The &3level &7by &c$player &7is &bLevel $input&7.")
+	public static MessageProvider LEVEL_SHOW_OTHERS;
+
+	@Message(id = "command.level.set.player", content = "$#level.prefix &7You &7set &b$player &7a new &cLevel &7from &3$oldamount &7to &3$amount Level&7.")
+	public static MessageProvider LEVEL_OTHERS_SET_PLAYER;
+
+	@Message(id = "command.level.set.target", content = "$#level.prefix &b$player &7set you a new &clevel &7from &3$oldamount &7to &3Level $amount&7.")
+	public static MessageProvider LEVEL_OTHERS_SET_TARGET;
+
+	@Message(id = "command.level.add.player", content = "$#level.prefix &7You &7added &b$player &7a &clevel &7from &3$oldamount &7to &3Level $amount&7.")
+	public static MessageProvider LEVEL_OTHERS_ADD_PLAYER;
+
+	@Message(id = "command.level.add.target", content = "$#level.prefix &b$player &7added you a &clevel &7from &3$oldamount &7to &3$amount Level&7.")
+	public static MessageProvider LEVEL_OTHERS_ADD_TARGET;
+
+	@Message(id = "command.level.remove.player", content = "$#level.prefix &7You &7removed &b$player &7a &clevel &7from &3$oldamount &7to &3Level $amount&7.")
+	public static MessageProvider LEVEL_OTHERS_REMOVE_PLAYER;
+
+	@Message(id = "command.level.remove.target", content = "$#level.prefix &b$player &7removed you a &clevel &7from &3$oldamount &7to &3Level $amount&7.")
+	public static MessageProvider LEVEL_OTHERS_REMOVE_TARGET;
+
+	@Message(id = "ping.prefix", content = "&8&l「 &3&lPING &8&l」&7")
+	public static MessageProvider PING_PREFIX;
+
+	@Message(id = "command.ping.online", content = "$#ping.prefix &cPlayer isn't online.")
+	public static MessageProvider PING_ONLINE;
+
+	@Message(id = "command.ping.self", content = "$#ping.prefix &7Your &3ping &7is &b$input ms&7.")
+	public static MessageProvider PING_SELF;
+
+	@Message(id = "command.ping.others", content = "$#ping.prefix &7The &3ping &7by &c$player &7is &b$input ms&7.")
+	public static MessageProvider PING_OTHERS;
+
+	@Message(id = "command.broadcast.prefix", content = "&8「 &5&lGALACTIC&d&lPROJECTS &8」&b&l")
+	public static MessageProvider BROADCAST_PREFIX;
+
+	@Message(id = "command.broadcast.format", content = {
+			"&7",
+			"$#command.broadcast.prefix $message",
+			"&7"
+	})
+	public static MessageProvider BROADCAST_COMMAND;
+
+	@Message(id = "system.necessary.network.restart.almost", content = {
+			"&8「 &5&lGALACTIC&d&lPROJECTS &8」 &4&lIMPORTANT NOTIFICATION",
+			"",
+			"&cOur &4network &cwill be &4automatically restart &cin",
+			"&c➥ $hour Hour(s), $minute Minute(s), $second Second(s)",
+			"",
+			"&8「 &5&lGALACTIC&d&lPROJECTS &8」 &4&lIMPORTANT NOTIFICATION",
+	})
+	public static MessageProvider SYSTEM_NETWORK_RESTART_ALMOST;
+
+	@Message(id = "system.necessary.network.restart.now", content = {
+			"&8「 &5&lGALACTIC&d&lPROJECTS &8」 &4&lIMPORTANT NOTIFICATION",
+			"",
+			"&cOur &4network &cwill be &4automatically restart &cnow.",
+			"",
+			"&8「 &5&lGALACTIC&d&lPROJECTS &8」 &4&lIMPORTANT NOTIFICATION",
+	})
+	public static MessageProvider SYSTEM_NETWORK_RESTART_NOW;
 }

@@ -20,49 +20,34 @@ import java.util.UUID;
 public class OnlineTimeCommand {
 
     @Action("")
-    public void onlineTime(BungeeActor<?> bungeeActor, ProxyPlugin plugin, CommonPlugin common, @Argument(name = "player", optional = true) String target) {
-        ProxiedPlayer player = bungeeActor.as(ProxiedPlayer.class).getHandle();
-
+    public void onlineTime(BungeeActor<?> actor, ProxyPlugin plugin, CommonPlugin common, @Argument(name = "player", optional = true) String target) {
+        ProxiedPlayer player = actor.as(ProxiedPlayer.class).getHandle();
         UUID uuid = player.getUniqueId();
 
-        if(target != null) {
-            UUID uniqueId = MojangProfileService.getUniqueId(target);
+        if(target != null){
+            UUID targetUnique = MojangProfileService.getUniqueId(target);
 
-            common.getDatabaseRef().asOptional().ifPresent(sqlDatabase -> {
-                sqlDatabase.getPlayer(uniqueId).thenAccept(playerData -> {
+            common.getDatabaseRef().asOptional().ifPresent(sql -> {
+                sql.getPlayer(targetUnique).thenAccept(playerData -> {
                     long time = playerData.getOnlineTime();
                     long minute = (time % 3600) / 60;
                     long hours = (time % 86400) / 3600;
                     long days = (time % 2629746) / 86400;
 
-                    String language = "en-uk";
-                    if(playerData.getLanguage() != null) {
-                        language = playerData.getLanguage();
-                    }
-
-
-                    common.getMessageManager().translate(CommandMessages.COMMAND_ONLINETIME_SUCCESS_OTHERS, playerData.getLanguage(),
-                            Key.of("player", MojangProfileService.getName(uniqueId))  ,Key.of("daystime", days), Key.of("hourtime", hours), Key.of("minutetime", minute));
+                    actor.sendTranslatedMessage(CommandMessages.COMMAND_ONLINETIME_SUCCESS_OTHERS, Key.of("player", MojangProfileService.getName(targetUnique)), Key.of("daystime", days), Key.of("hourtime", hours), Key.of("minutetime", minute));
                 });
             });
             return;
         }
 
-        common.getDatabaseRef().asOptional().ifPresent(sqlDatabase -> {
-            sqlDatabase.getPlayer(uuid).thenAccept(playerData -> {
+        common.getDatabaseRef().asOptional().ifPresent(sql -> {
+            sql.getPlayer(uuid).thenAccept(playerData -> {
                 long time = playerData.getOnlineTime();
                 long minute = (time % 3600) / 60;
                 long hours = (time % 86400) / 3600;
                 long days = (time % 2629746) / 86400;
 
-                String language = "en-uk";
-                if(playerData.getLanguage() != null) {
-                    language = playerData.getLanguage();
-                }
-
-                
-                bungeeActor.sendTranslatedMessage(net.galacticprojects.bungeecord.message.CommandMessages.COMMAND_ONLINETIME_SUCCESS, common, 
-                        Key.of("daystime", days), Key.of("hourtime", hours), Key.of("minutetime", minute));
+                actor.sendTranslatedMessage(CommandMessages.COMMAND_ONLINETIME_SUCCESS, Key.of("daystime", days), Key.of("hourtime", hours), Key.of("minutetime", minute));
             });
         });
     }

@@ -71,13 +71,13 @@ public class BungeeActor<P extends CommandSender> extends Actor<P> {
 
     public void setLanguage(String language) {
         this.language = language;
-        common.getDatabaseRef().ifPresent(sql -> {
-            database.getPlayer(getId()).thenAccept(player -> {
+        common.getDatabaseRef().asOptional().ifPresent(sql -> {
+            sql.getPlayer(getId()).thenAccept(player -> {
                 if(player == null){
-                    player = database.createPlayer(getId()).join();
+                    return;
                 }
                 player.setLanguage(language);
-                database.updatePlayer(player);
+                sql.updatePlayer(player);
             });
         });
     }
@@ -85,6 +85,15 @@ public class BungeeActor<P extends CommandSender> extends Actor<P> {
     @Override
     public void sendMessage(String message) {
         handle.sendMessage(ComponentParser.parse(message));
+    }
+    @Override
+    public void sendTranslatedMessage(String messageId, Key... placeholders) {
+        sendMessage(messageManager.translate(messageId, getLanguage(), placeholders));
+    }
+
+    @Override
+    public void sendTranslatedMessage(MessageProvider provider, Key... placeholders) {
+        sendMessage(messageManager.translate(provider, getLanguage(), placeholders));
     }
 
     @Override

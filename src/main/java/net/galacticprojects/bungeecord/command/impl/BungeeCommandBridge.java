@@ -9,6 +9,7 @@ import me.lauriichan.laylib.command.Node;
 import me.lauriichan.laylib.command.NodeCommand;
 import me.lauriichan.laylib.command.util.Triple;
 import me.lauriichan.laylib.localization.MessageManager;
+import net.galacticprojects.common.CommonPlugin;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
@@ -26,12 +27,13 @@ public final class BungeeCommandBridge extends Command implements TabExecutor {
 		super(name, null, aliases.toArray(String[]::new));
 		this.commandManager = commandManager;
 		this.messageManager = messageManager;
+		this.common = common;
 		this.name = name;
 	}
 
 	@Override
 	public void execute(CommandSender sender, String[] args) {
-		commandManager.createProcess(new BungeeActor<>(sender, messageManager), name, args);
+		commandManager.createProcess(new BungeeActor<>(sender, common, messageManager), name, args);
 	}
 
 	@Override

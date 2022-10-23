@@ -5,7 +5,6 @@ import me.lauriichan.laylib.command.Actor;
 import me.lauriichan.laylib.command.annotation.Action;
 import me.lauriichan.laylib.command.annotation.Argument;
 import me.lauriichan.laylib.command.annotation.Command;
-import me.lauriichan.laylib.command.annotation.Param;
 import me.lauriichan.laylib.localization.Key;
 import net.galacticprojects.bungeecord.ProxyPlugin;
 import net.galacticprojects.bungeecord.command.impl.BungeeActor;
@@ -14,16 +13,14 @@ import net.galacticprojects.bungeecord.util.TimeHelper;
 import net.galacticprojects.common.CommonPlugin;
 import net.galacticprojects.common.database.model.FriendRequest;
 import net.galacticprojects.common.database.model.FriendSettings;
+import net.galacticprojects.common.database.model.Friends;
 import net.galacticprojects.common.util.ComponentParser;
 import net.galacticprojects.common.util.MojangProfileService;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import org.checkerframework.checker.units.qual.A;
-import org.w3c.dom.Text;
 
-import java.lang.reflect.Proxy;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -33,15 +30,13 @@ public class FriendCommand {
 
     @Action("toggle")
     public void toggle(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin) {
-            Actor<ProxiedPlayer> playerActor = actor.as(ProxiedPlayer.class);
+        ProxiedPlayer bungeePlayer = actor.as(ProxiedPlayer.class).getHandle();
 
-            if(!playerActor.isValid()){
+        if (bungeePlayer == null) {
             return;
-            }
+        }
 
-            ProxiedPlayer playerA = playerActor.getHandle();
-            UUID uniqueId = playerActor.getId();
-
+        UUID uniqueId = bungeePlayer.getUniqueId();
 
         common.getDatabaseRef().asOptional().ifPresent(sql -> {
             sql.getPlayer(uniqueId).thenAccept(playerData -> {
@@ -49,10 +44,10 @@ public class FriendCommand {
 
                 if (sql.getFriendSettings(uniqueId).join().isRequests()) {
                     sql.updateFriendSettings(uniqueId, friendSettings.isJump(), friendSettings.isMessages(), false);
-                    playerA.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_TOGGLE_REQUESTS_OFF, playerData.getLanguage())));
+                    actor.sendTranslatedMessage(CommandMessages.FRIEND_TOGGLE_REQUESTS_ON);
                 } else {
                     sql.updateFriendSettings(uniqueId, friendSettings.isJump(), friendSettings.isMessages(), true);
-                    playerA.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_TOGGLE_REQUESTS_ON, playerData.getLanguage())));
+                    actor.sendTranslatedMessage(CommandMessages.FRIEND_TOGGLE_REQUESTS_OFF);
                 }
             });
         });
@@ -60,14 +55,13 @@ public class FriendCommand {
 
     @Action("togglemessage")
     public void toggleMessage(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin) {
-        Actor<ProxiedPlayer> playerActor = actor.as(ProxiedPlayer.class);
+        ProxiedPlayer bungeePlayer = actor.as(ProxiedPlayer.class).getHandle();
 
-        if(!playerActor.isValid()){
+        if (bungeePlayer == null) {
             return;
         }
 
-        ProxiedPlayer playerA = playerActor.getHandle();
-        UUID uniqueId = playerActor.getId();
+        UUID uniqueId = bungeePlayer.getUniqueId();
 
         common.getDatabaseRef().asOptional().ifPresent(sql -> {
             sql.getPlayer(uniqueId).thenAccept(playerData -> {
@@ -76,10 +70,10 @@ public class FriendCommand {
                 if (sql.getFriendSettings(uniqueId).join().isMessages()) {
 
                     sql.updateFriendSettings(uniqueId, friendSettings.isJump(), false, friendSettings.isRequests());
-                    playerA.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_TOGGLE_MESSAGES_OFF, playerData.getLanguage())));
+                    actor.sendTranslatedMessage(CommandMessages.FRIEND_TOGGLE_MESSAGES_OFF);
                 } else {
                     sql.updateFriendSettings(uniqueId, friendSettings.isJump(), true, friendSettings.isRequests());
-                    playerActor.sendTranslatedMessage(CommandMessages.FRIEND_TOGGLE_MESSAGES_ON, Key.of(playerData.getLanguage()));
+                    actor.sendTranslatedMessage(CommandMessages.FRIEND_TOGGLE_MESSAGES_ON);
                 }
 
             });
@@ -88,14 +82,13 @@ public class FriendCommand {
 
     @Action("togglejump")
     public void toggleJump(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin) {
-        Actor<ProxiedPlayer> playerActor = actor.as(ProxiedPlayer.class);
+        ProxiedPlayer bungeePlayer = actor.as(ProxiedPlayer.class).getHandle();
 
-        if(!playerActor.isValid()){
+        if (bungeePlayer == null) {
             return;
         }
 
-        ProxiedPlayer playerA = playerActor.getHandle();
-        UUID uniqueId = playerActor.getId();
+        UUID uniqueId = bungeePlayer.getUniqueId();
 
         common.getDatabaseRef().asOptional().ifPresent(sql -> {
             sql.getPlayer(uniqueId).thenAccept(playerData -> {
@@ -103,10 +96,10 @@ public class FriendCommand {
 
                 if (sql.getFriendSettings(uniqueId).join().isJump()) {
                     sql.updateFriendSettings(uniqueId, false, friendSettings.isMessages(), friendSettings.isRequests());
-                    playerA.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_TOGGLE_JUMP_OFF, playerData.getLanguage())));
+                    actor.sendTranslatedMessage(CommandMessages.FRIEND_TOGGLE_JUMP_OFF);
                 } else {
                     sql.updateFriendSettings(uniqueId, true, friendSettings.isMessages(), friendSettings.isRequests());
-                    playerA.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_TOGGLE_JUMP_ON, playerData.getLanguage())));
+                    actor.sendTranslatedMessage(CommandMessages.FRIEND_TOGGLE_JUMP_ON);
                 }
 
             });
@@ -115,198 +108,399 @@ public class FriendCommand {
 
     @Action("list")
     public void list(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin) {
+        ProxiedPlayer bungeePlayer = actor.as(ProxiedPlayer.class).getHandle();
 
+        if (bungeePlayer == null) {
+            return;
+        }
+
+        UUID uniqueId = bungeePlayer.getUniqueId();
+
+        common.getDatabaseRef().asOptional().ifPresent(sql -> {
+            sql.getPlayer(uniqueId).thenAccept(playerData -> {
+                if (!(sql.hasFriends(uniqueId).join())) {
+                    actor.sendTranslatedMessage(CommandMessages.FRIEND_NONE_LIST);
+                    return;
+                }
+
+                actor.sendTranslatedMessage(CommandMessages.FRIEND_LIST);
+                for (Friends friends : sql.getFriend(uniqueId).join()) {
+                    UUID uniqueIdFriend = friends.getFriendUniqueId();
+                    OffsetDateTime time = TimeHelper.fromString(friends.getDate());
+                    String date = TimeHelper.BAN_TIME_FORMATTER.format(time);
+                    ProxiedPlayer friend = ProxyServer.getInstance().getPlayer(uniqueIdFriend);
+
+                    TextComponent message = new TextComponent();
+                    message.setText("§b" + MojangProfileService.getName(uniqueIdFriend));
+                    message.addExtra(" §7▪ §3" + date);
+                    message.addExtra("\n§7» ");
+
+                    if (friend == null) {
+                        message.addExtra("§cOFFLINE");
+                        message.addExtra(" §7«\n");
+                        bungeePlayer.sendMessage(message);
+                        return;
+                    }
+
+                    message.addExtra("§aONLINE");
+                    message.addExtra(" §7«\n");
+
+                    bungeePlayer.sendMessage(message);
+                }
+            });
+        });
     }
 
     @Action("clear")
-    public void clear(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin) {
+    public void clear(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin, @Argument(name = "yes,true/no,false?") boolean clear) {
+        ProxiedPlayer bungeePlayer = actor.as(ProxiedPlayer.class).getHandle();
+
+        if (bungeePlayer == null) {
+            return;
+        }
+
+        UUID uniqueId = bungeePlayer.getUniqueId();
+
+        common.getDatabaseRef().asOptional().ifPresent(sql -> {
+            sql.getPlayer(uniqueId).thenAccept(playerData -> {
+                if (!(clear)) {
+                    actor.sendTranslatedMessage(CommandMessages.FRIEND_LIST_CLEARED_DENY);
+                    return;
+                }
+
+                for (Friends friends : sql.getFriend(uniqueId).join()) {
+                    UUID uniqueIdFriend = friends.getFriendUniqueId();
+                    sql.deleteFriend(uniqueId, uniqueIdFriend);
+                    sql.deleteFriend(uniqueIdFriend, uniqueId);
+                }
+                actor.sendTranslatedMessage(CommandMessages.FRIEND_LIST_CLEARED);
+            });
+        });
+
 
     }
 
     @Action("requests")
     public void requests(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin) {
-        ProxiedPlayer playerA = actor.as(ProxiedPlayer.class).getHandle();
-        UUID uniqueId = playerA.getUniqueId();
+        ProxiedPlayer bungeePlayer = actor.as(ProxiedPlayer.class).getHandle();
+
+        if (bungeePlayer == null) {
+            return;
+        }
+
+        UUID uniqueId = bungeePlayer.getUniqueId();
 
         common.getDatabaseRef().asOptional().ifPresent(sql -> {
             sql.getPlayer(uniqueId).thenAccept(playerData -> {
-                if(sql.getFriendRequestByRequesterId(uniqueId).join().size() == 0) {
-                    playerA.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_NONE_REQUEST, playerData.getLanguage())));
+                if (!(sql.isFriendRequestedByRequestor(uniqueId).join())) {
+                    actor.sendTranslatedMessage(CommandMessages.FRIEND_NONE_REQUEST);
                     return;
                 }
 
-                Key values = null;
-                TextComponent accept = new TextComponent(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_REQUEST_ACCEPT, playerData.getLanguage())));
-                accept.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, "/friend accept"));
-                TextComponent deny = new TextComponent(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_REQUEST_DENY, playerData.getLanguage())));
-                accept.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, "/friend deny"));
-                for(int i = 0; i != sql.getFriendRequestByRequesterId(uniqueId).join().size(); i++){
-                    UUID request = sql.getFriendRequestByRequesterId(uniqueId).join().get(i).getUUID();
-                    String date = sql.getFriendRequestByRequesterId(uniqueId).join().get(i).getDate();
-                    accept.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, MojangProfileService.getName(request)));
-                    deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, MojangProfileService.getName(request)));
-                    TextComponent message = new TextComponent();
-                    message.addExtra("&b" + MojangProfileService.getName(request));
-                    message.addExtra(" &7▪ &3");
-                    message.addExtra(date);
-                    message.addExtra(accept);
-                    message.addExtra(" &8▏&7");
-                    message.addExtra(deny);
-                    message.addExtra("\n");
-                    values = Key.of("input",  message);
-                }
+                TextComponent message = null;
+                actor.sendTranslatedMessage(CommandMessages.FRIEND_REQUESTS_LIST);
+                for (FriendRequest friendRequest : sql.getFriendRequestByRequesterId(uniqueId).join()) {
+                    UUID request = friendRequest.getUUID();
 
-                playerA.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_REQUESTS_LIST, playerData.getLanguage(), values)));
+                    TextComponent accept = new TextComponent();
+                    accept.setText(common.getMessageManager().translate(CommandMessages.FRIEND_REQUEST_ACCEPT, playerData.getLanguage()).replaceAll("&", "§"));
+                    accept.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/friend accept"));
+                    TextComponent deny = new TextComponent();
+                    deny.setText(common.getMessageManager().translate(CommandMessages.FRIEND_REQUEST_DENY, playerData.getLanguage()).replaceAll("&", "§"));
+                    deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/friend deny"));
+
+                    OffsetDateTime time = TimeHelper.fromString(friendRequest.getDate());
+                    String date = TimeHelper.BAN_TIME_FORMATTER.format(time);
+
+                    message = new TextComponent();
+                    message.setText("§b" + MojangProfileService.getName(request));
+                    message.addExtra(" §7▪ §3" + date);
+                    message.addExtra("\n§7» ");
+                    message.addExtra(accept);
+                    message.addExtra(" §8▏§7 ");
+                    message.addExtra(deny);
+                    message.addExtra(" §7«\n");
+                    bungeePlayer.sendMessage(message);
+                }
             });
         });
     }
 
     @Action("pendingrequests")
-    public void pendingRequests(BungeeActor<?> actor, CommonPlugin  common, ProxyPlugin plugin) {
-        ProxiedPlayer playerA = actor.as(ProxiedPlayer.class).getHandle();
-        UUID uniqueId = playerA.getUniqueId();
+    public void pendingRequests(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin) {
+        ProxiedPlayer bungeePlayer = actor.as(ProxiedPlayer.class).getHandle();
+
+        if (bungeePlayer == null) {
+            return;
+        }
+
+        UUID uniqueId = bungeePlayer.getUniqueId();
 
         common.getDatabaseRef().asOptional().ifPresent(sql -> {
             sql.getPlayer(uniqueId).thenAccept(playerData -> {
-                if(sql.getFriendRequest(uniqueId).join().size() == 0) {
-                    playerA.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_PENDING_REQUEST_NO, playerData.getLanguage())));
+                if (!(sql.isFriendRequested(uniqueId).join())) {
+                    actor.sendTranslatedMessage(CommandMessages.FRIEND_PENDING_REQUEST_NO);
                     return;
                 }
 
-                Key values = null;
-                for(int i = 0; i != sql.getFriendRequest(uniqueId).join().size(); i++){
-                    UUID request = sql.getFriendRequest(uniqueId).join().get(i).getRequestUUID();
-                    String date = String.valueOf(TimeHelper.fromString(sql.getFriendRequest(uniqueId).join().get(i).getDate()));
-                    values = Key.of("input", "&b" + MojangProfileService.getName(request) + " &7▪ &3" + date + "\n");
+                String message = null;
+                actor.sendTranslatedMessage(CommandMessages.FRIEND_PENDING_REQUEST_LIST);
+                for (FriendRequest friendRequest : sql.getFriendRequest(uniqueId).join()) {
+                    UUID request = friendRequest.getRequestUUID();
+                    OffsetDateTime time = TimeHelper.fromString(friendRequest.getDate());
+                    String date = TimeHelper.BAN_TIME_FORMATTER.format(time);
+                    message = "§b" + MojangProfileService.getName(request) + " §7▪ §3" + date + "\n";
+                    actor.sendMessage(message);
                 }
-
-                playerA.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_PENDING_REQUEST_LIST, playerData.getLanguage(), values)));
             });
         });
     }
 
     @Action("add")
-    public void add(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin, @Argument(name="player") String player) {
-        ProxiedPlayer playerA = actor.as(ProxiedPlayer.class).getHandle();
-        UUID uniqueId = playerA.getUniqueId();
+    public void add(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin, @Argument(name = "player") String player) {
+        ProxiedPlayer bungeePlayer = actor.as(ProxiedPlayer.class).getHandle();
+
+        if (bungeePlayer == null) {
+            return;
+        }
+
+        UUID uniqueId = bungeePlayer.getUniqueId();
         UUID uniqueTarget = MojangProfileService.getUniqueId(player);
 
         common.getDatabaseRef().asOptional().ifPresent(sql -> {
             sql.getPlayer(uniqueId).thenAccept(playerData -> {
-                if(!(sql.getFriendSettings(uniqueTarget).join().isRequests())){
-                    playerA.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_REQUEST_DISABLED, playerData.getLanguage())));
+                ProxiedPlayer target = ProxyServer.getInstance().getPlayer(player);
+
+                if (!(sql.getFriendSettings(uniqueTarget).join().isRequests())) {
+                    actor.sendTranslatedMessage(CommandMessages.FRIEND_REQUEST_DISABLED);
                     return;
                 }
 
-                ArrayList<FriendRequest> requests = sql.getFriendRequest(uniqueId).join();
-
-                UUID request = null;
-                for(int i = 0; i < requests.size(); i++) {
-                    if(requests.get(i).getRequestUUID() == uniqueTarget) {
-                        request = requests.get(i).getRequestUUID();
-                    }
+                if (sql.isFriendRequested(uniqueId, uniqueTarget).join()) {
+                    actor.sendTranslatedMessage(CommandMessages.FRIEND_REQUEST_ALREADY);
+                    return;
                 }
 
-                if(request != null){
-                    playerA.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_REQUEST_ALREADY, playerData.getLanguage())));
-                } else {
+                if (sql.isAlreadyFriend(uniqueId, uniqueTarget).join() || sql.isAlreadyFriend(uniqueTarget, uniqueId).join()) {
+                    actor.sendTranslatedMessage(CommandMessages.FRIEND_ALREADY);
+                    return;
+                }
 
-                    sql.createFriendRequest(uniqueId, uniqueTarget, TimeHelper.toString(OffsetDateTime.now()));
-                    playerA.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_REQUEST_SENT, playerData.getLanguage(), Key.of("target", MojangProfileService.getName(uniqueTarget)))));
-
-                    ProxiedPlayer target = ProxyServer.getInstance().getPlayer(player);
+                if (sql.isFriendRequested(uniqueTarget, uniqueId).join() || sql.isFriendRequested(uniqueId, uniqueTarget).join()) {
+                    sql.createFriend(uniqueId, uniqueTarget, TimeHelper.toString(OffsetDateTime.now()));
+                    sql.createFriend(uniqueTarget, uniqueId, TimeHelper.toString(OffsetDateTime.now()));
+                    sql.deleteFriendRequest(uniqueId, uniqueTarget);
+                    sql.deleteFriendRequest(uniqueTarget, uniqueId);
+                    actor.sendTranslatedMessage(CommandMessages.FRIEND_BOTH_SENDED);
                     if (target == null) {
                         return;
                     }
-
-                    TextComponent accept = new TextComponent(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_REQUEST_ACCEPT, playerData.getLanguage())));
-                    accept.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, "/friend accept"));
-                    TextComponent deny = new TextComponent(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_REQUEST_DENY, playerData.getLanguage())));
-                    accept.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_FILE, "/friend deny"));
-                    TextComponent message = new TextComponent();
-                    message.addExtra("&b" + playerA.getName());
-                    message.addExtra(" &7▪ &3");
-                    message.addExtra(String.valueOf(TimeHelper.fromString(TimeHelper.toString(OffsetDateTime.now()))));
-                    message.addExtra(accept);
-                    message.addExtra(" &8▏&7");
-                    message.addExtra(deny);
-                    message.addExtra("\n");
-                    Key values = Key.of("input", message);
-
                     sql.getPlayer(uniqueTarget).thenAccept(targetPlayerData -> {
-                        target.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_REQUEST_SENT_TARGET, playerData.getLanguage(), values)));
+                        target.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_BOTH_SENDED, targetPlayerData.getLanguage())));
                     });
+                    return;
                 }
+
+
+                sql.createFriendRequest(uniqueId, uniqueTarget, TimeHelper.toString(OffsetDateTime.now()));
+                actor.sendTranslatedMessage(CommandMessages.FRIEND_REQUEST_SENT, Key.of("target", MojangProfileService.getName(uniqueTarget)));
+
+                if (target == null) {
+                    return;
+                }
+                sql.getPlayer(uniqueTarget).thenAccept(targetPlayerData -> {
+                    TextComponent accept = new TextComponent();
+                    accept.setText(common.getMessageManager().translate(CommandMessages.FRIEND_REQUEST_ACCEPT, targetPlayerData.getLanguage()).replaceAll("&", "§"));
+                    accept.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/friend accept"));
+                    TextComponent deny = new TextComponent();
+                    deny.setText(common.getMessageManager().translate(CommandMessages.FRIEND_REQUEST_DENY, targetPlayerData.getLanguage()).replaceAll("&", "§"));
+                    deny.setClickEvent(new ClickEvent(ClickEvent.Action.RUN_COMMAND, "/friend deny"));
+
+                    TextComponent message = new TextComponent();
+                    OffsetDateTime time = TimeHelper.fromString(TimeHelper.toString(OffsetDateTime.now()));
+                    String date = TimeHelper.BAN_TIME_FORMATTER.format(time);
+                    message.setText("§b" + bungeePlayer.getName());
+                    message.addExtra(" §7▪ §3" + date);
+                    message.addExtra("\n§7» ");
+                    message.addExtra(accept);
+                    message.addExtra(" §8▏§7 ");
+                    message.addExtra(deny);
+                    message.addExtra(" §7«\n");
+
+                    target.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_REQUEST_SENT_TARGET, targetPlayerData.getLanguage())));
+                    target.sendMessage(message);
+                });
             });
         });
     }
 
     @Action("cancelrequest")
     public void cancelRequest(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin, @Argument(name = "player") String player) {
-        ProxiedPlayer playerA = actor.as(ProxiedPlayer.class).getHandle();
-        UUID uniqueId = playerA.getUniqueId();
+        ProxiedPlayer bungeePlayer = actor.as(ProxiedPlayer.class).getHandle();
+
+        if (bungeePlayer == null) {
+            return;
+        }
+
+        UUID uniqueId = bungeePlayer.getUniqueId();
         UUID uniqueTarget = MojangProfileService.getUniqueId(player);
 
         common.getDatabaseRef().asOptional().ifPresent(sql -> {
             sql.getPlayer(uniqueId).thenAccept(playerData -> {
-                if (sql.getFriendRequest(uniqueId).join().contains(uniqueTarget)) {
-                    sql.deleteFriendRequest(uniqueId, uniqueTarget);
-                    playerA.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_REQUEST_DELETED, playerData.getLanguage(), Key.of("player", MojangProfileService.getName(uniqueTarget)))));
-                } else {
-                    playerA.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_REQUEST_NOTSENT, playerData.getLanguage())));
+                if (!(sql.isFriendRequested(uniqueId, uniqueTarget).join())) {
+                    actor.sendTranslatedMessage(CommandMessages.FRIEND_REQUEST_NOTSENT);
+                    return;
                 }
+
+                sql.deleteFriendRequest(uniqueId, uniqueTarget);
+                actor.sendTranslatedMessage(CommandMessages.FRIEND_REQUEST_DELETED, Key.of("player", MojangProfileService.getName(uniqueTarget)));
             });
         });
+
     }
 
     @Action("remove")
-    public void remove(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin, @Argument(name="player") String player) {
+    public void remove(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin, @Argument(name = "player") String player) {
+        ProxiedPlayer bungeePlayer = actor.as(ProxiedPlayer.class).getHandle();
 
+        if (bungeePlayer == null) {
+            return;
+        }
+
+        UUID uniqueId = bungeePlayer.getUniqueId();
+        UUID uniqueIdTarget = MojangProfileService.getUniqueId(player);
+
+        common.getDatabaseRef().asOptional().ifPresent(sql -> {
+            sql.getPlayer(uniqueId).thenAccept(playerData -> {
+                if(!(sql.isAlreadyFriend(uniqueId, uniqueIdTarget).join())) {
+                    actor.sendTranslatedMessage(CommandMessages.FRIEND_NONE);
+                    return;
+                }
+
+                sql.deleteFriend(uniqueId, uniqueIdTarget);
+                sql.deleteFriend(uniqueIdTarget, uniqueId);
+                actor.sendTranslatedMessage(CommandMessages.FRIEND_DELETE, Key.of("player", bungeePlayer.getUniqueId()));
+            });
+        });
     }
 
     @Action("acceptall")
     public void acceptall(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin) {
+        ProxiedPlayer bungeePlayer = actor.as(ProxiedPlayer.class).getHandle();
 
-    }
+        if (bungeePlayer == null) {
+            return;
+        }
 
-    @Action("denyall")
-    public void denyall(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin) {
-
-    }
-
-    @Action("accept")
-    public void accept(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin, @Argument(name="player") String player) {
-
-    }
-
-
-    @Action("deny")
-    public void deny(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin, @Argument(name="player") String player) {
-        ProxiedPlayer playerA = actor.as(ProxiedPlayer.class).getHandle();
-        UUID uniqueId = playerA.getUniqueId();
-        UUID uniqueTarget = MojangProfileService.getUniqueId(player);
+        UUID uniqueId = bungeePlayer.getUniqueId();
 
         common.getDatabaseRef().asOptional().ifPresent(sql -> {
             sql.getPlayer(uniqueId).thenAccept(playerData -> {
-                ArrayList<FriendRequest> requests = sql.getFriendRequest(uniqueId).join();
-
-                UUID request = null;
-                for(int i = 0; i < requests.size(); i++) {
-                    if(requests.get(i).getRequestUUID() == uniqueTarget) {
-                        request = requests.get(i).getRequestUUID();
-                        break;
-                    }
-                }
-
-                if(request != null){
-                    sql.deleteFriendRequest(uniqueId, uniqueTarget);
-                    playerA.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_REQUEST_REMOVED, playerData.getLanguage(), Key.of("player", MojangProfileService.getName(uniqueTarget)))));
+                if (!(sql.isFriendRequested(uniqueId).join())) {
+                    actor.sendTranslatedMessage(CommandMessages.FRIEND_REQUEST_NO_REQUESTS);
                     return;
                 }
 
-                playerA.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_REQUEST_DENY_NOTSENT, playerData.getLanguage())));
+                for (FriendRequest requests : sql.getFriendRequestByRequesterId(uniqueId).join()) {
+                    UUID requestId = requests.getUUID();
+                    sql.createFriend(uniqueId, requestId, TimeHelper.toString(OffsetDateTime.now()));
+                    sql.createFriend(requestId, uniqueId, TimeHelper.toString(OffsetDateTime.now()));
+                    sql.deleteFriendRequest(requestId, uniqueId);
+                }
+                actor.sendTranslatedMessage(CommandMessages.FRIEND_REQUEST_ACCEPT_ALL);
             });
         });
     }
 
+    @Action("denyall")
+    public void denyall(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin) {
+        ProxiedPlayer bungeePlayer = actor.as(ProxiedPlayer.class).getHandle();
+
+        if (bungeePlayer == null) {
+            return;
+        }
+
+        UUID uniqueId = bungeePlayer.getUniqueId();
+
+        common.getDatabaseRef().asOptional().ifPresent(sql -> {
+            sql.getPlayer(uniqueId).thenAccept(playerData -> {
+                if (!(sql.isFriendRequested(uniqueId).join())) {
+                    actor.sendTranslatedMessage(CommandMessages.FRIEND_REQUEST_NO_REQUESTS);
+                    return;
+                }
+
+                for (FriendRequest requests : sql.getFriendRequestByRequesterId(uniqueId).join()) {
+                    UUID requestId = requests.getUUID();
+                    sql.deleteFriendRequest(requestId, uniqueId);
+                }
+                actor.sendTranslatedMessage(CommandMessages.FRIEND_REQUEST_DELETED_ALL);
+            });
+        });
+    }
+
+    @Action("accept")
+    public void accept(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin, @Argument(name = "player") String player) {
+        ProxiedPlayer bungeePlayer = actor.as(ProxiedPlayer.class).getHandle();
+
+        if (bungeePlayer == null) {
+            return;
+        }
+
+        UUID uniqueId = bungeePlayer.getUniqueId();
+        UUID uniqueTarget = MojangProfileService.getUniqueId(player);
+
+        common.getDatabaseRef().asOptional().ifPresent(sql -> {
+            sql.getPlayer(uniqueId).thenAccept(playerData -> {
+                ProxiedPlayer target = ProxyServer.getInstance().getPlayer(player);
+                if (target == null) {
+                    return;
+                }
+
+                if (!(sql.isFriendRequested(uniqueTarget, uniqueId).join())) {
+                    actor.sendTranslatedMessage(CommandMessages.FRIEND_REQUEST_DENY_NOTSENT);
+                    return;
+                }
+
+                if (sql.isAlreadyFriend(uniqueTarget, uniqueId).join()) {
+                    actor.sendTranslatedMessage(CommandMessages.FRIEND_ALREADY);
+                    return;
+                }
+
+
+                sql.createFriend(uniqueId, uniqueTarget, TimeHelper.toString(OffsetDateTime.now()));
+                sql.createFriend(uniqueTarget, uniqueId, TimeHelper.toString(OffsetDateTime.now()));
+                sql.deleteFriendRequest(uniqueTarget, uniqueId);
+
+                sql.getPlayer(target.getUniqueId()).thenAccept(targetData -> {
+                    target.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.FRIEND_REQUEST_ACCEPT_TARGET, targetData.getLanguage(), Key.of("player", actor.getName()))));
+                });
+                actor.sendTranslatedMessage(CommandMessages.FRIEND_REQUEST_ACCEPT_ALL);
+            });
+        });
+    }
+
+
+    @Action("deny")
+    public void deny(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin, @Argument(name = "player") String player) {
+        ProxiedPlayer bungeePlayer = actor.as(ProxiedPlayer.class).getHandle();
+
+        if (bungeePlayer == null) {
+            return;
+        }
+
+        UUID uniqueId = bungeePlayer.getUniqueId();
+        UUID uniqueTarget = MojangProfileService.getUniqueId(player);
+
+        common.getDatabaseRef().asOptional().ifPresent(sql -> {
+            sql.getPlayer(uniqueId).thenAccept(playerData -> {
+                if (!(sql.isFriendRequested(uniqueTarget, uniqueId).join())) {
+                    actor.sendTranslatedMessage(CommandMessages.FRIEND_REQUEST_DENY_NOTSENT);
+                    return;
+                }
+
+                sql.deleteFriendRequest(uniqueTarget, uniqueId);
+                actor.sendTranslatedMessage(CommandMessages.FRIEND_REQUEST_REMOVED, Key.of("player", MojangProfileService.getName(uniqueTarget)));
+            });
+        });
+    }
 }

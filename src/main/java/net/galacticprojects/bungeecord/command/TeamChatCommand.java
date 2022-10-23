@@ -31,7 +31,7 @@ public class TeamChatCommand {
              TEAMCHAT.add(player.getUniqueId());
              plugin.getDatabaseRef().asOptional().ifPresent(sql -> {
                  sql.getPlayer(player.getUniqueId()).thenAccept(playerData -> {
-                     player.sendMessage(ComponentParser.parse(plugin.getMessageManager().translate(CommandMessages.COMMAND_TEAMCHAT_LEFT, playerData.getLanguage())));
+                     player.sendMessage(ComponentParser.parse(plugin.getMessageManager().translate(CommandMessages.COMMAND_TEAMCHAT_JOIN, playerData.getLanguage())));
                  });
              });
            return;

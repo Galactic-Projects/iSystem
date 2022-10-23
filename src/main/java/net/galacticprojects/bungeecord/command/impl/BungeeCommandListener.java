@@ -8,6 +8,7 @@ import me.lauriichan.laylib.command.Actor;
 import me.lauriichan.laylib.command.CommandManager;
 import me.lauriichan.laylib.command.CommandProcess;
 import me.lauriichan.laylib.localization.MessageManager;
+import net.galacticprojects.common.CommonPlugin;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.Connection;

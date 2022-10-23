@@ -53,7 +53,7 @@ public class TimeHelper {
                 .appendLiteral(", ").appendValue(DAY_OF_MONTH, 1, 2, SignStyle.NOT_NEGATIVE).appendLiteral(". ")
                 .appendText(MONTH_OF_YEAR, moy).appendLiteral(' ').appendValue(YEAR, 4, 16, SignStyle.NOT_NEGATIVE).appendLiteral(" - ").appendValue(HOUR_OF_DAY, 2)
                 .appendLiteral(':').appendValue(MINUTE_OF_HOUR, 2).appendLiteral(':').appendValue(SECOND_OF_MINUTE, 2).appendLiteral(" (")
-                .appendZoneText(TextStyle.SHORT).appendLiteral(')').toFormatter().withZone(ZoneId.of("UTC"));
+                .appendZoneText(TextStyle.SHORT).appendLiteral(')').toFormatter().withZone(ZoneId.of("Europe/Berlin"));
     }
 
     public static DateTimeFormatter format(String language) {
