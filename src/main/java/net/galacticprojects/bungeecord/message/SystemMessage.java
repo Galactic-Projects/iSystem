@@ -81,6 +81,9 @@ public class SystemMessage {
     })
     public static MessageProvider SYSTEM_PARTY_MEMBER_LEAVE;
 
+    @Message(id = "system.party.action.rejoined", content = "$party.prefix &7$member $player $7has rejoined, party won't be deleted!")
+    public static MessageProvider SYSTEM_PARTY_REJOINED;
+
     @Message(id = "system.no.permission", content = "You do not have permission to execute this command!")
     public static MessageProvider SYSTEM_NO_PERMISSION;
 }

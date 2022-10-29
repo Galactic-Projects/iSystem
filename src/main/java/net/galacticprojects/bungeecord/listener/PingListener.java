@@ -63,7 +63,7 @@ public class PingListener implements Listener {
             protocol.setProtocol(2);
             ping.setDescriptionComponent(motdM);
             protocol.setName(version);
-            players.setMax(0);
+            players.setMax(-1);
             ping.setVersion(protocol);
             ping.setPlayers(players);
         } else {

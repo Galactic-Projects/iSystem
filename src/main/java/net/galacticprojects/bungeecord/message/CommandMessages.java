@@ -352,4 +352,85 @@ public final class CommandMessages {
 			"&8「 &5&lGALACTIC&d&lPROJECTS &8」 &4&lIMPORTANT NOTIFICATION",
 	})
 	public static MessageProvider SYSTEM_NETWORK_RESTART_NOW;
+
+	@Message(id = "prefix.history", content = "&8&l「 &9&lHISTORY &8&l」&7")
+	public static MessageProvider PREFIX_HISTORY;
+
+	@Message(id = "command.history.nohistory", content = "$#prefix.history &cThis player hasn't ever had a history!")
+	public static MessageProvider COMMAND_HISTORY_NOHISTORY;
+
+	@Message(id = "command.history.formatprefix", content = "$#prefix.history &6The history by&e $player &6is:")
+	public static MessageProvider COMMAND_HISTORY_FORMATPREFIX;
+
+	@Message(id = "command.history.format", content = "&7» &eID &8■ &c$id &7❘ &eSender &8■ &c$staff &7❘ &eType &8■ &c$type &7❘ &eReason &8■ &c$reason &7❘ &eTime &8■ &c$time &7❘ &eCreated at &8■ &c$creationTime")
+	public static MessageProvider COMMAND_HISTORY_FORMAT;
+
+	@Message(id = "command.history.deleted", content = "$#prefix.history &7You &asuccessfully &bdeleted &7the &3history &7by &c$player&7.")
+	public static MessageProvider COMMAND_HISTORY_DELETED;
+
+	@Message(id = "prefix.report", content = "&8&l「 &4&lREPORT &8&l」&7")
+	public static MessageProvider PREFIX_REPORT;
+
+	@Message(id = "command.report.errors.already", content = "$#prefix.report &cThis report is already being processed!")
+	public static MessageProvider REPORT_ERRORS_ALREADY;
+
+	@Message(id = "command.report.errors.offline", content = "$#prefix.report &cThis player has gone offline!")
+	public static MessageProvider REPORT_ERRORS_GONE;
+
+	@Message(id = "command.report.errors.reason", content = "$#prefix.report &cThis isn't a reason!")
+	public static MessageProvider REPORT_ERRORS_REASON;
+
+	@Message(id = "command.report.errors.online", content = "$#prefix.report &cThis player isn't online!")
+	public static MessageProvider REPORT_ERRORS_ONLINE;
+
+	@Message(id = "command.report.reported", content = "$#prefix.report &7You &asuccessfully &3reported &b$player$&7.")
+	public static MessageProvider REPORT_SUCCESSFULLY;
+
+	@Message(id = "command.report.teleport", content = "&a&lTELEPORT")
+	public static MessageProvider REPORT_TELEPORT;
+
+	@Message(id = "command.report.ignore", content = "&c&lIGNORE")
+	public static MessageProvider REPORT_IGNORE;
+
+	@Message(id = "command.report.teamformat", content = {
+			"$#prefix.report &6New Report: ",
+			"&8» &ePlayer &8■ &c$player &7❘ &eCreator &8■ &c$creator &7❘ &eReason &8■ &c$reason"
+	})
+	public static MessageProvider REPORT_TEAMFORMAT;
+
+	@Message(id = "command.report.commandline", content = "&8» &a$accept &7❘ &c$deny" )
+	public static MessageProvider REPORT_COMMANDLINE;
+
+	@Message(id = "command.report.process.finish", content = "$#prefix.report &aYou are processing the report from &2$player&a. If you are finished, press $button&a." )
+	public static MessageProvider REPORT_PROCESS_FINISHED;
+
+	@Message(id = "command.report.process.finishbutton", content = "&2[CLOSE REPORT]" )
+	public static MessageProvider REPORT_PROCESS_FINISHBUTTON;
+
+	@Message(id = "command.report.process.closed", content = "$#prefix.report &7Your &creport &7of &b$player &7has been &3closed&7." )
+	public static MessageProvider REPORT_PROCESS_CLOSED;
+
+	@Message(id = "command.report.errors.connected", content = "$#prefix.report &cYou are on the same server as the suspect." )
+	public static MessageProvider REPORT_ERRORS_CONNECTED;
+
+	@Message(id = "prefix.system", content = "&8&l「 &1&lSYSTEM &8&l」&7")
+	public static MessageProvider PREFIX_SYSTEM;
+
+	@Message(id = "command.administration.config.reloaded", content = "$#prefix.system &7Successfully &3reloaded &bconfiguration&7.")
+	public static MessageProvider SYSTEM_ADMINISTRATION_CONFIG_RELOADED;
+
+	@Message(id = "command.administration.errors.already", content = "$#prefix.system &cYour amount is already that amount!")
+	public static MessageProvider SYSTEM_ADMINISTRATION_ERRORS_ALREADY;
+
+	@Message(id = "command.administration.errors.small", content = "$#prefix.system &cThe player amount is too big for this amount, that you want to set!")
+	public static MessageProvider SYSTEM_ADMINISTRATION_ERRORS_SMALL;
+
+	@Message(id = "command.administration.errors.same", content = "$#prefix.system &cThe player amount is the same as the max-players amount!")
+	public static MessageProvider SYSTEM_ADMINISTRATION_ERRORS_SAME;
+
+	@Message(id = "command.administration.errors.realistic", content = "$#prefix.system &cPlease be realistic!")
+	public static MessageProvider SYSTEM_ADMINISTRATION_ERRORS_REALISTIC;
+
+	@Message(id = "command.administration.success.setted", content = "$#prefix.system &7You &asuccessfully &3set &cplayers-max amount &7from &b$oamount &7to &b$namount&7.")
+	public static MessageProvider SYSTEM_ADMINISTRATION_SUCCESS_SETTED;
 }

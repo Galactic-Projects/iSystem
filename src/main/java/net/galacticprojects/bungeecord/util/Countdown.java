@@ -26,10 +26,10 @@ public class Countdown {
     }
 
     public static void setCountdown(UUID player, Party party, int seconds) {
-        double delay = System.currentTimeMillis() + (seconds * 1000);
+        double delay = System.currentTimeMillis() + (seconds * 1000L);
         countdown.put(player, delay);
         taskId = ProxyServer.getInstance().getScheduler().schedule(PLUGIN, () -> {
-            if(countdown.get(player) != 0) {
+            if(countdown.get(player) != 0.0) {
                 if(online.contains(player)) {
                     countdown.remove(player, countdown.get(player));
                     online.remove(player);
@@ -58,8 +58,7 @@ public class Countdown {
     }
 
     public static boolean checkCountdown(UUID player) {
-        if (!countdown.containsKey(player)
-                || countdown.get(player) <= System.currentTimeMillis()) {
+        if (!countdown.containsKey(player) || countdown.get(player) <= System.currentTimeMillis()) {
             return false;
         }
         return true;
