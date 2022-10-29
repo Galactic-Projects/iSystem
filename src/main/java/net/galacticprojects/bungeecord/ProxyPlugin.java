@@ -31,6 +31,7 @@ import net.galacticprojects.bungeecord.command.*;
 import net.galacticprojects.bungeecord.command.impl.BungeeCommandInjector;
 import net.galacticprojects.bungeecord.command.provider.ProxyPluginProvider;
 import net.galacticprojects.bungeecord.config.BanConfiguration;
+import net.galacticprojects.bungeecord.config.BotConfiguration;
 import net.galacticprojects.bungeecord.config.PluginConfiguration;
 import net.galacticprojects.bungeecord.config.ReportConfiguration;
 import net.galacticprojects.bungeecord.listener.*;
@@ -47,6 +48,8 @@ import net.galacticprojects.common.database.model.Ban;
 import net.galacticprojects.common.database.model.Chatlog;
 import net.galacticprojects.common.message.MessageProviderFactoryImpl;
 import net.galacticprojects.common.util.ComponentParser;
+import net.galacticprojects.common.util.DiscordBot;
+import net.galacticprojects.common.util.TeamSpeakBot;
 import net.galacticprojects.spigot.message.CommandDescription;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -61,7 +64,10 @@ public class ProxyPlugin extends Plugin {
 	private PluginConfiguration pluginConfiguration;
 	private BanConfiguration banConfiguration;
 	private ReportConfiguration reportConfiguration;
+	private BotConfiguration botConfiguration;
 	private static ProxyPlugin plugin;
+	private DiscordBot discordBot;
+	private TeamSpeakBot teamSpeakBot;
 
 	@Override
 	public void onLoad() {
@@ -87,6 +93,8 @@ public class ProxyPlugin extends Plugin {
 		Countdown.setupCountdown(this);
 		new OnlineTime(this);
 		countDown();
+		discordBot = new DiscordBot();
+		teamSpeakBot = new TeamSpeakBot();
     }
     
     private void registerMessages() {
@@ -107,11 +115,14 @@ public class ProxyPlugin extends Plugin {
 		pluginConfiguration = new PluginConfiguration(logger, dataFolder);
 		banConfiguration = new BanConfiguration(logger, dataFolder);
 		reportConfiguration = new ReportConfiguration(logger, dataFolder);
+		botConfiguration = new BotConfiguration(logger, dataFolder);
 	}
 
 	public void reloadConfigurations() {
 		pluginConfiguration.reload();
 		banConfiguration.reload();
+		reportConfiguration.reload();
+		botConfiguration.reload();
 	}
 
     private void registerListeners() {
@@ -130,21 +141,21 @@ public class ProxyPlugin extends Plugin {
     
     private void registerCommands() {
     	CommandManager commandManager = common.getCommandManager();
-		commandManager.register(BungeeHelpCommand.class);
-    	commandManager.register(MaintenanceCommand.class);
 		commandManager.register(BanCommand.class);
-		commandManager.register(LanguageCommand.class);
-		commandManager.register(OnlineTimeCommand.class);
-		commandManager.register(FriendCommand.class);
-		commandManager.register(PartyCommand.class);
-		commandManager.register(TeamChatCommand.class);
-		commandManager.register(CoinsCommand.class);
-		commandManager.register(LevelCommand.class);
 		commandManager.register(BroadcastCommand.class);
+		commandManager.register(BungeeHelpCommand.class);
+		commandManager.register(CoinsCommand.class);
+		commandManager.register(FriendCommand.class);
 		commandManager.register(HistoryCommand.class);
-		commandManager.register(ReportCommand.class);
+		commandManager.register(LanguageCommand.class);
+		commandManager.register(LevelCommand.class);
+		commandManager.register(MaintenanceCommand.class);
+		commandManager.register(OnlineTimeCommand.class);
+		commandManager.register(PartyCommand.class);
 		commandManager.register(PingCommand.class);
-
+		commandManager.register(ReportCommand.class);
+		commandManager.register(SystemCommand.class);
+		commandManager.register(TeamChatCommand.class);
     }
 
 	public void countDown() {
@@ -304,7 +315,9 @@ public class ProxyPlugin extends Plugin {
     public void onDisable() {
 		pluginConfiguration.save();
     	common.stop();
-    }
+		discordBot.shutdown();
+		teamSpeakBot.shutdown();
+	}
     
     /*
      * Getter
@@ -315,6 +328,9 @@ public class ProxyPlugin extends Plugin {
 	}
 	public BanConfiguration getBanConfiguration() { return banConfiguration; }
 	public ReportConfiguration getReportConfiguration() { return reportConfiguration; }
+	public BotConfiguration getBotConfiguration() {
+		return botConfiguration;
+	}
 
 	public CommonPlugin getCommonPlugin() {return common;}
 

@@ -11,10 +11,14 @@ import net.galacticprojects.common.util.cache.Cache;
 import net.galacticprojects.common.util.cache.ThreadSafeCache;
 import net.galacticprojects.common.database.migration.impl.SQLMigrationType;
 import net.galacticprojects.common.util.Ref;
+import org.bukkit.entity.Husk;
+import org.checkerframework.checker.units.qual.A;
 
+import javax.swing.*;
 import java.sql.*;
 import java.time.OffsetDateTime;
 import java.util.*;
+import java.util.Timer;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -53,27 +57,32 @@ public final class SQLDatabase implements IMigrationSource {
     public static final String SELECT_PLAYER = String.format("SELECT * FROM `%s` WHERE UUID = ?", SQLTable.PLAYER_TABLE);
     public static final String SELECT_IP_PLAYER = String.format("SELECT * FROM `%s` WHERE IP = ?", SQLTable.PLAYER_TABLE);
     public static final String DELETE_PLAYER = String.format("DELETE FROM `%s` WHERE UUID = ?", SQLTable.PLAYER_TABLE);
-    public static final String INSERT_PLAYER = String
-            .format("INSERT INTO `%s` (UUID, IP, COINS, LEVEL, LANGUAGE, ONLINETIME) VALUES (?, ?, ?, ?, ?, ?)", SQLTable.PLAYER_TABLE);
+    public static final String INSERT_PLAYER = String.format("INSERT INTO `%s` (UUID, IP, COINS, LEVEL, LANGUAGE, ONLINETIME) VALUES (?, ?, ?, ?, ?, ?)", SQLTable.PLAYER_TABLE);
     public static final String UPDATE_PLAYER = String.format("UPDATE `%s` SET IP = ?, COINS = ?, LEVEL = ?, LANGUAGE = ?, ONLINETIME = ? WHERE UUID = ?", SQLTable.PLAYER_TABLE);
 
     public static final String SELECT_FRIENDPLAYER = String.format("SELECT * FROM `%s` WHERE UUID = ?", SQLTable.FRIENDS_TABLE);
     public static final String SELECT_FRIENDPLAYER_REQUEST = String.format("SELECT * FROM `%s` WHERE UUID = ? AND FRIENDUUID = ?", SQLTable.FRIENDS_TABLE);
     public static final String DELETE_FRIEND = String.format("DELETE FROM `%s` WHERE UUID = ? AND FRIENDUUID = ?", SQLTable.FRIENDS_TABLE);
     public static final String INSERT_FRIENDPLAYER = String.format("INSERT INTO `%s` (UUID, FRIENDUUID, DATE) VALUES (?,?,?)", SQLTable.FRIENDS_TABLE);
+
     public static final String SELECT_FRIENDREQUESTS = String.format("SELECT * FROM `%s` WHERE UUID = ?", SQLTable.FRIENDSREQUEST_TABLE);
     public static final String SELECT_FRIENDREQUESTS_BOTH = String.format("SELECT * FROM `%s` WHERE UUID = ? AND REQUESTID = ?", SQLTable.FRIENDSREQUEST_TABLE);
     public static final String SELECT_FRIENDREQUESTS_FROM_REQUESTID = String.format("SELECT * FROM `%s` WHERE REQUESTID = ?", SQLTable.FRIENDSREQUEST_TABLE);
     public static final String DELETE_FRIENDREQUEST = String.format("DELETE FROM `%s` WHERE UUID = ? AND REQUESTID = ?", SQLTable.FRIENDSREQUEST_TABLE);
     public static final String INSERT_FRIENDREQUEST = String.format("INSERT INTO `%s` (UUID, REQUESTID, DATE) VALUES (?,?,?)", SQLTable.FRIENDSREQUEST_TABLE);
+
     public static final String SELECT_FRIENDSETTINGS = String.format("SELECT * FROM `%s` WHERE UUID = ?", SQLTable.FRIENDS_SETTINGS);
     public static final String UPDATE__FRIENDSETTINGS = String.format("UPDATE `%s` SET REQUESTS = ?, JUMP = ?, MESSAGES = ? WHERE UUID = ?", SQLTable.FRIENDS_SETTINGS);
     public static final String INSERT_FRIENDSETTINGS = String.format("INSERT INTO `%s` (UUID, MESSAGES, JUMP, REQUESTS) VALUES (?,?,?,?)", SQLTable.FRIENDS_SETTINGS);
 
+    public static final String INSERT_PLAYER_HISTORY = String.format("INSERT INTO `%s` (UUID, INFORMATION) VALUES (?,?)", SQLTable.PLAYER_HISTORY);
+    public static final String SELECT_PLAYER_HISTORY = String.format("SELECT * FROM `%s` WHERE UUID = ?", SQLTable.PLAYER_HISTORY);
+    public static final String DELETE_PLAYER_HISTORY = String.format("DELETE FROM`%s` WHERE UUID = ?", SQLTable.PLAYER_HISTORY);
 
-    public static final String SELECT_PLAYERHISTORY = String.format("SELECT * FROM `%s` WHERE UUID = ?", SQLTable.PLAYER_HISTORY);
-
-    public static final String INSERT_PLAYER_HISTORY = String.format("INSERT INTO `%s` (UUID, OWNER, TYPE, REASON, TIME, CREATIONTIME) VALUES (?,?,?,?,?,?)", SQLTable.PLAYER_HISTORY);
+    public static final String INSERT_REPORT = String.format("INSERT INTO `%s` (UUID, CREATOR, REASON, STATUS, TIMESTAMP) VALUES (?,?,?,?,?)", SQLTable.REPORT_TABLE);
+    public static final String SELECT_REPORT = String.format("SELECT * FROM `%s` WHERE UUID = ?", SQLTable.REPORT_TABLE);
+    public static final String DELETE_REPORT = String.format("DELETE FROM `%s` WHERE UUID = ? AND WHERE CREATOR = ?", SQLTable.REPORT_TABLE);
+    public static final String UPDATE_STATUS_REPORT = String.format("UPDATE `%s` SET STATUS = ? WHERE UUID = ?", SQLTable.REPORT_TABLE);
 
     public static final String INSERT_CHATLOG = String.format("INSERT INTO `%s` (UUID, NAME, IP, SERVER, TIMESTAMP, MESSAGE) VALUES (?,?,?,?,?,?)", SQLTable.PLAYER_CHATLOG);
     public static final String SELECT_CHATLOG = String.format("SELECT * FROM `%s` WHERE UUID = ?", SQLTable.PLAYER_CHATLOG);
@@ -88,8 +97,7 @@ public final class SQLDatabase implements IMigrationSource {
     private final Cache<UUID, Ban> banCache = newCache(UUID.class, 300);
     private final Cache<UUID, Player> playerCache = newCache(UUID.class, 300);
     private final Cache<String, Player> playerIpCache = newCache(String.class, 300);
-
-    private final Cache<UUID, Friends> friendsCache = newCache(UUID.class, 300);
+    private final Cache<UUID, Report> reportCache = newCache(UUID.class, 300);
     private final Cache<UUID, FriendSettings> friendSettingsCache = newCache(UUID.class, 300);
     private final Cache<UUID, FriendRequest> friendRequestCache = newCache(UUID.class, 300);
     private final ISimpleLogger logger;
@@ -129,20 +137,144 @@ public final class SQLDatabase implements IMigrationSource {
         }
     }
 
-    public CompletableFuture<Void> createHistory(final UUID uniqueId, final UUID owner, final Type type, final String reason, final OffsetDateTime time, final OffsetDateTime creationTime) {
+    public CompletableFuture<Report> createReport(UUID uniqueId, UUID creator, String reason, boolean status, String timestamp) {
         return CompletableFuture.supplyAsync(() -> {
             try (Connection connection = pool.getConnection()) {
-                PreparedStatement statement = connection.prepareStatement(INSERT_PLAYER_HISTORY);
-                statement.setString(1, uniqueId.toString());
-                statement.setString(2, owner.toString());
-                statement.setString(3, type.formatString());
-                statement.setString(4, reason);
-                statement.setString(5, TimeHelper.toString(time));
-                statement.setString(6, TimeHelper.toString(creationTime));
-                statement.executeUpdate();
+                PreparedStatement preparedStatement = connection.prepareStatement(INSERT_REPORT);
+                preparedStatement.setString(1, uniqueId.toString());
+                preparedStatement.setString(2, creator.toString());
+                preparedStatement.setString(3, reason);
+                preparedStatement.setBoolean(4, status);
+                preparedStatement.setString(5, timestamp);
+                preparedStatement.executeUpdate();
+                Report report = new Report(uniqueId, creator, reason, status, timestamp);
+                reportCache.put(uniqueId, report);
+                return report;
+            } catch (SQLException e) {
+                logger.warning("A few SQL things went wrong while creating report ", e);
+                return null;
+            }
+        }, service);
+    }
+
+    public CompletableFuture<Report> getReport(UUID uniqueId) {
+        return CompletableFuture.supplyAsync(() -> {
+            if(reportCache.has(uniqueId)) {
+                return reportCache.get(uniqueId);
+            }
+            try (Connection connection = pool.getConnection()) {
+                PreparedStatement preparedStatement = connection.prepareStatement(SELECT_REPORT);
+                preparedStatement.setString(1, uniqueId.toString());
+                ResultSet set = preparedStatement.executeQuery();
+                if(set.next()) {
+                    UUID creator = UUID.fromString(set.getString("CREATOR"));
+                    String reason = set.getString("REASON");
+                    boolean status = set.getBoolean("STATUS");
+                    String timestamp = set.getString("TIMESTAMP");
+                    Report report =  new Report(uniqueId, creator, reason, status, timestamp);
+                    reportCache.remove(uniqueId);
+                    reportCache.put(uniqueId, report);
+                    return report;
+                }
                 return null;
             } catch (SQLException e) {
-                logger.warning("A few SQL things went wrong while creating friendrequest ", e);
+                logger.warning("A few SQL things went wrong while get report ", e);
+                return null;
+            }
+        },service);
+    }
+
+    public CompletableFuture<Report> updateReport(UUID uniqueId, Report report) {
+        return CompletableFuture.supplyAsync(() -> {
+            try (Connection connection = pool.getConnection()) {
+                PreparedStatement preparedStatement = connection.prepareStatement(SELECT_REPORT);
+                preparedStatement.setString(1, uniqueId.toString());
+                preparedStatement.executeUpdate();
+                Report meta = new Report(uniqueId, report.getCreator(), report.getReason(), report.isStatus(), report.getTimestamp());
+                if(reportCache.has(uniqueId)) {
+                    reportCache.remove(uniqueId);
+                }
+                reportCache.put(uniqueId, meta);
+                return report;
+            } catch (SQLException e) {
+                logger.warning("A few SQL things went wrong while get report ", e);
+                return null;
+            }
+        },service);
+    }
+
+    public CompletableFuture<Void> deleteReport(UUID uniqueId, UUID creator) {
+        return CompletableFuture.supplyAsync(() -> {
+            try (Connection connection = pool.getConnection()) {
+                PreparedStatement preparedStatement = connection.prepareStatement(DELETE_REPORT);
+                preparedStatement.setString(1, uniqueId.toString());
+                preparedStatement.setString(2, creator.toString());
+                preparedStatement.executeUpdate();
+                if(reportCache.has(uniqueId)) {
+                    reportCache.remove(uniqueId);
+                }
+                return null;
+            } catch (SQLException e) {
+                logger.warning("A few SQL things went wrong while delete report ", e);
+                return null;
+            }
+        }, service);
+    }
+
+    public CompletableFuture<ArrayList<History>> createHistory(final UUID uniqueId, final UUID owner, final Type type, final String reason, final OffsetDateTime time, final OffsetDateTime creationTime) {
+        return CompletableFuture.supplyAsync(() -> {
+            try (Connection connection = pool.getConnection()) {
+                ArrayList<History> histories;
+                histories = getHistory(uniqueId).join();
+                if(histories == null) {
+                    histories = new ArrayList<>();
+                }
+                histories.add(new History(uniqueId, owner, type, getBan(uniqueId).join().getId(), reason, time, creationTime));
+                Array history = connection.createArrayOf("INFORMATION", histories.toArray());
+                PreparedStatement statement = connection.prepareStatement(INSERT_PLAYER_HISTORY);
+                statement.setString(1, uniqueId.toString());
+                statement.setArray(2, history);
+                statement.executeUpdate();
+                return histories;
+            } catch (SQLException e) {
+                logger.warning("A few SQL things went wrong while creating history ", e);
+                return null;
+            }
+        }, service);
+    }
+
+    public CompletableFuture<Void> deleteHistory(final UUID uniqueId) {
+        return CompletableFuture.supplyAsync(() -> {
+            try (Connection connection = pool.getConnection()) {
+                PreparedStatement preparedStatement = connection.prepareStatement(DELETE_PLAYER_HISTORY);
+                preparedStatement.setString(1, uniqueId.toString());
+                preparedStatement.executeUpdate();
+                return null;
+            } catch (SQLException e) {
+                logger.warning("A few SQL things went wrong while trying to delete players history ", e);
+                return null;
+            }
+        }, service);
+    }
+
+    public CompletableFuture<ArrayList<History>> getHistory(final UUID uniqueId) {
+        return CompletableFuture.supplyAsync(() -> {
+            try (Connection connection = pool.getConnection()) {
+                PreparedStatement preparedStatement = connection.prepareStatement(SELECT_PLAYER_HISTORY);
+                preparedStatement.setString(1, uniqueId.toString());
+                ResultSet set = preparedStatement.executeQuery();
+                if(set.next()) {
+                    Array historyUniqueId = set.getArray("INFORMATION");
+                    History[] histories = (History[]) historyUniqueId.getArray();
+                    ArrayList<History> history = (ArrayList<History>) Arrays.asList(histories);
+                    logger.info(new Throwable("Amount getHistory " + history.size()));
+                    return history;
+                }
+                preparedStatement.close();
+                set.close();
+                return null;
+            } catch (SQLException e) {
+                logger.warning("Can't catch history from player", e);
                 return null;
             }
         }, service);
@@ -164,7 +296,7 @@ public final class SQLDatabase implements IMigrationSource {
                 }
                 return null;
             } catch (SQLException e) {
-                logger.warning("A few SQL things went wrong while creating friendrequest ", e);
+                logger.warning("A few SQL things went wrong while get chatlog ", e);
                 return null;
             }
         });
@@ -182,7 +314,7 @@ public final class SQLDatabase implements IMigrationSource {
                 preparedStatement.setString(6, chatlog.getMessage());
                 preparedStatement.executeUpdate();
             } catch (SQLException e) {
-                logger.warning("A few SQL things went wrong while creating friendrequest ", e);
+                logger.warning("A few SQL things went wrong while creating chatlog ", e);
             }
             return null;
         });

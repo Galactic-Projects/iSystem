@@ -35,34 +35,32 @@ public class DisconnectListener implements Listener {
         Party party = manager.getParty();
 
         CommonPlugin commonPlugin = plugin.getCommonPlugin();
+        Countdown.online.remove(player.getUniqueId());
 
-        if(Countdown.online.contains(player.getUniqueId())) {
-            Countdown.online.remove(player.getUniqueId());
-        }
-        if(party == null) {
+        if (party == null) {
             return;
         }
+
         Countdown.setCountdown(player.getUniqueId(), party, 60 * 5);
         ArrayList<UUID> members = party.getMember();
         members.add(party.getLeader());
-        for(UUID member : members) {
+        for (UUID member : members) {
             ProxiedPlayer players = ProxyServer.getInstance().getPlayer(member);
-            if(players != null) {
-            if (party.getLeader() == player.getUniqueId()) {
-                commonPlugin.getDatabaseRef().asOptional().ifPresent(sqlDatabase -> {
-                    sqlDatabase.getPlayer(players.getUniqueId()).thenAccept(playerData -> {
-                        players.sendMessage(ComponentParser.parse(commonPlugin.getMessageManager().translate(SystemMessage.SYSTEM_PARTY_MEMBER_LEAVE, playerData.getLanguage(), Key.of("member", SystemMessage.SYSTEM_PARTY_LEADER), Key.of("action", SystemMessage.SYSTEM_PARTY_ACTION_DELETE)))); //SystemMessage.SYSTEM_PARTY_MEMBER_LEAVE);
+            if (players != null) {
+                if (player.getUniqueId() == party.getLeader()) {
+                    commonPlugin.getDatabaseRef().asOptional().ifPresent(sqlDatabase -> {
+                        sqlDatabase.getPlayer(players.getUniqueId()).thenAccept(playerData -> {
+                            players.sendMessage(ComponentParser.parse(commonPlugin.getMessageManager().translate(SystemMessage.SYSTEM_PARTY_MEMBER_LEAVE, playerData.getLanguage(), Key.of("member", SystemMessage.SYSTEM_PARTY_LEADER), Key.of("action", SystemMessage.SYSTEM_PARTY_ACTION_DELETE)))); //SystemMessage.SYSTEM_PARTY_MEMBER_LEAVE);
+                        });
                     });
-                });
-            } else {
-                commonPlugin.getDatabaseRef().asOptional().ifPresent(sqlDatabase -> {
-                    sqlDatabase.getPlayer(players.getUniqueId()).thenAccept(playerData -> {
-                        players.sendMessage(ComponentParser.parse(commonPlugin.getMessageManager().translate(SystemMessage.SYSTEM_PARTY_MEMBER_LEAVE, playerData.getLanguage(), Key.of("member", SystemMessage.SYSTEM_PARTY_MEMBER), Key.of("action", SystemMessage.SYSTEM_PARTY_ACTION_KICK)))); //SystemMessage.SYSTEM_PARTY_MEMBER_LEAVE);
+                } else {
+                    commonPlugin.getDatabaseRef().asOptional().ifPresent(sqlDatabase -> {
+                        sqlDatabase.getPlayer(players.getUniqueId()).thenAccept(playerData -> {
+                            players.sendMessage(ComponentParser.parse(commonPlugin.getMessageManager().translate(SystemMessage.SYSTEM_PARTY_MEMBER_LEAVE, playerData.getLanguage(), Key.of("member", SystemMessage.SYSTEM_PARTY_MEMBER), Key.of("action", SystemMessage.SYSTEM_PARTY_ACTION_KICK)))); //SystemMessage.SYSTEM_PARTY_MEMBER_LEAVE);
+                        });
                     });
-                });
+                }
             }
         }
-        }
     }
-
 }
