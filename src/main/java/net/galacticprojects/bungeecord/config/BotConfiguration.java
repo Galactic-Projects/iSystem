@@ -11,16 +11,15 @@ public class BotConfiguration extends BaseConfiguration {
     private String activity;
     private String activityValue;
     private String status;
-    private long channelCReport;
-    private long channelCBan;
-    private long channelCLink;
-    private long channelNReport;
-    private long channelNBan;
-    private long channelNLink;
+    private String channelCReport;
+    private String channelCBan;
+    private String channelCLink;
+    private String channelNReport;
+    private String channelNBan;
+    private String channelNLink;
 
     private String host;
-    private int port;
-    private int qport;
+    private String port;
     private String user;
     private String password;
     private String name;
@@ -31,19 +30,19 @@ public class BotConfiguration extends BaseConfiguration {
 
     @Override
     protected void onLoad() throws Throwable {
+
         botToken = config.getValueOrDefault("discord.token", "YOUR.BOT.TOKEN.HERE");
         activity = config.getValueOrDefault("discord.activity.mode", "WATCHING");
         activityValue = config.getValueOrDefault("discord.activity.value",  "GALACTIC PROJECTS");
-        channelCReport = (long) config.getValueOrDefault("discord.channels.community.report", Long.parseLong("0"));
-        channelCBan = (long) config.getValueOrDefault("discord.channels.community.ban", Long.parseLong("0"));
-        channelCLink = (long) config.getValueOrDefault("discord.channels.community.link", Long.parseLong("0"));
-        channelNReport = (long) config.getValueOrDefault("discord.channels.network.report", Long.parseLong("0"));
-        channelNBan = (long) config.getValueOrDefault("discord.channels.network.ban", Long.parseLong("0"));
-        channelNLink = (long) config.getValueOrDefault("discord.channels.network.link", Long.parseLong("0"));
-
+        status = config.getValueOrDefault("discord.status.value", "ONLINE");
+        channelCReport = config.getValueOrDefault("discord.channels.community.report", "0");
+        channelCBan = config.getValueOrDefault("discord.channels.community.ban", "0");
+        channelCLink = config.getValueOrDefault("discord.channels.community.link", "0");
+        channelNReport = config.getValueOrDefault("discord.channels.network.report", "0");
+        channelNBan = config.getValueOrDefault("discord.channels.network.ban", "0");
+        channelNLink = config.getValueOrDefault("discord.channels.network.link", "0");
         host = config.getValueOrDefault("teamspeak.host", "localhost");
-        port = (int) config.getValueOrDefault("teamspeak.ports.normal", Integer.parseInt("9987"));
-        qport = (int) config.getValueOrDefault("teamspeak.ports.query", Integer.parseInt("10011"));
+        port = config.getValueOrDefault("teamspeak.port", "9987");
         user = config.getValueOrDefault("teamspeak.user", "serveradmin");
         password = config.getValueOrDefault("teamspeak.password", "your_super_secret_password");
         name = config.getValueOrDefault("teamspeak.name", "Galactic Projects | Bot");
@@ -54,6 +53,7 @@ public class BotConfiguration extends BaseConfiguration {
         config.setValue("discord.token", botToken);
         config.setValue("discord.activity.mode", activity);
         config.setValue("discord.activity.value", activityValue);
+        config.setValue("discord.status.value", status);
         config.setValue("discord.channels.community.report", channelCReport);
         config.setValue("discord.channels.community.ban", channelCBan);
         config.setValue("discord.channels.community.link", channelCLink);
@@ -61,8 +61,7 @@ public class BotConfiguration extends BaseConfiguration {
         config.setValue("discord.channels.network.ban", channelNBan);
         config.setValue("discord.channels.network.link", channelNLink);
         config.setValue("teamspeak.host", host);
-        config.setValue("teamspeak.ports.normal", port);
-        config.setValue("teamspeak.ports.query", qport);
+        config.setValue("teamspeak.port", port);
         config.setValue("teamspeak.user", user);
         config.setValue("teamspeak.password", password);
         config.setValue("teamspeak.name", name);
@@ -101,52 +100,52 @@ public class BotConfiguration extends BaseConfiguration {
         this.status = status;
     }
 
-    public long getChannelCBan() {
+    public String getChannelCBan() {
         return channelCBan;
     }
 
-    public void setChannelCBan(long channelCBan) {
+    public void setChannelCBan(String channelCBan) {
         this.channelCBan = channelCBan;
     }
 
-    public long getChannelCLink() {
+    public String getChannelCLink() {
         return channelCLink;
     }
 
-    public void setChannelCLink(long channelCLink) {
+    public void setChannelCLink(String channelCLink) {
         this.channelCLink = channelCLink;
     }
 
-    public long getChannelCReport() {
+    public String getChannelCReport() {
         return channelCReport;
     }
 
-    public void setChannelCReport(long channelCReport) {
+    public void setChannelCReport(String channelCReport) {
         this.channelCReport = channelCReport;
     }
 
 
-    public long getChannelNBan() {
+    public String getChannelNBan() {
         return channelNBan;
     }
 
-    public void setChannelNBan(long channelNBan) {
+    public void setChannelNBan(String channelNBan) {
         this.channelNBan = channelNBan;
     }
 
-    public long getChannelNLink() {
+    public String getChannelNLink() {
         return channelNLink;
     }
 
-    public void setChannelNLink(long channelNLink) {
+    public void setChannelNLink(String channelNLink) {
         this.channelNLink = channelNLink;
     }
 
-    public long getChannelNReport() {
+    public String getChannelNReport() {
         return channelNReport;
     }
 
-    public void setChannelNReport(long channelNReport) {
+    public void setChannelNReport(String channelNReport) {
         this.channelNReport = channelNReport;
     }
 
@@ -156,6 +155,14 @@ public class BotConfiguration extends BaseConfiguration {
 
     public String getHost() {
         return host;
+    }
+
+    public String getPort() {
+        return port;
+    }
+
+    public void setPort(String port) {
+        this.port = port;
     }
 
     public void setName(String name) {
@@ -172,22 +179,6 @@ public class BotConfiguration extends BaseConfiguration {
 
     public String getPassword() {
         return password;
-    }
-
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
-
-    public int getQport() {
-        return qport;
-    }
-
-    public void setQport(int qport) {
-        this.qport = qport;
     }
 
     public String getUser() {
