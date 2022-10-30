@@ -2,9 +2,7 @@ package net.galacticprojects.bungeecord.command;
 
 import me.lauriichan.laylib.command.Actor;
 import me.lauriichan.laylib.command.annotation.*;
-import me.lauriichan.laylib.localization.IMessage;
 import me.lauriichan.laylib.localization.Key;
-import me.lauriichan.laylib.localization.MessageProvider;
 import net.galacticprojects.bungeecord.ProxyPlugin;
 import net.galacticprojects.bungeecord.command.impl.BungeeActor;
 import net.galacticprojects.bungeecord.config.BanConfiguration;
@@ -14,18 +12,14 @@ import net.galacticprojects.bungeecord.message.CommandMessages;
 import net.galacticprojects.bungeecord.util.Type;
 import net.galacticprojects.common.CommonPlugin;
 import net.galacticprojects.common.database.SQLDatabase;
-import net.galacticprojects.common.database.model.Ban;
-import net.galacticprojects.common.database.model.Player;
-import net.galacticprojects.common.discord.api.EmbedCreator;
+import net.galacticprojects.common.modules.discord.EmbedCreator;
 import net.galacticprojects.common.util.ComponentParser;
 import net.galacticprojects.common.util.MojangProfileService;
 import net.galacticprojects.common.util.TimeHelper;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
-import java.sql.SQLData;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 

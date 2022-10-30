@@ -1,18 +1,15 @@
-package net.galacticprojects.common.discord.api;
+package net.galacticprojects.common.modules.discord;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.galacticprojects.bungeecord.party.Party;
-import net.galacticprojects.common.util.DiscordBot;
+import net.galacticprojects.common.modules.DiscordBot;
 
 import java.awt.*;
-import java.util.Arrays;
 
 public class EmbedCreator {
 
     private EmbedBuilder embedBuilder = null;
-    private long channelid = 0;
+    private String channelid = null;
     private String platform = null;
     private String suspect = null;
     private String member = null;
@@ -22,7 +19,7 @@ public class EmbedCreator {
     private String timestamp = null;
 
     // ALL FORMAT
-    public EmbedCreator(long channelid, String platform, String suspect, String member, String reason, String ip, long period, String timestamp) {
+    public EmbedCreator(String channelid, String platform, String suspect, String member, String reason, String ip, long period, String timestamp) {
         if(DiscordBot.getJDA() == null) {
             return;
         }
@@ -40,7 +37,7 @@ public class EmbedCreator {
     }
 
     // VERIFY FORMAT
-    public EmbedCreator(long channelid, String platform, String member, String ip, String timestamp) {
+    public EmbedCreator(String channelid, String platform, String member, String ip, String timestamp) {
         if(DiscordBot.getJDA() == null) {
             return;
         }
@@ -55,7 +52,7 @@ public class EmbedCreator {
     }
 
     // BAN FORMAT
-    public EmbedCreator(long channelid, String suspect, String member, String reason, String ip, long period, String timestamp) {
+    public EmbedCreator(String channelid, String suspect, String member, String reason, String ip, long period, String timestamp) {
         if(DiscordBot.getJDA() == null) {
             return;
         }
@@ -72,7 +69,7 @@ public class EmbedCreator {
     }
 
     // REPORT FORMAT
-    public EmbedCreator(long channelid, String suspect, String member, String reason, String ip, String timestamp) {
+    public EmbedCreator(String channelid, String suspect, String member, String reason, String ip, String timestamp) {
         if(DiscordBot.getJDA() == null) {
             return;
         }

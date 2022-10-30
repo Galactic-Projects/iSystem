@@ -1,11 +1,8 @@
 package net.galacticprojects.bungeecord.command;
 
 import de.dytanic.cloudnet.driver.CloudNetDriver;
-import de.dytanic.cloudnet.ext.bridge.player.CloudPlayer;
 import de.dytanic.cloudnet.ext.bridge.player.ICloudPlayer;
 import de.dytanic.cloudnet.ext.bridge.player.IPlayerManager;
-import me.lauriichan.laylib.command.ActionMessage;
-import me.lauriichan.laylib.command.Actor;
 import me.lauriichan.laylib.command.annotation.*;
 import me.lauriichan.laylib.localization.Key;
 import net.galacticprojects.bungeecord.ProxyPlugin;
@@ -18,24 +15,16 @@ import net.galacticprojects.bungeecord.util.Type;
 import net.galacticprojects.common.CommonPlugin;
 import net.galacticprojects.common.database.SQLDatabase;
 import net.galacticprojects.common.database.model.Report;
-import net.galacticprojects.common.discord.api.EmbedCreator;
+import net.galacticprojects.common.modules.discord.EmbedCreator;
 import net.galacticprojects.common.util.ComponentParser;
-import net.galacticprojects.common.util.DiscordBot;
 import net.galacticprojects.common.util.MojangProfileService;
 import net.galacticprojects.common.util.TimeHelper;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import org.apache.commons.io.filefilter.ConditionalFileFilter;
-import org.checkerframework.checker.units.qual.C;
-import org.w3c.dom.Text;
 
-import java.awt.*;
 import java.time.OffsetDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
 import java.util.UUID;
 
 @Command(name = "report", description = "Report a player")

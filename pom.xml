@@ -179,12 +179,6 @@ Execute the file with administrator permissions and follow the instruction!
               <groupId>net.dv8tion</groupId>
               <artifactId>JDA</artifactId>
               <version>5.0.0-alpha.21</version>
-              <exclusions>
-                  <exclusion>
-                      <groupId>club.minnced</groupId>
-                      <artifactId>opus-java</artifactId>
-                  </exclusion>
-              </exclusions>
           </dependency>
     </dependencies>
 

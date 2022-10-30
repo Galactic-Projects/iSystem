@@ -1,4 +1,4 @@
-package net.galacticprojects.common.util;
+package net.galacticprojects.common.modules;
 
 import com.github.theholywaffle.teamspeak3.TS3Api;
 import com.github.theholywaffle.teamspeak3.TS3Config;
@@ -14,8 +14,7 @@ public class TeamSpeakBot {
     public TeamSpeakBot() {
         BotConfiguration configuration = ProxyPlugin.getInstance().getBotConfiguration();
         TS3Config ts3Config = new TS3Config();
-        ts3Config.setHost(configuration.getHost() + ":" + configuration.getPort());
-        ts3Config.setQueryPort(configuration.getQport());
+        ts3Config.setHost(configuration.getHost());
 
         ts3Query = new TS3Query(ts3Config);
         ts3Query.connect();
@@ -32,6 +31,7 @@ public class TeamSpeakBot {
             return;
         }
 
+        api.logout();
         ts3Query.exit();
     }
 
