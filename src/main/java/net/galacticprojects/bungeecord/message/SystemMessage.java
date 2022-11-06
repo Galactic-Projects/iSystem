@@ -44,6 +44,32 @@ public class SystemMessage {
     })
     public static MessageProvider SYSTEM_MAINTENACE_KICK_NOW;
 
+
+    @Message(id = "system.service.full", content = {
+            "&8「 &5&lGALACTIC&d&lPROJECTS &8」&r",
+            "&cOur network is full. ",
+            "&7",
+            "&cPlease wait until you have a chance or buy a higher rank",
+            "at our store (at the lobby or web) to get access to our server at any time!"
+    })
+    public static MessageProvider SYSTEM_SERVICE_FULL;
+
+    @Message(id = "system.service.fulltotally", content = {
+            "&8「 &5&lGALACTIC&d&lPROJECTS &8」&r",
+            "&cOur network is absolutely full. ",
+            "&7",
+            "&cYou must be a team member to get access to absolutely full network.",
+    })
+    public static MessageProvider SYSTEM_SERVICE_ABSOLUTFULL;
+
+    @Message(id = "system.service.fulltotally", content = {
+            "&8「 &5&lGALACTIC&d&lPROJECTS &8」&r",
+            "&cYou have been kicked from our network!",
+            "&7",
+            "&cTo ensure the security of the network, you have been kicked to make space for a teammate!",
+    })
+    public static MessageProvider SYSTEM_SERVICE_MAKESPACE;
+
     @Message(id = "system.maintenance.kick.reason", content = "Maintenance")
     public static MessageProvider SYSTEM_MAINTENANCE_KICK_REASON;
 

@@ -1,9 +1,18 @@
 package net.galacticprojects.bungeecord.config;
 
+import com.syntaxphoenix.syntaxapi.json.JsonArray;
+import com.syntaxphoenix.syntaxapi.json.io.JsonParser;
 import me.lauriichan.laylib.logger.ISimpleLogger;
 import net.galacticprojects.common.config.BaseConfiguration;
+import net.galacticprojects.common.config.impl.json.JsonConfig;
+import org.apache.commons.collections4.map.HashedMap;
 
 import java.io.File;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 public class BotConfiguration extends BaseConfiguration {
 
@@ -24,16 +33,22 @@ public class BotConfiguration extends BaseConfiguration {
     private String password;
     private String name;
 
+    private String communityGuild;
+    private String networkGuild;
+
+    private ArrayList<String> discordGroups = new ArrayList<>();
+    private ArrayList<String> teamspeakGroups = new ArrayList<>();
+
+
     public BotConfiguration(ISimpleLogger logger, File dataFolder) {
         super(logger, dataFolder, "bot.json");
     }
 
     @Override
     protected void onLoad() throws Throwable {
-
         botToken = config.getValueOrDefault("discord.token", "YOUR.BOT.TOKEN.HERE");
         activity = config.getValueOrDefault("discord.activity.mode", "WATCHING");
-        activityValue = config.getValueOrDefault("discord.activity.value",  "GALACTIC PROJECTS");
+        activityValue = config.getValueOrDefault("discord.activity.value", "GALACTIC PROJECTS");
         status = config.getValueOrDefault("discord.status.value", "ONLINE");
         channelCReport = config.getValueOrDefault("discord.channels.community.report", "0");
         channelCBan = config.getValueOrDefault("discord.channels.community.ban", "0");
@@ -46,6 +61,10 @@ public class BotConfiguration extends BaseConfiguration {
         user = config.getValueOrDefault("teamspeak.user", "serveradmin");
         password = config.getValueOrDefault("teamspeak.password", "your_super_secret_password");
         name = config.getValueOrDefault("teamspeak.name", "Galactic Projects | Bot");
+        communityGuild = config.getValueOrDefault("verification.discord.guilds.community", "0");
+        networkGuild = config.getValueOrDefault("verification.discord.guilds.network", "0");
+        discordGroups = config.getValueOrDefault("verification.discord.groups", discordGroups);
+        teamspeakGroups = config.getValueOrDefault("verification.teamspeak.groups", teamspeakGroups);
     }
 
     @Override
@@ -65,6 +84,10 @@ public class BotConfiguration extends BaseConfiguration {
         config.setValue("teamspeak.user", user);
         config.setValue("teamspeak.password", password);
         config.setValue("teamspeak.name", name);
+        config.setValue("verification.discord.guilds.community", communityGuild);
+        config.setValue("verification.discord.guilds.network", networkGuild);
+        config.setValue("verification.discord.groups", discordGroups);
+        config.setValue("verification.teamspeak.groups", teamspeakGroups);
     }
 
     public String getBotToken() {
@@ -187,5 +210,37 @@ public class BotConfiguration extends BaseConfiguration {
 
     public void setUser(String user) {
         this.user = user;
+    }
+
+    public String getCommunityGuild() {
+        return communityGuild;
+    }
+
+    public void setCommunityGuild(String communityGuild) {
+        this.communityGuild = communityGuild;
+    }
+
+    public String getNetworkGuild() {
+        return networkGuild;
+    }
+
+    public void setNetworkGuild(String networkGuild) {
+        this.networkGuild = networkGuild;
+    }
+
+    public ArrayList<String> getDiscordGroups() {
+        return discordGroups;
+    }
+
+    public void setDiscordGroups(ArrayList<String> discordGroups) {
+        this.discordGroups = discordGroups;
+    }
+
+    public ArrayList<String> getTeamspeakGroups() {
+        return teamspeakGroups;
+    }
+
+    public void setTeamspeakGroups(ArrayList<String> teamspeakGroups) {
+        this.teamspeakGroups = teamspeakGroups;
     }
 }

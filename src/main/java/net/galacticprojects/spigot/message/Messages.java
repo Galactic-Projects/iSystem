@@ -5,10 +5,7 @@ import me.lauriichan.laylib.localization.source.Message;
 
 public class Messages {
 
-    @Message(id = "message.id", content = {
-            "Hallo",
-            "Welt"
-    })
+    @Message(id = "message.id", content = "")
     public static MessageProvider MESSAGE_ID;
 
 }

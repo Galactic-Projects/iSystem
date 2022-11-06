@@ -144,7 +144,6 @@ public class ProxyPlugin extends Plugin {
 			OffsetDateTime offsetDateTime = OffsetDateTime.now();
 			String time = TimeHelper.BAN_TIME_FORMATTER.format(offsetDateTime);
 
-			// Fridat, 14. October 2022 - 04:14:30 (MESZ)
 			if(time.contains("04:00:00")){
 				for(ProxiedPlayer player : ProxyServer.getInstance().getPlayers()){
 					common.getDatabaseRef().asOptional().ifPresent(sql -> {
