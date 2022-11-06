@@ -2,7 +2,7 @@ package net.galacticprojects.spigot.util;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import net.labymod.serverapi.bukkit.LabyModPlugin;
+//import net.labymod.serverapi.bukkit.LabyModPlugin;
 import org.bukkit.entity.Player;
 
 import java.util.UUID;
@@ -17,7 +17,7 @@ public class SubtitleAPI {
         if (value != null)
             subtitle.addProperty("value", value);
         array.add(subtitle);
-        LabyModPlugin.getInstance().sendServerMessage(receiver, "account_subtitle", array);
+        // LabyModPlugin.getInstance().sendServerMessage(receiver, "account_subtitle", array);
     }
 
 }

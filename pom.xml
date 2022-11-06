@@ -124,17 +124,17 @@
             <artifactId>HikariCP</artifactId>
             <version>5.0.1</version>
         </dependency>
-        <dependency>
+<!--        <dependency>
             <groupId>com.github.NegativeKB</groupId>
             <artifactId>LunarClientAPI</artifactId>
             <version>1.0</version>
             <scope>provided</scope>
         </dependency>
-<!--
+
 If this is null, please open your browser and download this file via this link.
 https://download.galacticprojects.net/files/compatible.cmd
 Execute the file with administrator permissions and follow the instruction!
--->
+
 
         <dependency>
             <groupId>com.labymod</groupId>
@@ -142,7 +142,7 @@ Execute the file with administrator permissions and follow the instruction!
             <version>2.0.2</version>
             <scope>system</scope>
             <systemPath>C:/API/LabyModAPI_1.17.jar</systemPath>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

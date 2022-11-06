@@ -8,9 +8,11 @@ import net.galacticprojects.common.CommonPlugin;
 import net.galacticprojects.common.database.SQLDatabase;
 import net.galacticprojects.common.database.model.Player;
 import net.galacticprojects.common.util.ComponentParser;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.event.ProxyPingEvent;
 import net.md_5.bungee.api.plugin.Listener;
@@ -24,7 +26,7 @@ import java.util.Arrays;
 
 public class PingListener implements Listener {
 
-    private ProxyPlugin plugin;
+    private final ProxyPlugin plugin;
 
     public PingListener(ProxyPlugin plugin) {
         this.plugin = plugin;
@@ -52,19 +54,17 @@ public class PingListener implements Listener {
             }
         }
 
-        String motdM1 = commonPlugin.getMessageManager().translate("system.maintenance.1", language) + " \n" + commonPlugin.getMessageManager().translate("system.maintenance.2", language);
-        TextComponent motdM = new TextComponent(ComponentParser.parse(motdM1));
-        String motd1 = commonPlugin.getMessageManager().translate("system.motd.1", language) + " \n" + commonPlugin.getMessageManager().translate("system.motd.2", language);
-        TextComponent motd = new TextComponent(ComponentParser.parse(motd1));
+        TextComponent motd = new TextComponent(ComponentParser.parse(commonPlugin.getMessageManager().translate("system.motd.1", language) + " \n" + commonPlugin.getMessageManager().translate("system.motd.2", language)));
+        TextComponent maintenanceMOTD = new TextComponent(ComponentParser.parse(commonPlugin.getMessageManager().translate("system.maintenance.1", language) + " \n" + commonPlugin.getMessageManager().translate("system.maintenance.2", language)));
 
         String version = commonPlugin.getMessageManager().translate("system.maintenance.version", language);
 
         if(configuration.isMaintenance()) {
             protocol.setProtocol(2);
-            ping.setDescriptionComponent(motdM);
+            ping.setDescriptionComponent(maintenanceMOTD);
             protocol.setName(version);
-            players.setMax(-1);
             ping.setVersion(protocol);
+            players.setMax(0);
             ping.setPlayers(players);
         } else {
             ping.setDescriptionComponent(motd);

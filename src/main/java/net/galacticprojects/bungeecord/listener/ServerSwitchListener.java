@@ -29,7 +29,7 @@ public class ServerSwitchListener implements Listener {
     public void onServerSwitch(ServerSwitchEvent event) {
         ProxiedPlayer player = event.getPlayer();
 
-        for(int i = 0; i != 99; i++){
+        for(int i = 0; i != 14; i++){
             player.sendMessage(ComponentParser.parse(""));
         }
 

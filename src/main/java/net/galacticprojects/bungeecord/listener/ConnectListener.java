@@ -1,7 +1,5 @@
 package net.galacticprojects.bungeecord.listener;
 
-import de.dytanic.cloudnet.driver.CloudNetDriver;
-import de.dytanic.cloudnet.ext.bridge.player.IPlayerManager;
 import me.lauriichan.laylib.localization.Key;
 import net.galacticprojects.bungeecord.ProxyPlugin;
 import net.galacticprojects.bungeecord.config.PluginConfiguration;
@@ -16,23 +14,17 @@ import net.galacticprojects.bungeecord.util.TimeHelper;
 import net.galacticprojects.common.CommonPlugin;
 import net.galacticprojects.common.database.SQLDatabase;
 import net.galacticprojects.common.database.model.Ban;
-import net.galacticprojects.common.database.model.FriendRequest;
 import net.galacticprojects.common.database.model.FriendSettings;
 import net.galacticprojects.common.database.model.Player;
 import net.galacticprojects.common.util.ComponentParser;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
-import org.bukkit.block.data.type.Bed;
 
-import java.sql.SQLData;
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 
 public class ConnectListener implements Listener {
 
@@ -52,19 +44,20 @@ public class ConnectListener implements Listener {
         String language = "en-uk";
         Player playerData = database.getPlayer(uniqueId).join();
 
-        for(int i = 0; i != 99; i++){
+        for (int i = 0; i != 99; i++) {
             player.sendMessage(ComponentParser.parse(""));
         }
 
-        if(playerData == null) {
+        if (playerData == null) {
             playerData = database.createPlayer(uniqueId, player.getAddress().getAddress().getHostAddress(), 1000, 1, "en-uk", 0L).join();
         }
+
 
         if (playerData.getLanguage() != null) {
             language = playerData.getLanguage();
         }
 
-        if(!Countdown.online.contains(player.getUniqueId())) {
+        if (!Countdown.online.contains(player.getUniqueId())) {
             Countdown.online.add(player.getUniqueId());
         }
 
@@ -73,14 +66,34 @@ public class ConnectListener implements Listener {
         if (configuration.isMaintenance()) {
             if (!(player.hasPermission("system.maintenance.bypass") || player.hasPermission("system.maintenance.*"))) {
                 Key reason = Key.of("reason", commonPlugin.getMessageManager().translate(SystemMessage.SYSTEM_MAINTENANCE_KICK_REASON, language, Key.of("reason", configuration.getMaintenanceReason())));
-                Key enddate = Key.of("enddate", TimeHelper.format(language).format(TimeHelper.fromString(configuration.getDays())));
-                player.disconnect(ComponentParser.parse(commonPlugin.getMessageManager().translate(SystemMessage.SYSTEM_MAINTENACE_KICK_CURRENTLY, language, enddate, reason)));
-                //CloudNetDriver.getInstance(). //(BridgePlayerManager.getInstance().getOnlinePlayer(uniqueId), commonPlugin.getMessageManager().translate(SystemMessage.SYSTEM_MAINTENACE_KICK_CURRENTLY, finalLanguage, enddate, reason));
+                Key end_date = Key.of("enddate", TimeHelper.format(language).format(TimeHelper.fromString(configuration.getDays())));
+                player.disconnect(ComponentParser.parse(commonPlugin.getMessageManager().translate(SystemMessage.SYSTEM_MAINTENACE_KICK_CURRENTLY, language, end_date, reason)));
+                return;
             }
         }
 
+        if (ProxyServer.getInstance().getPlayers().size() >= Integer.parseInt(configuration.getPlayerAmount()) && !player.hasPermission("system.bypass.full")) {
+            player.disconnect(ComponentParser.parse(commonPlugin.getMessageManager().translate(SystemMessage.SYSTEM_SERVICE_FULL, language)));
+            return;
+        }
+
+        if (ProxyServer.getInstance().getPlayers().size() >= (Integer.parseInt(configuration.getPlayerAmount()) + 25) && !player.hasPermission("system.bypass.total.full")) {
+            player.disconnect(ComponentParser.parse(commonPlugin.getMessageManager().translate(SystemMessage.SYSTEM_SERVICE_ABSOLUTFULL, language)));
+            return;
+        }
+
+        if (ProxyServer.getInstance().getPlayers().size() >= (Integer.parseInt(configuration.getPlayerAmount()) + 25) && player.hasPermission("system.bypass.total.full")) {
+            ProxiedPlayer looser = ProxyServer.getInstance().getPlayers().stream().skip((int) (ProxyServer.getInstance().getPlayers().size() * Math.random())).findFirst().orElse(null);
+            if (looser == null) {
+                return;
+            }
+            database.getPlayer(looser.getUniqueId()).thenAccept(data -> {
+                looser.disconnect(ComponentParser.parse(commonPlugin.getMessageManager().translate(SystemMessage.SYSTEM_SERVICE_MAKESPACE, data.getLanguage())));
+            });
+        }
+
         FriendSettings friendSettings = database.getFriendSettings(uniqueId).join();
-        if(friendSettings == null) {
+        if (friendSettings == null) {
             friendSettings = database.createFriendSettings(uniqueId).join();
             return;
         }
