@@ -14,10 +14,7 @@ import org.apache.commons.collections4.map.HashedMap;
 
 import java.io.File;
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class BotConfiguration extends BaseConfiguration {
 
@@ -40,12 +37,16 @@ public class BotConfiguration extends BaseConfiguration {
 
     private String communityGuild;
     private String networkGuild;
-
-    private ArrayList<String> discordGroups = new ArrayList<>();
     private ArrayList<String> teamspeakGroups = new ArrayList<>();
 
-    DynamicArray<String> infos = new DynamicArray<>();
-    DynamicArray<Long> longInfos = new DynamicArray<>();
+    private DynamicArray<String> infos = new DynamicArray<>();
+
+    private DynamicArray<String> groupArray = new DynamicArray<>();
+    private DynamicArray<Long> longInfos = new DynamicArray<>();
+
+    private HashMap<String, String> groupHash = new HashMap<>();
+
+    private HashMap<Long, String> serverHash = new HashMap<>();
 
 
     public BotConfiguration(ISimpleLogger logger, File dataFolder) {
@@ -87,11 +88,18 @@ public class BotConfiguration extends BaseConfiguration {
                 continue;
             }
             JsonObject object = (JsonObject) value;
-            JsonValue<?> rawGroups = object.get("groups");
+            JsonValue<?> rawGroup = object.get("group");
+            JsonValue<?> rawId = object.get("id");
+            JsonValue<?> rawServerName = object.get("server-name");
             JsonValue<?> rawServer = object.get("server");
-            String groups = (rawGroups == null ? "N/A" : rawGroups.getValue().toString());
+            String id = (rawId == null ? "N/A" : rawId.getValue().toString());
+            String group = (rawGroup == null ? "N/A" : rawGroup.getValue().toString());
+            String serverName = (rawServerName == null ? "N/A" : rawServer.getValue().toString());
             long server = (rawServer == null ? 0 : ((JsonNumber<?>) rawServer).getValue().longValue());
-            infos.add(groups);
+            infos.add(id);
+            groupArray.add(group);
+            groupHash.put(id, group);
+            serverHash.put(server, serverName);
             longInfos.add(server);
         }
 
@@ -258,10 +266,19 @@ public class BotConfiguration extends BaseConfiguration {
     }
 
     public ArrayList<String> getDiscordGroups() {
+        ArrayList<String> groups = new ArrayList<>();
         for(int i = 0; i < infos.length(); i++) {
-            discordGroups.add(infos.get(i));
+            groups.add(infos.get(i));
         }
-        return discordGroups;
+        return groups;
+    }
+
+    public String getDiscordGroupName(String id) {
+        return groupHash.get(id);
+    }
+
+    public String getServerName(long serverId) {
+        return serverHash.get(serverId);
     }
 
     public ArrayList<Long> getServer() {
@@ -277,11 +294,6 @@ public class BotConfiguration extends BaseConfiguration {
         for(int i = 0; i < servers.size(); i++) {
             longInfos.add(servers.get(i));
         }
-        save();
-    }
-
-    public void setDiscordGroups(ArrayList<String> discordGroups) {
-        this.discordGroups = discordGroups;
         save();
     }
 
