@@ -1,10 +1,15 @@
 package net.galacticprojects.bungeecord.config;
 
 import com.syntaxphoenix.syntaxapi.json.JsonArray;
+import com.syntaxphoenix.syntaxapi.json.JsonObject;
+import com.syntaxphoenix.syntaxapi.json.JsonValue;
+import com.syntaxphoenix.syntaxapi.json.ValueType;
 import com.syntaxphoenix.syntaxapi.json.io.JsonParser;
+import com.syntaxphoenix.syntaxapi.json.value.JsonNumber;
 import me.lauriichan.laylib.logger.ISimpleLogger;
 import net.galacticprojects.common.config.BaseConfiguration;
 import net.galacticprojects.common.config.impl.json.JsonConfig;
+import net.galacticprojects.common.util.DynamicArray;
 import org.apache.commons.collections4.map.HashedMap;
 
 import java.io.File;
@@ -39,6 +44,9 @@ public class BotConfiguration extends BaseConfiguration {
     private ArrayList<String> discordGroups = new ArrayList<>();
     private ArrayList<String> teamspeakGroups = new ArrayList<>();
 
+    DynamicArray<String> infos = new DynamicArray<>();
+    DynamicArray<Long> longInfos = new DynamicArray<>();
+
 
     public BotConfiguration(ISimpleLogger logger, File dataFolder) {
         super(logger, dataFolder, "bot.json");
@@ -63,8 +71,30 @@ public class BotConfiguration extends BaseConfiguration {
         name = config.getValueOrDefault("teamspeak.name", "Galactic Projects | Bot");
         communityGuild = config.getValueOrDefault("verification.discord.guilds.community", "0");
         networkGuild = config.getValueOrDefault("verification.discord.guilds.network", "0");
-        discordGroups = config.getValueOrDefault("verification.discord.groups", discordGroups);
         teamspeakGroups = config.getValueOrDefault("verification.teamspeak.groups", teamspeakGroups);
+        loadInfos();
+    }
+
+    private void loadInfos() throws Throwable {
+        infos.clear();
+        JsonArray array = (JsonArray) config.get("verification.discord.groups");
+        if(array == null) {
+            config.set("verification.discord.groups", new JsonArray());
+            return;
+        }
+        for(JsonValue<?> value : array) {
+            if(value == null || !value.hasType(ValueType.OBJECT)) {
+                continue;
+            }
+            JsonObject object = (JsonObject) value;
+            JsonValue<?> rawGroups = object.get("groups");
+            JsonValue<?> rawServer = object.get("server");
+            String groups = (rawGroups == null ? "N/A" : rawGroups.getValue().toString());
+            long server = (rawServer == null ? 0 : ((JsonNumber<?>) rawServer).getValue().longValue());
+            infos.add(groups);
+            longInfos.add(server);
+        }
+
     }
 
     @Override
@@ -86,7 +116,6 @@ public class BotConfiguration extends BaseConfiguration {
         config.setValue("teamspeak.name", name);
         config.setValue("verification.discord.guilds.community", communityGuild);
         config.setValue("verification.discord.guilds.network", networkGuild);
-        config.setValue("verification.discord.groups", discordGroups);
         config.setValue("verification.teamspeak.groups", teamspeakGroups);
     }
 
@@ -229,11 +258,31 @@ public class BotConfiguration extends BaseConfiguration {
     }
 
     public ArrayList<String> getDiscordGroups() {
+        for(int i = 0; i < infos.length(); i++) {
+            discordGroups.add(infos.get(i));
+        }
         return discordGroups;
+    }
+
+    public ArrayList<Long> getServer() {
+        ArrayList<Long> servers = new ArrayList<>();
+        for(int i = 0; i < longInfos.length(); i++) {
+            servers.add(longInfos.get(i));
+        }
+        return servers;
+    }
+
+    public void setLongInfos(ArrayList<Long> servers) {
+        longInfos.clear();
+        for(int i = 0; i < servers.size(); i++) {
+            longInfos.add(servers.get(i));
+        }
+        save();
     }
 
     public void setDiscordGroups(ArrayList<String> discordGroups) {
         this.discordGroups = discordGroups;
+        save();
     }
 
     public ArrayList<String> getTeamspeakGroups() {
