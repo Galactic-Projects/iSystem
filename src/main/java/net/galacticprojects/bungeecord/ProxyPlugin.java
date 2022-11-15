@@ -61,6 +61,7 @@ public class ProxyPlugin extends Plugin {
 	
     @Override
     public void onEnable() {
+		getProxy().registerChannel("BungeeCord");
 		plugin = this;
 		registerMessages();
 		common.getCommandManager().setInjector(new BungeeCommandInjector(common.getCommandManager(), common.getMessageManager(), common, this));
