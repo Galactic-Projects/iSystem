@@ -87,6 +87,11 @@ public final class SQLDatabase implements IMigrationSource {
     public static final String INSERT_CHATLOG = String.format("INSERT INTO `%s` (UUID, NAME, IP, SERVER, TIMESTAMP, MESSAGE) VALUES (?,?,?,?,?,?)", SQLTable.PLAYER_CHATLOG);
     public static final String SELECT_CHATLOG = String.format("SELECT * FROM `%s` WHERE UUID = ?", SQLTable.PLAYER_CHATLOG);
 
+    public static final String SELECT_LOBBY = String.format("SELECT * FROM `%s` WHERE UUID = ?", SQLTable.LOBBY_TABLE);
+    public static final String INSERT_LOBBY = String
+            .format("INSERT INTO `%s` (UUID, LOTTERY, CHEST, DATA) VALUES (?, ?, ?, ?)", SQLTable.LOBBY_TABLE);
+    public static final String UPDATE_LOBBY = String.format("UPDATE `%s` SET LOTTERY = ?, CHEST = ?, DATA = ? WHERE UUID = ?", SQLTable.LOBBY_TABLE);
+
     private final HikariPool pool;
 
     private final Timer timer;
