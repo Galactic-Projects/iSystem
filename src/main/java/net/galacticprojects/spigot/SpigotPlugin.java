@@ -7,6 +7,7 @@ import net.galacticprojects.spigot.command.HelpCommand;
 import net.galacticprojects.spigot.command.SubtitleCommand;
 import net.galacticprojects.spigot.command.impl.BukkitCommandInjector;
 import net.galacticprojects.spigot.command.provider.SpigotPluginProvider;
+import net.galacticprojects.spigot.listener.AsyncChatListener;
 import net.galacticprojects.spigot.listener.ConnectionListener;
 import net.galacticprojects.spigot.listener.LabyModListener;
 import net.galacticprojects.spigot.message.CommandDescription;
@@ -73,6 +74,7 @@ public class SpigotPlugin extends JavaPlugin {
         PluginManager manager = Bukkit.getPluginManager();
         manager.registerEvents(new ConnectionListener(), this);
         manager.registerEvents(new LabyModListener(), this);
+		manager.registerEvents(new AsyncChatListener(), this);
     }
     
     private void registerArgumentTypes() {

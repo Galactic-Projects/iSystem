@@ -1,5 +1,6 @@
 package net.galacticprojects.bungeecord.listener;
 
+import eu.cloudnetservice.driver.CloudNetDriver;
 import me.lauriichan.laylib.localization.Key;
 import net.galacticprojects.bungeecord.ProxyPlugin;
 import net.galacticprojects.bungeecord.config.PluginConfiguration;
@@ -119,6 +120,8 @@ public class ConnectListener implements Listener {
         Party party = manager.getParty();
 
         Countdown.online.add(player.getUniqueId());
+
+        player.setDisplayName(CloudNetDriver.instance().permissionManagement().highestPermissionGroup(CloudNetDriver.instance().permissionManagement().user(player.getUniqueId())).prefix() + " " + player.getName());
 
         if (party == null) {
             return;
