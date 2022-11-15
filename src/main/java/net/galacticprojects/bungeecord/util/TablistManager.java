@@ -1,10 +1,8 @@
 package net.galacticprojects.bungeecord.util;
 
-import de.dytanic.cloudnet.driver.CloudNetDriver;
-import de.dytanic.cloudnet.ext.bridge.BridgePlayerManager;
-import de.dytanic.cloudnet.ext.bridge.BridgePlayerProvider;
-import de.dytanic.cloudnet.ext.bridge.player.ICloudPlayer;
-import de.dytanic.cloudnet.ext.bridge.player.IPlayerManager;
+import eu.cloudnetservice.driver.CloudNetDriver;
+import eu.cloudnetservice.modules.bridge.player.CloudPlayer;
+import eu.cloudnetservice.modules.bridge.player.PlayerManager;
 import me.lauriichan.laylib.localization.Key;
 import net.galacticprojects.bungeecord.ProxyPlugin;
 import net.galacticprojects.bungeecord.config.PluginConfiguration;
@@ -46,13 +44,13 @@ public class TablistManager {
                 if (playerData.getLanguage() != null) {
                     language = playerData.getLanguage();
                 }
-                ICloudPlayer cloudPlayer = CloudNetDriver.getInstance().getServicesRegistry().getFirstService(IPlayerManager.class).getOnlinePlayer(player.getUniqueId());
+                CloudPlayer cloudPlayer = CloudNetDriver.instance().serviceRegistry().firstProvider(PlayerManager.class).onlinePlayer(player.getUniqueId());
 
                 if(cloudPlayer == null) {
                     return;
                 }
 
-                Key server = Key.of("server", cloudPlayer.getConnectedService().getTaskName());
+                Key server = Key.of("server", cloudPlayer.connectedService().taskName());
                 Key players = Key.of("online", plugin.getProxy().getOnlineCount());
                 Key maxPlayers = Key.of("max", plugin.getPluginConfiguration().getPlayerAmount());
 

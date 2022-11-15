@@ -1,8 +1,7 @@
 package net.galacticprojects.bungeecord.listener;
 
-import de.dytanic.cloudnet.driver.CloudNetDriver;
-import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
-import de.dytanic.cloudnet.ext.bridge.player.IPlayerManager;
+import eu.cloudnetservice.driver.CloudNetDriver;
+import eu.cloudnetservice.modules.bridge.player.PlayerManager;
 import net.galacticprojects.bungeecord.ProxyPlugin;
 import net.galacticprojects.bungeecord.party.Party;
 import net.galacticprojects.bungeecord.party.PartyManager;
@@ -42,10 +41,10 @@ public class ServerSwitchListener implements Listener {
             return;
         }
         ProxyServer.getInstance().getScheduler().schedule(plugin, () -> {
-            IPlayerManager manager = CloudNetDriver.getInstance().getServicesRegistry().getFirstService(IPlayerManager.class);
-            UUID serviceUUID = manager.getOnlinePlayer(player.getUniqueId()).getConnectedService().getUniqueId();
+            PlayerManager manager = CloudNetDriver.instance().serviceRegistry().firstProvider(PlayerManager.class);
+            UUID serviceUUID = manager.onlinePlayer(player.getUniqueId()).connectedService().uniqueId();
             for(UUID uniqueId : party.getMember()) {
-                manager.getOnlinePlayer(uniqueId).getPlayerExecutor().connect(CloudNetDriver.getInstance().getCloudServiceProvider().getCloudService(serviceUUID).getName());
+                manager.onlinePlayer(uniqueId).playerExecutor().connect(CloudNetDriver.instance().cloudServiceProvider().service(serviceUUID).serviceId().taskName());
             }
         }, 1L, TimeUnit.SECONDS);
     }

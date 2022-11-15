@@ -1,8 +1,8 @@
 package net.galacticprojects.bungeecord.command;
 
-import de.dytanic.cloudnet.driver.CloudNetDriver;
-import de.dytanic.cloudnet.ext.bridge.player.ICloudPlayer;
-import de.dytanic.cloudnet.ext.bridge.player.IPlayerManager;
+import eu.cloudnetservice.driver.CloudNetDriver;
+import eu.cloudnetservice.modules.bridge.player.CloudPlayer;
+import eu.cloudnetservice.modules.bridge.player.PlayerManager;
 import me.lauriichan.laylib.command.annotation.*;
 import me.lauriichan.laylib.localization.Key;
 import net.galacticprojects.bungeecord.ProxyPlugin;
@@ -64,8 +64,8 @@ public class ReportCommand {
         actor.sendTranslatedMessage(CommandMessages.REPORT_SUCCESSFULLY, Key.of("player", target.getName()));
         database.createReport(target.getUniqueId(), player.getUniqueId(), reportInfo.getReason(), false, TimeHelper.toString(OffsetDateTime.now()));
         database.createHistory(target.getUniqueId(), player.getUniqueId(), Type.REPORT, reportInfo.getReason(), OffsetDateTime.now(), OffsetDateTime.now());
-        new EmbedCreator(plugin.getBotConfiguration().getChannelCReport(), target.getName(), player.getName(), reportInfo.getReason(), target.getAddress().getAddress().getHostAddress(), TimeHelper.toString(OffsetDateTime.now()));
-        new EmbedCreator(plugin.getBotConfiguration().getChannelCReport(), target.getName(), player.getName(), reportInfo.getReason(), target.getAddress().getAddress().getHostAddress(), TimeHelper.toString(OffsetDateTime.now()));
+        new EmbedCreator(plugin.getBotConfiguration().getChannelCReport(), target.getName(), player.getName(), reportInfo.getReason(), target.getAddress().getAddress().getHostAddress(), TimeHelper.BAN_TIME_FORMATTER.format(OffsetDateTime.now()));
+        new EmbedCreator(plugin.getBotConfiguration().getChannelNReport(), target.getName(), player.getName(), reportInfo.getReason(), target.getAddress().getAddress().getHostAddress(), TimeHelper.BAN_TIME_FORMATTER.format(OffsetDateTime.now()));
         TextComponent accept = new TextComponent();
         TextComponent deny = new TextComponent();
         for (ProxiedPlayer all : ProxyServer.getInstance().getPlayers()) {
@@ -109,17 +109,17 @@ public class ReportCommand {
                 return;
             }
 
-            database.updateReport(uniqueIdTarget, new Report(reportData.getUUID(), reportData.getCreator(), reportData.getReason(), true, reportData.getTimestamp()));
-            ICloudPlayer cloudPlayer = CloudNetDriver.getInstance().getServicesRegistry().getFirstService(IPlayerManager.class).getOnlinePlayer(player.getUniqueId());
-            ICloudPlayer targetCloudPlayer = CloudNetDriver.getInstance().getServicesRegistry().getFirstService(IPlayerManager.class).getOnlinePlayer(target.getUniqueId());
+            database.updateReport(new Report(uniqueIdTarget, reportData.getCreator(), reportData.getReason(), true, reportData.getTimestamp()));
+            CloudPlayer cloudPlayer = CloudNetDriver.instance().serviceRegistry().firstProvider(PlayerManager.class).onlinePlayer(player.getUniqueId());
+            CloudPlayer targetCloudPlayer = CloudNetDriver.instance().serviceRegistry().firstProvider(PlayerManager.class).onlinePlayer(target.getUniqueId());
             if (cloudPlayer == null || targetCloudPlayer == null) {
                 return;
             }
-            if (cloudPlayer.getConnectedService() == targetCloudPlayer.getConnectedService()) {
+            if (cloudPlayer.connectedService() == targetCloudPlayer.connectedService()) {
                 actor.sendTranslatedMessage(CommandMessages.REPORT_ERRORS_CONNECTED);
                 return;
             }
-            cloudPlayer.setConnectedService(targetCloudPlayer.getConnectedService());
+            cloudPlayer.loginService(targetCloudPlayer.connectedService());
 
             TextComponent finish = new TextComponent();
             database.getPlayer(player.getUniqueId()).thenAccept(playerData -> {
@@ -144,6 +144,7 @@ public class ReportCommand {
             return;
         }
 
+
         database.getReport(targetUnique).thenAccept(reportData -> {
             UUID uniqueId = reportData.getCreator();
             ProxiedPlayer creator = ProxyServer.getInstance().getPlayer(uniqueId);
@@ -151,16 +152,21 @@ public class ReportCommand {
             if (creator == null) {
                 return;
             }
+            if(reportData.isStatus()) {
 
-            database.createHistory(targetUnique, player.getUniqueId(), Type.REPORT_CLOSED, "-/-", OffsetDateTime.now(), OffsetDateTime.now());
-            database.deleteReport(targetUnique, reportData.getCreator());
-            database.getPlayer(creator.getUniqueId()).thenAccept(playerData -> {
-                creator.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.REPORT_PROCESS_CLOSED, playerData.getLanguage(), Key.of("player", MojangProfileService.getName(targetUnique)))));
-            });
+                database.createHistory(targetUnique, player.getUniqueId(), Type.REPORT_CLOSED, "-/-", OffsetDateTime.now(), OffsetDateTime.now());
+                database.deleteReport(targetUnique, reportData.getCreator());
+                database.getPlayer(creator.getUniqueId()).thenAccept(playerData -> {
+                    creator.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.REPORT_PROCESS_CLOSED, playerData.getLanguage(), Key.of("player", MojangProfileService.getName(targetUnique)))));
+                });
+                checkmode = new Checkmode();
+                checkmode.disable(player.getUniqueId());
+                return;
+            }
+            actor.sendTranslatedMessage("command.report.errors.processed");
         });
 
-        checkmode = new Checkmode();
-        checkmode.disable(player.getUniqueId());
+
     }
 
     @Action("ignore")
@@ -168,7 +174,7 @@ public class ReportCommand {
     public void ignore(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin){
         ProxiedPlayer player = actor.as(ProxiedPlayer.class).getHandle();
         for(int i = 0; i != 9; i++) {
-            actor.sendTranslatedMessage("");
+            player.sendMessage(new TextComponent(""));
         }
     }
 }

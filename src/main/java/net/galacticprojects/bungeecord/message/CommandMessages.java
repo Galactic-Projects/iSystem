@@ -19,8 +19,12 @@ public final class CommandMessages {
 
 	@Message(id = "command.maintenance.off", content = "$#maintenance.prefix &7The &4maintenace mode &7is now &cdisabled&7.")
 	public static MessageProvider COMMAND_MAINTENANCE_OFF;
+	@Message(id = "command.maintenance.already.off", content = "$#maintenance.prefix &cThe maintenance mode is already disabled!")
+	public static MessageProvider COMMAND_MAINTENANCE_ALREADY_OFF;
 	@Message(id = "command.maintenance.on", content = "$#maintenance.prefix &7The &4maintenace mode &7is now &aenabled&7 with &4reason &c$reason&7.")
 	public static MessageProvider COMMAND_MAINTENANCE_ON;
+	@Message(id = "command.maintenance.already.on", content = "$#maintenance.prefix &cThe maintenance mode is already enabled!")
+	public static MessageProvider COMMAND_MAINTENANCE_ALREADY_ON;
 
 
 	@Message(id = "command.ban.not-banned", content = "$player is not banned")
@@ -376,6 +380,9 @@ public final class CommandMessages {
 
 	@Message(id = "command.report.errors.offline", content = "$#prefix.report &cThis player has gone offline!")
 	public static MessageProvider REPORT_ERRORS_GONE;
+
+	@Message(id = "command.report.errors.processed", content = "$#prefix.report &cThis report wasn't processed!")
+	public static MessageProvider REPORT_ERRORS_PROCESSED;
 
 	@Message(id = "command.report.errors.reason", content = "$#prefix.report &cThis isn't a reason!")
 	public static MessageProvider REPORT_ERRORS_REASON;

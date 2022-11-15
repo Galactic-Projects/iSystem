@@ -1,9 +1,9 @@
 package net.galacticprojects.bungeecord.listener;
 
-import de.dytanic.cloudnet.driver.CloudNetDriver;
-import de.dytanic.cloudnet.driver.permission.IPermissionGroup;
-import de.dytanic.cloudnet.ext.bridge.player.ICloudPlayer;
-import de.dytanic.cloudnet.ext.bridge.player.IPlayerManager;
+import eu.cloudnetservice.driver.CloudNetDriver;
+import eu.cloudnetservice.driver.permission.PermissionGroup;
+import eu.cloudnetservice.modules.bridge.player.CloudPlayer;
+import eu.cloudnetservice.modules.bridge.player.PlayerManager;
 import me.lauriichan.laylib.command.CommandManager;
 import me.lauriichan.laylib.localization.Key;
 import net.galacticprojects.bungeecord.ProxyPlugin;
@@ -24,8 +24,6 @@ import net.md_5.bungee.api.event.ChatEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
-import org.checkerframework.checker.units.qual.A;
-
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.UUID;
@@ -48,8 +46,8 @@ public class ChatListener implements Listener {
         }
 
         if (event.getSender() instanceof ProxiedPlayer player) {
-            ICloudPlayer cloudPlayer = CloudNetDriver.getInstance().getServicesRegistry().getFirstService(IPlayerManager.class).getOnlinePlayer(player.getUniqueId());
-            IPermissionGroup info = CloudNetDriver.getInstance().getPermissionManagement().getHighestPermissionGroup(CloudNetDriver.getInstance().getPermissionManagement().getUser(player.getUniqueId()));
+            CloudPlayer cloudPlayer = CloudNetDriver.instance().serviceRegistry().firstProvider(PlayerManager.class).onlinePlayer(player.getUniqueId());
+            PermissionGroup info = CloudNetDriver.instance().permissionManagement().highestPermissionGroup(CloudNetDriver.instance().permissionManagement().user(player.getUniqueId()));
 
             if (cloudPlayer == null) {
                 return;
@@ -63,7 +61,7 @@ public class ChatListener implements Listener {
                 UUID uniqueId = player.getUniqueId();
                 String name = player.getName();
                 String ip = player.getAddress().getAddress().getHostAddress();
-                String server = cloudPlayer.getConnectedService().getServiceId().getName();
+                String server = cloudPlayer.connectedService().taskName();
                 String timestamp = TimeHelper.toString(OffsetDateTime.now());
 
                 Chatlog chatlog = null;
@@ -81,7 +79,7 @@ public class ChatListener implements Listener {
                     for (ProxiedPlayer all : ProxyServer.getInstance().getPlayers()) {
                         sql.getPlayer(all.getUniqueId()).thenAccept(playerData -> {
                             if (TeamChatCommand.TEAMCHAT.contains(all.getUniqueId()) || all.hasPermission("system.teamchat")) {
-                                Key playerName = Key.of("player", info.getPrefix() + player.getName());
+                                Key playerName = Key.of("player", info.prefix() + player.getName());
                                 Key message = Key.of("message", event.getMessage().replaceAll("@", ""));
 
                                 all.sendMessage(ComponentParser.parse(commonPlugin.getMessageManager().translate(CommandMessages.COMMAND_TEAMCHAT_FORMAT, playerData.getLanguage(), playerName, message)));

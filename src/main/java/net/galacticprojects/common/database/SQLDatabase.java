@@ -1,9 +1,11 @@
 package net.galacticprojects.common.database;
 
 import com.zaxxer.hikari.pool.HikariPool;
+import eu.cloudnetservice.driver.permission.CachedPermissionManagement;
 import me.lauriichan.laylib.logger.ISimpleLogger;
 import me.lauriichan.minecraft.wildcard.migration.IMigrationSource;
 import net.galacticprojects.bungeecord.util.Type;
+import net.galacticprojects.common.database.migration.LinkMigration2022_11_10_15_15;
 import net.galacticprojects.common.database.migration.impl.MigrationManager;
 import net.galacticprojects.common.database.model.*;
 import net.galacticprojects.common.util.TimeHelper;
@@ -12,9 +14,9 @@ import net.galacticprojects.common.util.cache.ThreadSafeCache;
 import net.galacticprojects.common.database.migration.impl.SQLMigrationType;
 import net.galacticprojects.common.util.Ref;
 import org.bukkit.entity.Husk;
-import org.checkerframework.checker.units.qual.A;
 
 import javax.swing.*;
+import java.net.ConnectException;
 import java.sql.*;
 import java.time.OffsetDateTime;
 import java.util.*;
@@ -69,7 +71,7 @@ public final class SQLDatabase implements IMigrationSource {
     public static final String SELECT_FRIENDREQUESTS_BOTH = String.format("SELECT * FROM `%s` WHERE UUID = ? AND REQUESTID = ?", SQLTable.FRIENDSREQUEST_TABLE);
     public static final String SELECT_FRIENDREQUESTS_FROM_REQUESTID = String.format("SELECT * FROM `%s` WHERE REQUESTID = ?", SQLTable.FRIENDSREQUEST_TABLE);
     public static final String DELETE_FRIENDREQUEST = String.format("DELETE FROM `%s` WHERE UUID = ? AND REQUESTID = ?", SQLTable.FRIENDSREQUEST_TABLE);
-    public static final String INSERT_FRIENDREQUEST = String.format("INSERT INTO `%s` (UUID, REQUESTID, DATE) VALUES (?,?,?)", SQLTable.FRIENDSREQUEST_TABLE);
+    public static final String INSERT_FRIENDREQUEST = String.format("INSERT INTO `%s` (UUID, REQUESTID) VALUES (?,?,?)", SQLTable.FRIENDSREQUEST_TABLE);
 
     public static final String SELECT_FRIENDSETTINGS = String.format("SELECT * FROM `%s` WHERE UUID = ?", SQLTable.FRIENDS_SETTINGS);
     public static final String UPDATE__FRIENDSETTINGS = String.format("UPDATE `%s` SET REQUESTS = ?, JUMP = ?, MESSAGES = ? WHERE UUID = ?", SQLTable.FRIENDS_SETTINGS);
@@ -82,15 +84,15 @@ public final class SQLDatabase implements IMigrationSource {
     public static final String INSERT_REPORT = String.format("INSERT INTO `%s` (UUID, CREATOR, REASON, STATUS, TIMESTAMP) VALUES (?,?,?,?,?)", SQLTable.REPORT_TABLE);
     public static final String SELECT_REPORT = String.format("SELECT * FROM `%s` WHERE UUID = ?", SQLTable.REPORT_TABLE);
     public static final String DELETE_REPORT = String.format("DELETE FROM `%s` WHERE UUID = ? AND WHERE CREATOR = ?", SQLTable.REPORT_TABLE);
-    public static final String UPDATE_STATUS_REPORT = String.format("UPDATE `%s` SET STATUS = ? WHERE UUID = ?", SQLTable.REPORT_TABLE);
-
     public static final String INSERT_CHATLOG = String.format("INSERT INTO `%s` (UUID, NAME, IP, SERVER, TIMESTAMP, MESSAGE) VALUES (?,?,?,?,?,?)", SQLTable.PLAYER_CHATLOG);
     public static final String SELECT_CHATLOG = String.format("SELECT * FROM `%s` WHERE UUID = ?", SQLTable.PLAYER_CHATLOG);
 
     public static final String SELECT_LOBBY = String.format("SELECT * FROM `%s` WHERE UUID = ?", SQLTable.LOBBY_TABLE);
-    public static final String INSERT_LOBBY = String
-            .format("INSERT INTO `%s` (UUID, LOTTERY, CHEST, DATA) VALUES (?, ?, ?, ?)", SQLTable.LOBBY_TABLE);
+    public static final String INSERT_LOBBY = String.format("INSERT INTO `%s` (UUID, LOTTERY, CHEST, DATA) VALUES (?, ?, ?, ?)", SQLTable.LOBBY_TABLE);
     public static final String UPDATE_LOBBY = String.format("UPDATE `%s` SET LOTTERY = ?, CHEST = ?, DATA = ? WHERE UUID = ?", SQLTable.LOBBY_TABLE);
+
+    public static final String INSERT_LINK = String.format("INSERT INTO `%s` (UUID, DISCORDTAG, DISCORDTIME, DISCORDBOOL, TSIDENTIFIER, TSIP, TSTIME, TSBOOL) VALUES (?,?,?,?,?,?,?,?)", SQLTable.LINK_TABLE);
+    public static final String SELECT_LINK = String.format("SELECT * FROM `%s` WHERE UUID = ?", SQLTable.LINK_TABLE);
 
     private final HikariPool pool;
 
@@ -105,6 +107,7 @@ public final class SQLDatabase implements IMigrationSource {
     private final Cache<UUID, Report> reportCache = newCache(UUID.class, 300);
     private final Cache<UUID, FriendSettings> friendSettingsCache = newCache(UUID.class, 300);
     private final Cache<UUID, FriendRequest> friendRequestCache = newCache(UUID.class, 300);
+    private final Cache<UUID, LinkPlayer> linkPlayerCache = newCache(UUID.class, 300);
     private final ISimpleLogger logger;
 
     public SQLDatabase(final ISimpleLogger logger, final IPoolProvider provider) {
@@ -140,6 +143,54 @@ public final class SQLDatabase implements IMigrationSource {
         } catch (final Throwable e) {
             // Ignore
         }
+    }
+
+
+    public CompletableFuture<LinkPlayer> createLinkPlayer(UUID uniqueId) {
+        return CompletableFuture.supplyAsync(() -> {
+            try (Connection connection = pool.getConnection()) {
+                PreparedStatement preparedStatement = connection.prepareStatement(INSERT_LINK);
+                preparedStatement.setString(1, uniqueId.toString());
+                preparedStatement.executeUpdate();
+                LinkPlayer linkPlayer = new LinkPlayer(uniqueId, null, null, false, null, null, null, false);
+                linkPlayerCache.put(uniqueId, linkPlayer);
+                return linkPlayer;
+            } catch (SQLException e) {
+                logger.warning("A few SQL things went wrong while creating report ", e);
+                return null;
+            }
+        }, service);
+    }
+
+    public CompletableFuture<LinkPlayer> getLinkedPlayer(UUID uniqueId) {
+        return CompletableFuture.supplyAsync(() -> {
+            if(linkPlayerCache.has(uniqueId)) {
+                return linkPlayerCache.get(uniqueId);
+            }
+            try (Connection connection = pool.getConnection()) {
+                PreparedStatement preparedStatement = connection.prepareStatement(SELECT_LINK);
+                preparedStatement.setString(1, uniqueId.toString());
+                ResultSet resultSet = preparedStatement.executeQuery();
+                if(resultSet != null) {
+                    String discordTag = resultSet.getString("DISCORDTAG");
+                    String discordTime = resultSet.getString("DISCORDTIME");
+                    boolean discordLinked = resultSet.getBoolean("DISCORDBOOL");
+                    String teamspeakIdentifier = resultSet.getString("TSIDENTIFIER");
+                    String teamspeakIP = resultSet.getString("TSIP");
+                    String teamspeakTime = resultSet.getString("TSTIME");
+                    boolean teamspeakLinked = resultSet.getBoolean("TSBOOL");
+
+                    LinkPlayer linkPlayer = new LinkPlayer(uniqueId, discordTag, TimeHelper.fromString(discordTime), discordLinked, teamspeakIdentifier, teamspeakIP, TimeHelper.fromString(teamspeakTime), teamspeakLinked);
+                    linkPlayerCache.put(uniqueId, linkPlayer);
+                    return linkPlayer;
+                }
+                return null;
+
+            } catch (SQLException e) {
+                logger.warning("A few SQL things went wrong while catching link player");
+                return null;
+            }
+        }, service);
     }
 
     public CompletableFuture<Report> createReport(UUID uniqueId, UUID creator, String reason, boolean status, String timestamp) {
@@ -189,17 +240,17 @@ public final class SQLDatabase implements IMigrationSource {
         },service);
     }
 
-    public CompletableFuture<Report> updateReport(UUID uniqueId, Report report) {
+    public CompletableFuture<Report> updateReport(Report report) {
         return CompletableFuture.supplyAsync(() -> {
             try (Connection connection = pool.getConnection()) {
                 PreparedStatement preparedStatement = connection.prepareStatement(SELECT_REPORT);
-                preparedStatement.setString(1, uniqueId.toString());
+                preparedStatement.setString(1, report.getUUID().toString());
                 preparedStatement.executeUpdate();
-                Report meta = new Report(uniqueId, report.getCreator(), report.getReason(), report.isStatus(), report.getTimestamp());
-                if(reportCache.has(uniqueId)) {
-                    reportCache.remove(uniqueId);
+                Report meta = new Report(report.getUUID(), report.getCreator(), report.getReason(), report.isStatus(), report.getTimestamp());
+                if(reportCache.has(report.getUUID())) {
+                    reportCache.remove(report.getUUID());
                 }
-                reportCache.put(uniqueId, meta);
+                reportCache.put(report.getUUID(), meta);
                 return report;
             } catch (SQLException e) {
                 logger.warning("A few SQL things went wrong while get report ", e);
@@ -235,7 +286,7 @@ public final class SQLDatabase implements IMigrationSource {
                     histories = new ArrayList<>();
                 }
                 histories.add(new History(uniqueId, owner, type, getBan(uniqueId).join().getId(), reason, time, creationTime));
-                Array history = connection.createArrayOf("INFORMATION", histories.toArray());
+                Array history = connection.createArrayOf(Array.class.getTypeName(), histories.toArray());
                 PreparedStatement statement = connection.prepareStatement(INSERT_PLAYER_HISTORY);
                 statement.setString(1, uniqueId.toString());
                 statement.setArray(2, history);
@@ -335,7 +386,7 @@ public final class SQLDatabase implements IMigrationSource {
                     friends = new ArrayList<>();
                 }
                 friends.add(new Friends(uniqueId, friendUniqueId, date));
-                Array friendDing = connection.createArrayOf("FRIENDS", friends.toArray());
+                Array friendDing = connection.createArrayOf(Array.class.getTypeName(), friends.toArray());
                 preparedStatement.setArray(1, friendDing);
                 preparedStatement.executeUpdate();
                 return friends;
@@ -426,7 +477,7 @@ public final class SQLDatabase implements IMigrationSource {
                     requests = new ArrayList<>();
                 }
                 requests.add(new FriendRequest(uniqueId, requestUniqueId, date));
-                preparedStatement.setArray(1, connection.createArrayOf("REQUESTS", requests.toArray()));
+                preparedStatement.setArray(1, connection.createArrayOf(Array.class.getTypeName(), requests.toArray()));
                 preparedStatement.executeUpdate();
                 return new FriendRequest(uniqueId, requestUniqueId, date);
             } catch (SQLException e) {

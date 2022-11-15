@@ -23,7 +23,7 @@ import java.time.OffsetDateTime;
 @Command(name = "maintenance")
 public final class MaintenanceCommand {
 
-	@Action("")
+	@Action("on")
 	@Description("command.description.maintenance")
 	@Permission("system.command.maintenance")
 	public void maintenance(Actor<?> actor, CommonPlugin common, ProxyPlugin plugin, @Argument(name = "reason", optional = true) String reason, @Argument(name = "days", params = {
@@ -38,10 +38,13 @@ public final class MaintenanceCommand {
 			return;
 		}
 		
-		if(!config.isMaintenance()) {
+		if(config.isMaintenance()) {
+			actor.sendTranslatedMessage("command.maintenance.already.off");
+		} else {
 			config.setMaintenance(true);
 			config.setMaintenanceReason(reason = (reason == null ? "Maintenance" : reason));
 			config.setDays(TimeHelper.toString(OffsetDateTime.now().plusDays(days)));
+			config.save();
 			actor.sendTranslatedMessage("command.maintenance.on", Key.of("reason", reason), Key.of("enddate", TimeHelper.BAN_TIME_FORMATTER.format(TimeHelper.fromString(config.getDays()))));
 
 			for(ProxiedPlayer all : ProxyServer.getInstance().getPlayers()) {
@@ -54,9 +57,29 @@ public final class MaintenanceCommand {
 					all.disconnect(ComponentParser.parse(common.getMessageManager().translate(SystemMessage.SYSTEM_MAINTENACE_KICK_NOW, language, Key.of("enddate", TimeHelper.BAN_TIME_FORMATTER.format(TimeHelper.fromString(config.getDays()))), Key.of("reason", reason))));
 				}
 			}
+		}
+	}
+
+	@Action("off")
+	@Description("command.description.maintenance")
+	@Permission("system.command.maintenance")
+	public void off(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin) {
+		PluginConfiguration config = plugin.getPluginConfiguration();
+		SQLDatabase database = plugin.getCommonPlugin().getDatabaseRef().get();
+
+		if(database == null) {
+			common.getLogger().error(new Throwable("Database is unavailable!"));
 			return;
 		}
-		config.setMaintenance(false);
-		actor.sendTranslatedMessage("command.maintenance.off");
+
+		if(config.isMaintenance()) {
+			config.setMaintenance(false);
+			config.setMaintenanceReason("NONE");
+			config.setDays("NOTHING");
+			config.save();
+			actor.sendTranslatedMessage("command.maintenance.off");
+		} else {
+			actor.sendTranslatedMessage("command.maintenance.already.on");
+		}
 	}
 }

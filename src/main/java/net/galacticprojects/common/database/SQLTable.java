@@ -5,7 +5,8 @@ public enum SQLTable {
     BAN_TABLE("PlayerBans"), PLAYER_TABLE("Player"),
     PLAYER_HISTORY("PlayerHistory"), PLAYER_CHATLOG("PlayerChatLog"),
     FRIENDS_TABLE("Friends"), FRIENDSREQUEST_TABLE("FriendsRequest"),
-    FRIENDS_SETTINGS("FriendsSettings"), REPORT_TABLE("Report")
+    FRIENDS_SETTINGS("FriendsSettings"), REPORT_TABLE("Report"),
+    LINK_TABLE("PlayerLink"), LOBBY_TABLE("Lobby")
     ;
     private final String defaultTableName;
     private String tableName;

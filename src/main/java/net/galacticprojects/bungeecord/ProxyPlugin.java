@@ -4,8 +4,8 @@ import java.io.File;
 import java.time.OffsetDateTime;
 import java.util.concurrent.TimeUnit;
 
-import de.dytanic.cloudnet.driver.CloudNetDriver;
-import de.dytanic.cloudnet.driver.service.ServiceInfoSnapshot;
+import eu.cloudnetservice.driver.CloudNetDriver;
+import eu.cloudnetservice.driver.service.ServiceInfoSnapshot;
 import me.lauriichan.laylib.command.ArgumentRegistry;
 import me.lauriichan.laylib.command.CommandManager;
 import me.lauriichan.laylib.localization.Key;
@@ -138,6 +138,7 @@ public class ProxyPlugin extends Plugin {
 		commandManager.register(ReportCommand.class);
 		commandManager.register(SystemCommand.class);
 		commandManager.register(TeamChatCommand.class);
+		commandManager.register(LinkCommand.class);
     }
 
 	public void countDown() {
@@ -274,13 +275,13 @@ public class ProxyPlugin extends Plugin {
 				ProxyServer.getInstance().getScheduler().schedule(this, new Runnable() {
 					@Override
 					public void run() {
-						CloudNetDriver.getInstance().getPermissionManagement().reload();
-						CloudNetDriver.getInstance().getGroupConfigurationProvider().reload();
-						CloudNetDriver.getInstance().getModuleProvider().stopAll();
-						for(ServiceInfoSnapshot serviceInfoSnapshots : CloudNetDriver.getInstance().getCloudServiceProvider().getCloudServices()) {
-							CloudNetDriver.getInstance().getCloudServiceProvider(serviceInfoSnapshots).stopAsync();
+						CloudNetDriver.instance().permissionManagement().reload();
+						CloudNetDriver.instance().groupConfigurationProvider().reload();
+						CloudNetDriver.instance().moduleProvider().stopAll();
+						for(ServiceInfoSnapshot serviceInfoSnapshots : CloudNetDriver.instance().cloudServiceProvider().services()) {
+
 						}
-						CloudNetDriver.getInstance().getModuleProvider().startAll();
+						CloudNetDriver.instance().moduleProvider().startAll();
 					}
 				}, 1, TimeUnit.SECONDS);
 			}

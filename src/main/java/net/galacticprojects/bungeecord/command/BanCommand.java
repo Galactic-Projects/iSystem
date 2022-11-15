@@ -74,8 +74,8 @@ public class BanCommand {
                 }
                 database.createHistory(uniqueId, actor.getId(), Type.BAN, info.getReason(), time, creation);
                 database.getPlayer(uniqueId).thenAccept(players -> {
-                    new EmbedCreator(plugin.getBotConfiguration().getChannelCBan(), MojangProfileService.getName(uniqueId), actor.getName(), info.getReason(), players.getIP(), info.getHours(), TimeHelper.toString(OffsetDateTime.now()));
-                    new EmbedCreator(plugin.getBotConfiguration().getChannelNBan(), MojangProfileService.getName(uniqueId), actor.getName(), info.getReason(), players.getIP(), info.getHours(), TimeHelper.toString(OffsetDateTime.now()));
+                    new EmbedCreator(plugin.getBotConfiguration().getChannelCBan(), MojangProfileService.getName(uniqueId), actor.getName(), info.getReason(), players.getIP(), info.getHours(), TimeHelper.BAN_TIME_FORMATTER.format(OffsetDateTime.now()));
+                    new EmbedCreator(plugin.getBotConfiguration().getChannelNBan(), MojangProfileService.getName(uniqueId), actor.getName(), info.getReason(), players.getIP(), info.getHours(), TimeHelper.BAN_TIME_FORMATTER.format(OffsetDateTime.now()));
                 });
 
                 BanMessage message = BanMessage.valueOf("COMMAND_BAN_ID_" + banId);
