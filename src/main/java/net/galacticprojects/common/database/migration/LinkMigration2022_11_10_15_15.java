@@ -13,10 +13,10 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 @Migration(source = SQLDatabase.class, type = SQLMigrationType.class)
-public class ReportMigration2022_10_23_20_04 extends MySQLMigration {
+public class LinkMigration2022_11_10_15_15 extends MySQLMigration {
 
-    public ReportMigration2022_10_23_20_04() {
-        super(SQLTable.REPORT_TABLE);
+    public LinkMigration2022_11_10_15_15() {
+        super(SQLTable.LINK_TABLE);
     }
 
     @Override
@@ -27,7 +27,7 @@ public class ReportMigration2022_10_23_20_04 extends MySQLMigration {
 
     @Override
     public String getNewFormat() {
-        return "ID INT AUTO_INCREMENT, UUID VARCHAR(36), CREATOR VARCHAR(36), REASON VARCHAR(64), STATUS BOOLEAN DEFAULT FALSE, TIMESTAMP VARCHAR(128) NOT NULL, PRIMARY KEY (ID)";
+        return "ID INT AUTO_INCREMENT, UUID VARCHAR(36), DISCORDTAG VARCHAR(64), DISCORDTIME VARCHAR(128), DISCORDBOOL BOOLEAN DEFAULT FALSE, TSIDENTIFIER VARCHAR(64), TSIP VARCHAR(128), TSTIME VARCHAR(128), TSBOOL BOOLEAN DEFAULT FALSE, PRIMARY KEY (ID)";
     }
 
     @Override
@@ -42,6 +42,6 @@ public class ReportMigration2022_10_23_20_04 extends MySQLMigration {
 
     @Override
     protected long getDate() {
-        return Date.of(20, 4,23,10,2022);
+        return Date.of(15, 15,10,11,2022);
     }
 }

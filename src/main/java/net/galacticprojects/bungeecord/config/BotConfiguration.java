@@ -1,18 +1,20 @@
 package net.galacticprojects.bungeecord.config;
 
 import com.syntaxphoenix.syntaxapi.json.JsonArray;
+import com.syntaxphoenix.syntaxapi.json.JsonObject;
+import com.syntaxphoenix.syntaxapi.json.JsonValue;
+import com.syntaxphoenix.syntaxapi.json.ValueType;
 import com.syntaxphoenix.syntaxapi.json.io.JsonParser;
+import com.syntaxphoenix.syntaxapi.json.value.JsonNumber;
 import me.lauriichan.laylib.logger.ISimpleLogger;
 import net.galacticprojects.common.config.BaseConfiguration;
 import net.galacticprojects.common.config.impl.json.JsonConfig;
+import net.galacticprojects.common.util.DynamicArray;
 import org.apache.commons.collections4.map.HashedMap;
 
 import java.io.File;
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class BotConfiguration extends BaseConfiguration {
 
@@ -36,9 +38,17 @@ public class BotConfiguration extends BaseConfiguration {
     private String communityGuild;
     private String networkGuild;
 
-    private ArrayList<String> discordGroups = new ArrayList<>();
-    private ArrayList<String> teamspeakGroups = new ArrayList<>();
+    private DynamicArray<String> infos = new DynamicArray<>();
 
+    private DynamicArray<String> groupArray = new DynamicArray<>();
+    private DynamicArray<Long> longInfos = new DynamicArray<>();
+
+    private HashMap<String, String> groupHash = new HashMap<>();
+
+    private HashMap<Long, String> serverHash = new HashMap<>();
+    private final DynamicArray<Integer> teamspeakInfo = new DynamicArray<>();
+    private final DynamicArray<Integer> teamspeakGroupArray = new DynamicArray<>();
+    private final HashMap<String, Integer> teamspeakGroupHash = new HashMap<>();
 
     public BotConfiguration(ISimpleLogger logger, File dataFolder) {
         super(logger, dataFolder, "bot.json");
@@ -61,10 +71,58 @@ public class BotConfiguration extends BaseConfiguration {
         user = config.getValueOrDefault("teamspeak.user", "serveradmin");
         password = config.getValueOrDefault("teamspeak.password", "your_super_secret_password");
         name = config.getValueOrDefault("teamspeak.name", "Galactic Projects | Bot");
-        communityGuild = config.getValueOrDefault("verification.discord.guilds.community", "0");
-        networkGuild = config.getValueOrDefault("verification.discord.guilds.network", "0");
-        discordGroups = config.getValueOrDefault("verification.discord.groups", discordGroups);
-        teamspeakGroups = config.getValueOrDefault("verification.teamspeak.groups", teamspeakGroups);
+        loadDiscordInfo();
+        loadTeamSpeakInfo();
+    }
+
+    private void loadDiscordInfo() throws Throwable {
+        infos.clear();
+        JsonArray array = (JsonArray) config.get("verification.discord.groups");
+        if(array == null) {
+            config.set("verification.discord.groups", new JsonArray());
+            return;
+        }
+        for(JsonValue<?> value : array) {
+            if(value == null || !value.hasType(ValueType.OBJECT)) {
+                continue;
+            }
+            JsonObject object = (JsonObject) value;
+            JsonValue<?> rawGroup = object.get("group");
+            JsonValue<?> rawId = object.get("id");
+            JsonValue<?> rawServerName = object.get("server-name");
+            JsonValue<?> rawServer = object.get("server");
+            String id = (rawId == null ? "N/A" : rawId.getValue().toString());
+            String group = (rawGroup == null ? "N/A" : rawGroup.getValue().toString());
+            String serverName = (rawServerName == null ? "N/A" : rawServer.getValue().toString());
+            long server = (rawServer == null ? 0 : ((JsonNumber<?>) rawServer).getValue().longValue());
+            infos.add(id);
+            groupArray.add(group);
+            groupHash.put(id, group);
+            serverHash.put(server, serverName);
+            longInfos.add(server);
+        }
+    }
+
+    private void loadTeamSpeakInfo() throws Throwable {
+        teamspeakInfo.clear();
+        JsonArray array = (JsonArray) config.get("verification.teamspeak.groups");
+        if(array == null) {
+            config.set("verification.teamspeak.groups", new JsonArray());
+            return;
+        }
+        for(JsonValue<?> value : array) {
+            if(value == null || !value.hasType(ValueType.OBJECT)) {
+                continue;
+            }
+            JsonObject object = (JsonObject) value;
+            JsonValue<?> rawId = object.get("id");
+            JsonValue<?> rawPermission = object.get("permissions");
+            int id = (rawId == null ? 0 : ((JsonNumber<?>) rawId).getValue().intValue());
+            String permission = (rawPermission == null ? "N/A" : rawPermission.getValue().toString());
+            teamspeakInfo.add(id);
+            teamspeakGroupArray.add(id);
+            teamspeakGroupHash.put(permission, id);
+        }
     }
 
     @Override
@@ -84,10 +142,6 @@ public class BotConfiguration extends BaseConfiguration {
         config.setValue("teamspeak.user", user);
         config.setValue("teamspeak.password", password);
         config.setValue("teamspeak.name", name);
-        config.setValue("verification.discord.guilds.community", communityGuild);
-        config.setValue("verification.discord.guilds.network", networkGuild);
-        config.setValue("verification.discord.groups", discordGroups);
-        config.setValue("verification.teamspeak.groups", teamspeakGroups);
     }
 
     public String getBotToken() {
@@ -229,18 +283,55 @@ public class BotConfiguration extends BaseConfiguration {
     }
 
     public ArrayList<String> getDiscordGroups() {
-        return discordGroups;
+        ArrayList<String> groups = new ArrayList<>();
+        for(int i = 0; i < infos.length(); i++) {
+            groups.add(infos.get(i));
+        }
+        return groups;
     }
 
-    public void setDiscordGroups(ArrayList<String> discordGroups) {
-        this.discordGroups = discordGroups;
+    public String getDiscordGroupName(String id) {
+        return groupHash.get(id);
     }
 
-    public ArrayList<String> getTeamspeakGroups() {
-        return teamspeakGroups;
+    public String getServerName(long serverId) {
+        return serverHash.get(serverId);
     }
 
-    public void setTeamspeakGroups(ArrayList<String> teamspeakGroups) {
-        this.teamspeakGroups = teamspeakGroups;
+    public ArrayList<Long> getServer() {
+        ArrayList<Long> servers = new ArrayList<>();
+        for(int i = 0; i < longInfos.length(); i++) {
+            servers.add(longInfos.get(i));
+        }
+        return servers;
     }
+
+    public void setLongInfos(ArrayList<Long> servers) {
+        longInfos.clear();
+        for(int i = 0; i < servers.size(); i++) {
+            longInfos.add(servers.get(i));
+        }
+        save();
+    }
+
+    public ArrayList<Integer> getTeamSpeakGroups() {
+        ArrayList<Integer> groups = new ArrayList<>();
+        for(int i = 0; i != teamspeakGroupArray.length(); i++) {
+            groups.add(teamspeakGroupArray.get(i));
+        }
+        return groups;
+    }
+
+    public Integer getTeamSpeakGroupByPermission(String permission) {
+        return teamspeakGroupHash.get(permission);
+    }
+
+    public void setTeamspeakGroupHash(ArrayList<Integer> service) {
+        teamspeakInfo.clear();
+        for(int i = 0; i < service.size(); i++) {
+            teamspeakInfo.add(service.get(i));
+        }
+        save();
+    }
+
 }

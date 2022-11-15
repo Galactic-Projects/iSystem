@@ -15,6 +15,7 @@ import net.galacticprojects.common.CommonPlugin;
 import net.galacticprojects.common.database.SQLDatabase;
 import net.galacticprojects.common.database.model.Ban;
 import net.galacticprojects.common.database.model.FriendSettings;
+import net.galacticprojects.common.database.model.LinkPlayer;
 import net.galacticprojects.common.database.model.Player;
 import net.galacticprojects.common.util.ComponentParser;
 import net.md_5.bungee.api.ProxyServer;
@@ -95,6 +96,12 @@ public class ConnectListener implements Listener {
         FriendSettings friendSettings = database.getFriendSettings(uniqueId).join();
         if (friendSettings == null) {
             friendSettings = database.createFriendSettings(uniqueId).join();
+            return;
+        }
+
+        LinkPlayer linkPlayer = database.getLinkedPlayer(uniqueId).join();
+        if(linkPlayer == null) {
+            linkPlayer = database.createLinkPlayer(uniqueId).join();
             return;
         }
 
