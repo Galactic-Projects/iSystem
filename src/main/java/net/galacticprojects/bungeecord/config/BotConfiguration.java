@@ -326,6 +326,14 @@ public class BotConfiguration extends BaseConfiguration {
         return teamspeakGroupHash.get(permission);
     }
 
+    public HashMap<String, Integer> getTeamspeakGroupHash() {
+        return teamspeakGroupHash;
+    }
+
+    public DynamicArray<Integer> getTeamspeakInfo() {
+        return teamspeakInfo;
+    }
+
     public void setTeamspeakGroupHash(ArrayList<Integer> service) {
         teamspeakInfo.clear();
         for(int i = 0; i < service.size(); i++) {

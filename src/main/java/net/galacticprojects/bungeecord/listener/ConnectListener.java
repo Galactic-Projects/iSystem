@@ -121,8 +121,6 @@ public class ConnectListener implements Listener {
 
         Countdown.online.add(player.getUniqueId());
 
-        player.setDisplayName(CloudNetDriver.instance().permissionManagement().highestPermissionGroup(CloudNetDriver.instance().permissionManagement().user(player.getUniqueId())).prefix() + " " + player.getName());
-
         if (party == null) {
             return;
         }

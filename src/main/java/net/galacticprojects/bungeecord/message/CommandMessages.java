@@ -440,4 +440,17 @@ public final class CommandMessages {
 
 	@Message(id = "command.administration.success.setted", content = "$#prefix.system &7You &asuccessfully &3set &cplayers-max amount &7from &b$oamount &7to &b$namount&7.")
 	public static MessageProvider SYSTEM_ADMINISTRATION_SUCCESS_SETTED;
+
+	@Message(id = "prefix.verification", content = "&8&l「 &c&lVERIFICATION &8&l」&7")
+	public static MessageProvider PREFIX_VERIFICATION;
+
+	@Message(id = "command.verification.error.wrong", content = "$#prefix.verification &cSomething went wrong, please check that you are online or on our servers!")
+	public static MessageProvider VERIFICATION_SOMETHING_WENT_WRONG;
+
+	@Message(id = "command.verification.error.already", content = "$#prefix.verification &cYou are already verified!")
+	public static MessageProvider VERIFICATION_ALREADY_VERIFIED;
+
+	@Message(id = "command.verification.success.verify", content = "$#prefix.verification &7Your &cAccount &7was &asuccessfully &bconnected &7to our &3$service&7.")
+	public static MessageProvider VERIFICATION_SOMETHING_SUCCESS;
+
 }
