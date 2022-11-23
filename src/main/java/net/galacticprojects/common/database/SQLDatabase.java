@@ -93,6 +93,7 @@ public final class SQLDatabase implements IMigrationSource {
 
     public static final String INSERT_LINK = String.format("INSERT INTO `%s` (UUID, DISCORDTAG, DISCORDTIME, DISCORDBOOL, TSIDENTIFIER, TSIP, TSTIME, TSBOOL) VALUES (?,?,?,?,?,?,?,?)", SQLTable.LINK_TABLE);
     public static final String SELECT_LINK = String.format("SELECT * FROM `%s` WHERE UUID = ?", SQLTable.LINK_TABLE);
+    public static final String UPDATE_LINK = String.format("UPDATE `%s` SET DISCORDTAG = ?, DISCORDTIME = ?, DISCORDBOOL = ?, TSIDENTIFIER = ?, TSIP = ?, TSIP = ?, TSBOOL = ? WHERE UUID = ?", SQLTable.LINK_TABLE);
 
     private final HikariPool pool;
 
@@ -151,12 +152,19 @@ public final class SQLDatabase implements IMigrationSource {
             try (Connection connection = pool.getConnection()) {
                 PreparedStatement preparedStatement = connection.prepareStatement(INSERT_LINK);
                 preparedStatement.setString(1, uniqueId.toString());
+                preparedStatement.setString(2, null);
+                preparedStatement.setString(3, null);
+                preparedStatement.setBoolean(4, false);
+                preparedStatement.setString(5, null);
+                preparedStatement.setString(6, null);
+                preparedStatement.setString(7, null);
+                preparedStatement.setBoolean(8, false);
                 preparedStatement.executeUpdate();
                 LinkPlayer linkPlayer = new LinkPlayer(uniqueId, null, null, false, null, null, null, false);
                 linkPlayerCache.put(uniqueId, linkPlayer);
                 return linkPlayer;
             } catch (SQLException e) {
-                logger.warning("A few SQL things went wrong while creating report ", e);
+                logger.warning("A few SQL things went wrong while creating link ", e);
                 return null;
             }
         }, service);
@@ -185,9 +193,33 @@ public final class SQLDatabase implements IMigrationSource {
                     return linkPlayer;
                 }
                 return null;
-
             } catch (SQLException e) {
                 logger.warning("A few SQL things went wrong while catching link player");
+                return null;
+            }
+        }, service);
+    }
+
+    public CompletableFuture<LinkPlayer> updateLinkPlayer(LinkPlayer linkPlayer) {
+        return CompletableFuture.supplyAsync(() -> {
+            try (Connection connection = pool.getConnection()) {
+                PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_LINK);
+                preparedStatement.setString(1, linkPlayer.getDiscordTag());
+                preparedStatement.setString(2, TimeHelper.toString(linkPlayer.getDiscordTime()));
+                preparedStatement.setBoolean(3, linkPlayer.isDiscordLinked());
+                preparedStatement.setString(4, linkPlayer.getTeamspeakIdentifier());
+                preparedStatement.setString(5, linkPlayer.getTeamspeakIp());
+                preparedStatement.setString(6, TimeHelper.toString(linkPlayer.getTeamspeakTime()));
+                preparedStatement.setBoolean(7, linkPlayer.isTeamspeakLinked());
+                preparedStatement.setString(8, linkPlayer.getUniqueId().toString());
+                preparedStatement.executeUpdate();
+                if(linkPlayerCache.has(linkPlayer.getUniqueId())){
+                    linkPlayerCache.remove(linkPlayer.getUniqueId());
+                }
+                linkPlayerCache.put(linkPlayer.getUniqueId(), linkPlayer);
+                return linkPlayer;
+            } catch (SQLException e) {
+                logger.warning("A few SQL things went wrong while updating link player");
                 return null;
             }
         }, service);

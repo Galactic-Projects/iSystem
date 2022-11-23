@@ -37,7 +37,7 @@ public class DiscordBot {
         }
     }
 
-    public static JDA getJDA() {
+    public JDA getJDA() {
         return jda;
     }
 

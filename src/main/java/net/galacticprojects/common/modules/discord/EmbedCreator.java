@@ -2,15 +2,17 @@ package net.galacticprojects.common.modules.discord;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.galacticprojects.bungeecord.ProxyPlugin;
 import net.galacticprojects.common.modules.DiscordBot;
 
 import java.awt.*;
+import java.util.UUID;
 
 public class EmbedCreator {
 
     private EmbedBuilder embedBuilder = null;
     private String channelid = null;
-    private String platform = null;
+    private String identifier = null;
     private String suspect = null;
     private String member = null;
     private String reason = null;
@@ -20,12 +22,11 @@ public class EmbedCreator {
 
     // ALL FORMAT
     public EmbedCreator(String channelid, String platform, String suspect, String member, String reason, String ip, long period, String timestamp) {
-        if(DiscordBot.getJDA() == null) {
+        if(ProxyPlugin.getInstance().getDiscordBot().getJDA() == null) {
             return;
         }
 
         this.channelid = channelid;
-        this.platform = platform;
         this.suspect = suspect;
         this.member = member;
         this.reason = reason;
@@ -37,13 +38,13 @@ public class EmbedCreator {
     }
 
     // VERIFY FORMAT
-    public EmbedCreator(String channelid, String platform, String member, String ip, String timestamp) {
-        if(DiscordBot.getJDA() == null) {
+    public EmbedCreator(String channelid, String identifier, String member, String ip, String timestamp) {
+        if(ProxyPlugin.getInstance().getDiscordBot().getJDA() == null) {
             return;
         }
 
         this.channelid = channelid;
-        this.platform = platform;
+        this.identifier = identifier;
         this.member = member;
         this.ip = ip;
         this.timestamp = timestamp;
@@ -53,7 +54,7 @@ public class EmbedCreator {
 
     // BAN FORMAT
     public EmbedCreator(String channelid, String suspect, String member, String reason, String ip, long period, String timestamp) {
-        if(DiscordBot.getJDA() == null) {
+        if(ProxyPlugin.getInstance().getDiscordBot().getJDA() == null) {
             return;
         }
 
@@ -70,7 +71,7 @@ public class EmbedCreator {
 
     // REPORT FORMAT
     public EmbedCreator(String channelid, String suspect, String member, String reason, String ip, String timestamp) {
-        if(DiscordBot.getJDA() == null) {
+        if(ProxyPlugin.getInstance().getDiscordBot().getJDA() == null) {
             return;
         }
 
@@ -95,8 +96,8 @@ public class EmbedCreator {
         if(member != null) {
             embedBuilder.addField(":speaking_head: Member: ", member, false);
         }
-        if(platform != null) {
-            embedBuilder.addField(":desktop: Platform: ", platform, false);
+        if(identifier != null) {
+            embedBuilder.addField(":bust_in_silhouette: Identifier: ", identifier.toString(), false);
         }
         if(reason != null) {
             embedBuilder.addField(":writing_hand: Reason: ", reason, false);
@@ -116,7 +117,7 @@ public class EmbedCreator {
     }
 
     public void send() {
-        TextChannel textChannel = DiscordBot.getJDA().getTextChannelById(channelid);
+        TextChannel textChannel = ProxyPlugin.getInstance().getDiscordBot().getJDA().getTextChannelById(channelid);
         if(textChannel == null) {
             return;
         }

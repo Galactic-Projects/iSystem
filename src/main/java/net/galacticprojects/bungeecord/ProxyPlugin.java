@@ -39,56 +39,56 @@ import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
 
 public class ProxyPlugin extends Plugin {
-	
+
 	private CommonPlugin common;
-	
+
 	private PluginConfiguration pluginConfiguration;
 	private BanConfiguration banConfiguration;
 	private ReportConfiguration reportConfiguration;
 	private BotConfiguration botConfiguration;
 	private static ProxyPlugin plugin;
-	private DiscordBot discordBot;
-	private TeamSpeakBot teamSpeakBot;
+	private static DiscordBot discordBot;
+	private static TeamSpeakBot teamSpeakBot;
 
 	@Override
 	public void onLoad() {
 		common = new CommonPlugin(getLogger(), getDataFolder(), getFile());
 	}
-	
+
 	/*
 	 * Startup
 	 */
-	
-    @Override
-    public void onEnable() {
+
+	@Override
+	public void onEnable() {
 		getProxy().registerChannel("BungeeCord");
 		plugin = this;
 		registerMessages();
 		common.getCommandManager().setInjector(new BungeeCommandInjector(common.getCommandManager(), common.getMessageManager(), common, this));
-    	common.start();
-    	// Other stuff after this
-    	createConfigurations();
-    	reloadConfigurations();
-    	registerListeners();
-    	registerArgumentTypes();
-    	registerCommands();
+		common.start();
+		// Other stuff after this
+		createConfigurations();
+		reloadConfigurations();
+		registerListeners();
+		registerArgumentTypes();
+		registerCommands();
 		Countdown.setupCountdown(this);
 		new OnlineTime(this);
 		countDown();
 		discordBot = new DiscordBot();
 		teamSpeakBot = new TeamSpeakBot();
-    }
-    
-    private void registerMessages() {
-    	MessageManager messageManager = common.getMessageManager();
-    	MessageProviderFactoryImpl factory = common.getMessageProviderFactory();
-    	// Register messages below
+	}
+
+	private void registerMessages() {
+		MessageManager messageManager = common.getMessageManager();
+		MessageProviderFactoryImpl factory = common.getMessageProviderFactory();
+		// Register messages below
 		messageManager.register(new EnumMessageSource(BanMessage.class, factory));
-    	messageManager.register(new EnumMessageSource(CommandDescription.class, factory));
+		messageManager.register(new EnumMessageSource(CommandDescription.class, factory));
 		messageManager.register(new AnnotationMessageSource(TimeMessage.class, factory));
 		messageManager.register(new AnnotationMessageSource(CommandMessages.class, factory));
 		messageManager.register(new AnnotationMessageSource(SystemMessage.class, factory));
-    }
+	}
 
 	private void createConfigurations() {
 		ISimpleLogger logger = common.getLogger();
@@ -107,22 +107,22 @@ public class ProxyPlugin extends Plugin {
 		botConfiguration.reload();
 	}
 
-    private void registerListeners() {
-        PluginManager manager = getProxy().getPluginManager();
-        manager.registerListener(this, new ConnectListener(this));
+	private void registerListeners() {
+		PluginManager manager = getProxy().getPluginManager();
+		manager.registerListener(this, new ConnectListener(this));
 		manager.registerListener(this, new PingListener(this));
 		manager.registerListener(this, new ServerSwitchListener(this));
 		manager.registerListener(this, new DisconnectListener(this));
 		manager.registerListener(this, new ChatListener(this));
-    }
-    
-    private void registerArgumentTypes() {
-    	ArgumentRegistry registry = common.getCommandManager().getRegistry();
-    	registry.setProvider(new ProxyPluginProvider(this));
-    }
-    
-    private void registerCommands() {
-    	CommandManager commandManager = common.getCommandManager();
+	}
+
+	private void registerArgumentTypes() {
+		ArgumentRegistry registry = common.getCommandManager().getRegistry();
+		registry.setProvider(new ProxyPluginProvider(this));
+	}
+
+	private void registerCommands() {
+		CommandManager commandManager = common.getCommandManager();
 		commandManager.register(BanCommand.class);
 		commandManager.register(BroadcastCommand.class);
 		commandManager.register(BungeeHelpCommand.class);
@@ -139,15 +139,15 @@ public class ProxyPlugin extends Plugin {
 		commandManager.register(SystemCommand.class);
 		commandManager.register(TeamChatCommand.class);
 		commandManager.register(LinkCommand.class);
-    }
+	}
 
 	public void countDown() {
 		ProxyServer.getInstance().getScheduler().schedule(this, () -> {
 			OffsetDateTime offsetDateTime = OffsetDateTime.now();
 			String time = TimeHelper.BAN_TIME_FORMATTER.format(offsetDateTime);
 
-			if(time.contains("04:00:00")){
-				for(ProxiedPlayer player : ProxyServer.getInstance().getPlayers()){
+			if (time.contains("04:00:00")) {
+				for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
 					common.getDatabaseRef().asOptional().ifPresent(sql -> {
 						sql.getPlayer(player.getUniqueId()).thenAccept(data -> {
 							player.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.SYSTEM_NETWORK_RESTART_ALMOST, data.getLanguage(),
@@ -158,8 +158,8 @@ public class ProxyPlugin extends Plugin {
 				return;
 			}
 
-			if(time.contains("04:15:00")){
-				for(ProxiedPlayer player : ProxyServer.getInstance().getPlayers()){
+			if (time.contains("04:15:00")) {
+				for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
 					common.getDatabaseRef().asOptional().ifPresent(sql -> {
 						sql.getPlayer(player.getUniqueId()).thenAccept(data -> {
 							player.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.SYSTEM_NETWORK_RESTART_ALMOST, data.getLanguage(),
@@ -170,8 +170,8 @@ public class ProxyPlugin extends Plugin {
 				return;
 			}
 
-			if(time.contains("04:30:00")){
-				for(ProxiedPlayer player : ProxyServer.getInstance().getPlayers()){
+			if (time.contains("04:30:00")) {
+				for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
 					common.getDatabaseRef().asOptional().ifPresent(sql -> {
 						sql.getPlayer(player.getUniqueId()).thenAccept(data -> {
 							player.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.SYSTEM_NETWORK_RESTART_ALMOST, data.getLanguage(),
@@ -182,8 +182,8 @@ public class ProxyPlugin extends Plugin {
 				return;
 			}
 
-			if(time.contains("04:45:00")){
-				for(ProxiedPlayer player : ProxyServer.getInstance().getPlayers()){
+			if (time.contains("04:45:00")) {
+				for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
 					common.getDatabaseRef().asOptional().ifPresent(sql -> {
 						sql.getPlayer(player.getUniqueId()).thenAccept(data -> {
 							player.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.SYSTEM_NETWORK_RESTART_ALMOST, data.getLanguage(),
@@ -194,8 +194,8 @@ public class ProxyPlugin extends Plugin {
 				return;
 			}
 
-			if(time.contains("04:50:00")){
-				for(ProxiedPlayer player : ProxyServer.getInstance().getPlayers()){
+			if (time.contains("04:50:00")) {
+				for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
 					common.getDatabaseRef().asOptional().ifPresent(sql -> {
 						sql.getPlayer(player.getUniqueId()).thenAccept(data -> {
 							player.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.SYSTEM_NETWORK_RESTART_ALMOST, data.getLanguage(),
@@ -206,8 +206,8 @@ public class ProxyPlugin extends Plugin {
 				return;
 			}
 
-			if(time.contains("04:55:00")){
-				for(ProxiedPlayer player : ProxyServer.getInstance().getPlayers()){
+			if (time.contains("04:55:00")) {
+				for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
 					common.getDatabaseRef().asOptional().ifPresent(sql -> {
 						sql.getPlayer(player.getUniqueId()).thenAccept(data -> {
 							player.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.SYSTEM_NETWORK_RESTART_ALMOST, data.getLanguage(),
@@ -218,8 +218,8 @@ public class ProxyPlugin extends Plugin {
 				return;
 			}
 
-			if(time.contains("04:59:00")){
-				for(ProxiedPlayer player : ProxyServer.getInstance().getPlayers()){
+			if (time.contains("04:59:00")) {
+				for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
 					common.getDatabaseRef().asOptional().ifPresent(sql -> {
 						sql.getPlayer(player.getUniqueId()).thenAccept(data -> {
 							player.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.SYSTEM_NETWORK_RESTART_ALMOST, data.getLanguage(),
@@ -230,7 +230,7 @@ public class ProxyPlugin extends Plugin {
 				return;
 			}
 
-			if(time.contains("04:59:30")) {
+			if (time.contains("04:59:30")) {
 				for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
 					common.getDatabaseRef().asOptional().ifPresent(sql -> {
 						sql.getPlayer(player.getUniqueId()).thenAccept(data -> {
@@ -253,8 +253,8 @@ public class ProxyPlugin extends Plugin {
 				}
 			}
 
-			if(time.contains("04:59:55")){
-				for(ProxiedPlayer player : ProxyServer.getInstance().getPlayers()){
+			if (time.contains("04:59:55")) {
+				for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
 					common.getDatabaseRef().asOptional().ifPresent(sql -> {
 						sql.getPlayer(player.getUniqueId()).thenAccept(data -> {
 							player.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.SYSTEM_NETWORK_RESTART_ALMOST, data.getLanguage(),
@@ -264,8 +264,8 @@ public class ProxyPlugin extends Plugin {
 				}
 			}
 
-			if(time.contains("05:00:00")){
-				for(ProxiedPlayer player : ProxyServer.getInstance().getPlayers()){
+			if (time.contains("05:00:00")) {
+				for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
 					common.getDatabaseRef().asOptional().ifPresent(sql -> {
 						sql.getPlayer(player.getUniqueId()).thenAccept(data -> {
 							player.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.SYSTEM_NETWORK_RESTART_NOW, data.getLanguage())));
@@ -278,7 +278,7 @@ public class ProxyPlugin extends Plugin {
 						CloudNetDriver.instance().permissionManagement().reload();
 						CloudNetDriver.instance().groupConfigurationProvider().reload();
 						CloudNetDriver.instance().moduleProvider().stopAll();
-						for(ServiceInfoSnapshot serviceInfoSnapshots : CloudNetDriver.instance().cloudServiceProvider().services()) {
+						for (ServiceInfoSnapshot serviceInfoSnapshots : CloudNetDriver.instance().cloudServiceProvider().services()) {
 
 						}
 						CloudNetDriver.instance().moduleProvider().startAll();
@@ -288,36 +288,53 @@ public class ProxyPlugin extends Plugin {
 
 		}, 1L, 1L, TimeUnit.SECONDS);
 	}
-    
-    /*
-     * Shutdown
-     */
 
-    @Override
-    public void onDisable() {
+	/*
+	 * Shutdown
+	 */
+
+	@Override
+	public void onDisable() {
 		pluginConfiguration.save();
-    	common.stop();
+		common.stop();
 		discordBot.shutdown();
 		teamSpeakBot.shutdown();
 	}
-    
-    /*
-     * Getter
-     */
-    
-    public PluginConfiguration getPluginConfiguration() {
+
+	/*
+	 * Getter
+	 */
+
+	public PluginConfiguration getPluginConfiguration() {
 		return pluginConfiguration;
 	}
-	public BanConfiguration getBanConfiguration() { return banConfiguration; }
-	public ReportConfiguration getReportConfiguration() { return reportConfiguration; }
+
+	public BanConfiguration getBanConfiguration() {
+		return banConfiguration;
+	}
+
+	public ReportConfiguration getReportConfiguration() {
+		return reportConfiguration;
+	}
+
 	public BotConfiguration getBotConfiguration() {
 		return botConfiguration;
 	}
 
-	public CommonPlugin getCommonPlugin() {return common;}
+	public TeamSpeakBot getTeamSpeakBot() {
+		return teamSpeakBot;
+	}
+
+	public DiscordBot getDiscordBot() {
+		return discordBot;
+	}
+
+	public CommonPlugin getCommonPlugin() {
+		return common;
+	}
 
 	public static ProxyPlugin getInstance() {
-return plugin;
+		return plugin;
 	}
 
 }
