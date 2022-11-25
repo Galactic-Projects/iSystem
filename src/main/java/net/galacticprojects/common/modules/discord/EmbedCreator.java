@@ -116,7 +116,7 @@ public class EmbedCreator {
         send();
     }
 
-    public void send() {
+    private void send() {
         TextChannel textChannel = ProxyPlugin.getInstance().getDiscordBot().getJDA().getTextChannelById(channelid);
         if(textChannel == null) {
             return;

@@ -6,6 +6,15 @@ import me.lauriichan.laylib.command.annotation.Argument;
 import me.lauriichan.laylib.command.annotation.Command;
 import me.lauriichan.laylib.localization.Key;
 import me.lauriichan.laylib.localization.MessageProvider;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.PrivateChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonStyle;
 import net.galacticprojects.bungeecord.ProxyPlugin;
 import net.galacticprojects.bungeecord.command.impl.BungeeActor;
 import net.galacticprojects.bungeecord.config.BotConfiguration;
@@ -13,13 +22,19 @@ import net.galacticprojects.bungeecord.message.CommandMessages;
 import net.galacticprojects.common.CommonPlugin;
 import net.galacticprojects.common.database.SQLDatabase;
 import net.galacticprojects.common.database.model.LinkPlayer;
+import net.galacticprojects.common.database.model.Player;
 import net.galacticprojects.common.modules.LinkAPI;
 import net.galacticprojects.common.modules.discord.EmbedCreator;
 import net.galacticprojects.common.util.MojangProfileService;
 import net.galacticprojects.common.util.TimeHelper;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 
+import static net.galacticprojects.common.modules.discord.VerifyListener.*;
+
+import java.awt.*;
+import java.sql.SQLData;
 import java.time.OffsetDateTime;
+import java.util.HashMap;
 import java.util.UUID;
 
 @Command(name = "link", description = "Link your accounts")
@@ -32,7 +47,45 @@ public class LinkCommand {
         ProxiedPlayer player = actor.as(ProxiedPlayer.class).getHandle();
         UUID uniqueId = player.getUniqueId();
 
+        JDA jda = ProxyPlugin.getInstance().getDiscordBot().getJDA();
+        HashMap<String, Long> members = new HashMap<>();
+        Guild guild = jda.getGuilds().listIterator().next();
 
+        if (guild == null) {
+            actor.sendTranslatedMessage(CommandMessages.VERIFICATION_SOMETHING_WENT_WRONG);
+            return;
+        }
+
+        for (Member member : guild.loadMembers().get()) {
+            members.put(member.getUser().getAsTag().toLowerCase(), member.getIdLong());
+        }
+
+        if (!members.containsKey(tag.toLowerCase())) {
+            actor.sendTranslatedMessage(CommandMessages.VERIFICATION_SOMETHING_WENT_WRONG);
+            return;
+        }
+
+        User user = jda.getUserByTag(tag.toLowerCase());
+
+        SQLDatabase database = common.getDatabaseRef().get();
+
+        Player systemPlayer = database.getPlayer(uniqueId).join();
+        LinkPlayer linkPlayer = database.getLinkedPlayer(uniqueId).join();
+        PrivateChannel channel = user.openPrivateChannel().complete();
+        EmbedBuilder builder = new EmbedBuilder();
+        builder.setColor(Color.green);
+        builder.setTitle("Galactic Projects - Verification");
+        builder.setThumbnail("https://www.galacticprojects.net/img/0108221659359489510D3E38-29B1-47512x.png");
+        builder.addField("Minecraft Player", player.getDisplayName(), true);
+        builder.addField("Discord User", tag, true);
+        builder.addField("Verified", "False", true);
+        builder.addField("Time", net.galacticprojects.bungeecord.util.TimeHelper.format(systemPlayer.getLanguage()).format(OffsetDateTime.now()), true);
+        builder.setFooter("Copyright © | Since 2022 - GalacticProjects.net");
+        Message message = channel.sendMessageEmbeds(builder.build()).complete();
+        message.addReaction(Emoji.fromUnicode("U+2705")).complete();
+        message.addReaction(Emoji.fromUnicode("U+274C")).complete();
+        VERIFY_MAP.put(message.getId(), tag.toLowerCase());
+        PLAYER_MAP.put(tag.toLowerCase(), player.getUniqueId());
     }
 
     @Action("teamspeak")

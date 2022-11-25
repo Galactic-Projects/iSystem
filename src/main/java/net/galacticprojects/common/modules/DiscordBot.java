@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.utils.Compression;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 import net.galacticprojects.bungeecord.ProxyPlugin;
 import net.galacticprojects.bungeecord.config.BotConfiguration;
+import net.galacticprojects.common.modules.discord.VerifyListener;
 
 public class DiscordBot {
 
@@ -20,14 +21,13 @@ public class DiscordBot {
         try {
             BotConfiguration configuration = ProxyPlugin.getInstance().getBotConfiguration();
             jdaBuilder = JDABuilder.createDefault(configuration.getBotToken());
-            for (GatewayIntent gatewayIntent : jdaBuilder.build().getGatewayIntents()) {
-                jdaBuilder.enableIntents(gatewayIntent);
-            }
+            jdaBuilder.enableIntents(GatewayIntent.DIRECT_MESSAGES, GatewayIntent.GUILD_MEMBERS, GatewayIntent.DIRECT_MESSAGE_REACTIONS, GatewayIntent.DIRECT_MESSAGES, GatewayIntent.GUILD_EMOJIS_AND_STICKERS, GatewayIntent.GUILD_MESSAGE_TYPING, GatewayIntent.GUILD_PRESENCES);
             jdaBuilder.disableCache(CacheFlag.MEMBER_OVERRIDES, CacheFlag.VOICE_STATE);
             jdaBuilder.setBulkDeleteSplittingEnabled(false);
             jdaBuilder.setCompression(Compression.NONE);
             jdaBuilder.setActivity(Activity.of(Activity.ActivityType.valueOf(configuration.getActivity()), configuration.getActivityValue()));
             jdaBuilder.setStatus(OnlineStatus.valueOf(configuration.getStatus()));
+            jdaBuilder.addEventListeners(new VerifyListener());
             jdaBuilder.setAutoReconnect(true);
             jda = jdaBuilder.build();
 
@@ -50,6 +50,7 @@ public class DiscordBot {
         jdaBuilder.setAutoReconnect(false);
         jdaBuilder.setStatus(OnlineStatus.OFFLINE);
         jdaBuilder.setEnableShutdownHook(true);
+        jda.shutdown();
     }
 
 }
