@@ -1,6 +1,7 @@
 package net.galacticprojects.common.modules;
 
 import com.github.theholywaffle.teamspeak3.TS3Api;
+import com.github.theholywaffle.teamspeak3.TS3ApiAsync;
 import com.github.theholywaffle.teamspeak3.TS3Config;
 import com.github.theholywaffle.teamspeak3.TS3Query;
 import net.galacticprojects.bungeecord.ProxyPlugin;
@@ -10,6 +11,7 @@ public class TeamSpeakBot {
 
     private final TS3Query ts3Query;
     private final TS3Api api;
+    private TS3ApiAsync aapi;
 
     public TeamSpeakBot() {
         BotConfiguration configuration = ProxyPlugin.getInstance().getBotConfiguration();
@@ -19,7 +21,9 @@ public class TeamSpeakBot {
         ts3Query = new TS3Query(ts3Config);
         ts3Query.connect();
 
+
         api = ts3Query.getApi();
+        aapi = ts3Query.getAsyncApi();
         api.login(configuration.getUser(), configuration.getPassword());
         api.selectVirtualServerById(1);
         api.setNickname(configuration.getName());
@@ -33,9 +37,14 @@ public class TeamSpeakBot {
 
         api.logout();
         ts3Query.exit();
+        aapi = null;
     }
 
     public TS3Api getAPI() {
         return api;
+    }
+
+    public TS3ApiAsync getAsyncAPI() {
+        return aapi;
     }
 }

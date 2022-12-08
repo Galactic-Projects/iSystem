@@ -170,12 +170,12 @@ Execute the file with administrator permissions and follow the instruction!
               <groupId>com.github.theholywaffle</groupId>
               <artifactId>teamspeak3-api</artifactId>
               <version>1.3.0</version>
-          </dependency>
-          <dependency>
-              <groupId>net.dv8tion</groupId>
-              <artifactId>JDA</artifactId>
-              <version>5.0.0-alpha.21</version>
-          </dependency>
+        </dependency>
+        <dependency>
+            <groupId>net.dv8tion</groupId>
+            <artifactId>JDA</artifactId>
+            <version>5.0.0-beta.1</version>
+        </dependency>
     </dependencies>
 
     <properties>

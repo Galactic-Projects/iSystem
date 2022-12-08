@@ -32,6 +32,7 @@ public class VerifyListener extends ListenerAdapter {
         if(unicode.equals("U+274C")) {
             System.out.println("Unicode U+274C detected");
             VERIFY_MAP.remove(VERIFY_MAP.get(event.getMessageId()));
+            event.getChannel().deleteMessageById(event.getMessageId()).complete();
             return;
         }
         if(unicode.equals("U+2705")) {
@@ -44,10 +45,5 @@ public class VerifyListener extends ListenerAdapter {
             return;
         }
         System.out.println("nothing detected");
-    }
-
-    @Override
-    public void onMessageReactionRemove(@NotNull MessageReactionRemoveEvent event) {
-        super.onMessageReactionRemove(event);
     }
 }
