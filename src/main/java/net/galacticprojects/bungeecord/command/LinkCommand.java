@@ -50,9 +50,19 @@ public class LinkCommand {
         JDA jda = ProxyPlugin.getInstance().getDiscordBot().getJDA();
         HashMap<String, Long> members = new HashMap<>();
         Guild guild = jda.getGuilds().listIterator().next();
+        SQLDatabase database = common.getDatabaseRef().get();
 
-        if (guild == null) {
+        if ((guild == null) || (database == null)) {
+            common.getLogger().error(new Throwable("Database ist unavailable"));
             actor.sendTranslatedMessage(CommandMessages.VERIFICATION_SOMETHING_WENT_WRONG);
+            return;
+        }
+
+        Player systemPlayer = database.getPlayer(uniqueId).join();
+        LinkPlayer linkPlayer = database.getLinkedPlayer(uniqueId).join();
+
+        if (linkPlayer.isDiscordLinked()) {
+            actor.sendTranslatedMessage(CommandMessages.VERIFICATION_ALREADY_VERIFIED);
             return;
         }
 
@@ -67,10 +77,7 @@ public class LinkCommand {
 
         User user = jda.getUserByTag(tag.toLowerCase());
 
-        SQLDatabase database = common.getDatabaseRef().get();
 
-        Player systemPlayer = database.getPlayer(uniqueId).join();
-        LinkPlayer linkPlayer = database.getLinkedPlayer(uniqueId).join();
         PrivateChannel channel = user.openPrivateChannel().complete();
         EmbedBuilder builder = new EmbedBuilder();
         builder.setColor(Color.green);
@@ -78,7 +85,7 @@ public class LinkCommand {
         builder.setThumbnail("https://www.galacticprojects.net/img/0108221659359489510D3E38-29B1-47512x.png");
         builder.addField("Minecraft Player", player.getDisplayName(), true);
         builder.addField("Discord User", tag, true);
-        builder.addField("Verified", "False", true);
+        builder.addField("Verified", ":x:", true);
         builder.addField("Time", net.galacticprojects.bungeecord.util.TimeHelper.format(systemPlayer.getLanguage()).format(OffsetDateTime.now()), true);
         builder.setFooter("Copyright © | Since 2022 - GalacticProjects.net");
         Message message = channel.sendMessageEmbeds(builder.build()).complete();
