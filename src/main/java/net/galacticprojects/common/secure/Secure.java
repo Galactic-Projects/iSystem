@@ -3,18 +3,16 @@ package net.galacticprojects.common.secure;
 public class Secure {
 
     private final GalacticSecure secure;
-    private final String message;
 
-    public Secure(String message) throws Exception {
+    public Secure() throws Exception {
         this.secure = new GalacticSecure();
-        this.message = message;
     }
 
-    public String encrypt() {
+    public String hashString(String message) {
         return secure.powerfulHash(message);
     }
 
-    public String decrypt() {
+    public String unhashString (String message) {
         return secure.powerfulDecrypt(message);
     }
 

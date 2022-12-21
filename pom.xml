@@ -6,7 +6,7 @@
 
     <groupId>net.galacticprojects</groupId>
     <artifactId>iSystem</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.1.0-SNAPSHOT</version>
 
     <pluginRepositories>
         <pluginRepository>
@@ -120,25 +120,22 @@
             <artifactId>HikariCP</artifactId>
             <version>5.0.1</version>
         </dependency>
-<!--        <dependency>
-            <groupId>com.github.NegativeKB</groupId>
-            <artifactId>LunarClientAPI</artifactId>
-            <version>1.0</version>
-            <scope>provided</scope>
-        </dependency>
-
-If this is null, please open your browser and download this file via this link.
-https://download.galacticprojects.net/files/compatible.cmd
-Execute the file with administrator permissions and follow the instruction!
-
-
-        <dependency>
-            <groupId>com.labymod</groupId>
-            <artifactId>labymod-server-api</artifactId>
-            <version>2.0.2</version>
-            <scope>system</scope>
-            <systemPath>C:/API/LabyModAPI_1.17.jar</systemPath>
-        </dependency>-->
+        <!--        <dependency>
+                    <groupId>com.github.NegativeKB</groupId>
+                    <artifactId>LunarClientAPI</artifactId>
+                    <version>1.0</version>
+                    <scope>provided</scope>
+                </dependency>
+        If this is null, please open your browser and download this file via this link.
+        https://download.galacticprojects.net/files/compatible.cmd
+        Execute the file with administrator permissions and follow the instruction!
+                <dependency>
+                    <groupId>com.labymod</groupId>
+                    <artifactId>labymod-server-api</artifactId>
+                    <version>2.0.2</version>
+                    <scope>system</scope>
+                    <systemPath>C:/API/LabyModAPI_1.17.jar</systemPath>
+                </dependency>-->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -149,11 +146,6 @@ Execute the file with administrator permissions and follow the instruction!
             <groupId>me.lauriichan.laylib</groupId>
             <artifactId>command</artifactId>
             <version>0.1.0-10191ac-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>com.syntaxphoenix.syntaxapi</groupId>
-            <artifactId>json-lib</artifactId>
-            <version>2.0.12</version>
         </dependency>
         <dependency>
             <groupId>com.syntaxphoenix.syntaxapi</groupId>
@@ -174,9 +166,9 @@ Execute the file with administrator permissions and follow the instruction!
             <systemPath>C:/API/GalacticAPI.jar</systemPath>
         </dependency>
         <dependency>
-              <groupId>com.github.theholywaffle</groupId>
-              <artifactId>teamspeak3-api</artifactId>
-              <version>1.3.0</version>
+            <groupId>com.github.theholywaffle</groupId>
+            <artifactId>teamspeak3-api</artifactId>
+            <version>1.3.0</version>
         </dependency>
         <dependency>
             <groupId>net.dv8tion</groupId>
