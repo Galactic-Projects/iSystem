@@ -4,6 +4,7 @@ import com.zaxxer.hikari.pool.HikariPool;
 import eu.cloudnetservice.driver.permission.CachedPermissionManagement;
 import me.lauriichan.laylib.logger.ISimpleLogger;
 import me.lauriichan.minecraft.wildcard.migration.IMigrationSource;
+import net.galacticprojects.bungeecord.ProxyPlugin;
 import net.galacticprojects.bungeecord.util.Type;
 import net.galacticprojects.common.database.migration.LinkMigration2022_11_10_15_15;
 import net.galacticprojects.common.database.migration.impl.MigrationManager;
@@ -13,6 +14,7 @@ import net.galacticprojects.common.util.cache.Cache;
 import net.galacticprojects.common.util.cache.ThreadSafeCache;
 import net.galacticprojects.common.database.migration.impl.SQLMigrationType;
 import net.galacticprojects.common.util.Ref;
+import org.apache.http.impl.conn.ProxySelectorRoutePlanner;
 import org.bukkit.entity.Husk;
 
 import javax.swing.*;
@@ -706,11 +708,11 @@ public final class SQLDatabase implements IMigrationSource {
             try (Connection connection = pool.getConnection()) {
                 PreparedStatement statement = connection.prepareStatement(INSERT_PLAYER);
                 statement.setString(1, uniqueId.toString());
-                statement.setString(2, ip);
-                statement.setInt(3, coins);
-                statement.setInt(4, level);
-                statement.setString(5, language);
-                statement.setLong(6, onlineTime);
+                statement.setString(2, hashString(ip));
+                statement.setInt(3, Integer.parseInt(hashString(String.valueOf(coins))));
+                statement.setInt(4, Integer.parseInt(hashString(String.valueOf(level))));
+                statement.setString(5, hashString(language));
+                statement.setLong(6, Long.parseLong(hashString(String.valueOf(onlineTime))));
                 statement.executeUpdate();
                 Player player = new Player(uniqueId, ip, onlineTime, coins, language, level);
                 playerCache.put(uniqueId, player);
@@ -747,11 +749,11 @@ public final class SQLDatabase implements IMigrationSource {
                 statement.setString(1, uniqueId.toString());
                 ResultSet set = statement.executeQuery();
                 if (set.next()) {
-                    String ip = set.getString("IP");
-                    int coins = set.getInt("COINS");
-                    int level = set.getInt("LEVEL");
-                    String language = set.getString("LANGUAGE");
-                    long onlineTime = set.getLong("ONLINETIME");
+                    String ip = unhashString(set.getString("IP"));
+                    int coins = Integer.parseInt(unhashString(String.valueOf(set.getInt("COINS"))));
+                    int level = Integer.parseInt(unhashString(String.valueOf(set.getInt("LEVEL"))));
+                    String language = unhashString(set.getString("LANGUAGE"));
+                    long onlineTime = Integer.parseInt(unhashString(String.valueOf(set.getLong("ONLINETIME"))));
                     Player player = new Player(uniqueId, ip, onlineTime, coins, language, level);
                     playerCache.put(uniqueId, player);
                     return player;
@@ -775,10 +777,10 @@ public final class SQLDatabase implements IMigrationSource {
                 ResultSet set = statement.executeQuery();
                 if (set.next()) {
                     UUID uniqueId = UUID.fromString(set.getString("UUID"));
-                    int coins = set.getInt("COINS");
-                    int level = set.getInt("LEVEL");
-                    String language = set.getString("LANGUAGE");
-                    long onlineTime = set.getLong("ONLINETIME");
+                    int coins = Integer.parseInt(unhashString(String.valueOf(set.getInt("COINS"))));
+                    int level = Integer.parseInt(unhashString(String.valueOf(set.getInt("LEVEL"))));
+                    String language = unhashString(set.getString("LANGUAGE"));
+                    long onlineTime = Long.parseLong(unhashString(String.valueOf(set.getLong("ONLINETIME"))));
                     Player player = new Player(uniqueId, ip, onlineTime, coins, language, level);
                     playerIpCache.put(ip, player);
                     return player;
@@ -809,11 +811,11 @@ public final class SQLDatabase implements IMigrationSource {
         return CompletableFuture.supplyAsync(() -> {
             try (Connection connection = pool.getConnection()) {
                 PreparedStatement statement = connection.prepareStatement(UPDATE_PLAYER);
-                statement.setString(1, player.getIP());
-                statement.setInt(2, player.getCoins());
-                statement.setInt(3, player.getLevel());
-                statement.setString(4, player.getLanguage());
-                statement.setLong(5, player.getOnlineTime());
+                statement.setString(1, hashString(player.getIP()));
+                statement.setInt(2, Integer.parseInt(hashString(String.valueOf(player.getCoins()))));
+                statement.setInt(3, Integer.parseInt(hashString(String.valueOf(player.getLevel()))));
+                statement.setString(4, hashString(player.getLanguage()));
+                statement.setLong(5, Long.parseLong(hashString(String.valueOf(player.getOnlineTime()))));
                 statement.setString(6, player.getUUID().toString());
                 statement.executeUpdate();
                 playerCache.put(player.getUUID(), player);
@@ -887,5 +889,13 @@ public final class SQLDatabase implements IMigrationSource {
                 return null;
             }
         }, service);
+    }
+    
+    public String hashString(String message) {
+        return ProxyPlugin.getInstance().getSecure().hashString(message);
+    }
+
+    public String unhashString(String message) {
+        return ProxyPlugin.getInstance().getSecure().unhashString(message);
     }
 }

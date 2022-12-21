@@ -3,6 +3,7 @@ package net.galacticprojects.spigot;
 import net.galacticprojects.bungeecord.config.PluginConfiguration;
 import net.galacticprojects.common.CommonPlugin;
 import net.galacticprojects.common.message.MessageProviderFactoryImpl;
+import net.galacticprojects.common.secure.Secure;
 import net.galacticprojects.spigot.command.HelpCommand;
 import net.galacticprojects.spigot.command.SubtitleCommand;
 import net.galacticprojects.spigot.command.impl.BukkitCommandInjector;
@@ -29,6 +30,7 @@ import me.lauriichan.laylib.logger.ISimpleLogger;
 public class SpigotPlugin extends JavaPlugin {
 	
 	private CommonPlugin common;
+	private Secure secure;
 
 	@Override
 	public void onLoad() {
@@ -50,6 +52,9 @@ public class SpigotPlugin extends JavaPlugin {
     	registerListeners();
     	registerArgumentTypes();
     	registerCommands();
+		try {
+			secure = new Secure();
+		} catch (Exception e) { e.printStackTrace(); }
     }
     
     private void registerMessages() {
@@ -87,8 +92,12 @@ public class SpigotPlugin extends JavaPlugin {
 		commandManager.register(HelpCommand.class);
     	commandManager.register(SubtitleCommand.class);
     }
-    
-    /*
+
+	public Secure getSecure() {
+		return secure;
+	}
+
+	/*
      * Shutdown
      */
 
