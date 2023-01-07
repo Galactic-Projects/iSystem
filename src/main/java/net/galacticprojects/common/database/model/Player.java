@@ -7,13 +7,13 @@ public class Player {
 
     private final UUID uuid;
     private String ip;
-    private long onlineTime;
+    private String onlineTime;
 
-    private int coins;
+    private String coins;
     private String language;
-    private int level;
+    private String level;
 
-    public Player (UUID uuid, String ip, long onlineTime, int coins, String language, int level) {
+    public Player (UUID uuid, String ip, String onlineTime, String coins, String language, String level) {
         this.uuid = uuid;
         this.ip = ip;
         this.onlineTime = onlineTime;
@@ -30,25 +30,25 @@ public class Player {
         return ip;
     }
 
-    public long getOnlineTime() { return onlineTime; }
+    public String getOnlineTime() { return onlineTime; }
 
 
-    public int getCoins() {
+    public String getCoins() {
         return coins;
     }
 
     public String getLanguage() {return language;}
-    public int getLevel() {return level;}
+    public String getLevel() { return level;}
 
     public void setLanguage(String language) {
         this.language = language;
     }
 
-    public void setOnlineTime(long onlineTime) {
+    public void setOnlineTime(String onlineTime) {
         this.onlineTime = onlineTime;
     }
 
-    public void setCoins(int coins) {
+    public void setCoins(String coins) {
         this.coins = coins;
     }
 
@@ -56,7 +56,7 @@ public class Player {
         this.ip = ip;
     }
 
-    public void setLevel(int level) {
+    public void setLevel(String level) {
         this.level = level;
     }
 }

@@ -26,6 +26,7 @@ import net.md_5.bungee.event.EventHandler;
 import net.md_5.bungee.event.EventPriority;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.UUID;
 
 public class ChatListener implements Listener {
@@ -47,7 +48,7 @@ public class ChatListener implements Listener {
 
         if (event.getSender() instanceof ProxiedPlayer player) {
             CloudPlayer cloudPlayer = CloudNetDriver.instance().serviceRegistry().firstProvider(PlayerManager.class).onlinePlayer(player.getUniqueId());
-            PermissionGroup info = CloudNetDriver.instance().permissionManagement().highestPermissionGroup(CloudNetDriver.instance().permissionManagement().user(player.getUniqueId()));
+            PermissionGroup info = CloudNetDriver.instance().permissionManagement().highestPermissionGroup(Objects.requireNonNull(CloudNetDriver.instance().permissionManagement().user(player.getUniqueId())));
 
             if (cloudPlayer == null) {
                 return;
@@ -61,7 +62,7 @@ public class ChatListener implements Listener {
                 UUID uniqueId = player.getUniqueId();
                 String name = player.getName();
                 String ip = player.getAddress().getAddress().getHostAddress();
-                String server = cloudPlayer.connectedService().taskName();
+                String server = Objects.requireNonNull(cloudPlayer.connectedService()).serverName();
                 String timestamp = TimeHelper.toString(OffsetDateTime.now());
 
                 Chatlog chatlog = null;

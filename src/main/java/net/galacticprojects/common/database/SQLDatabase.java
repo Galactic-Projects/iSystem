@@ -9,6 +9,7 @@ import net.galacticprojects.bungeecord.util.Type;
 import net.galacticprojects.common.database.migration.LinkMigration2022_11_10_15_15;
 import net.galacticprojects.common.database.migration.impl.MigrationManager;
 import net.galacticprojects.common.database.model.*;
+import net.galacticprojects.common.secure.GalacticSecure;
 import net.galacticprojects.common.util.TimeHelper;
 import net.galacticprojects.common.util.cache.Cache;
 import net.galacticprojects.common.util.cache.ThreadSafeCache;
@@ -56,7 +57,7 @@ public final class SQLDatabase implements IMigrationSource {
 
     public static final String SELECT_PLAYER_BAN = String.format("SELECT * FROM `%s` WHERE UUID = ?", SQLTable.BAN_TABLE);
     public static final String DELETE_PLAYER_BAN = String.format("DELETE FROM `%s` WHERE UUID = ?", SQLTable.BAN_TABLE);
-    public static final String INSERT_PLAYER_BAN = String.format("INSERT INTO `%s` (UUID, STAFF, REASON, TIME, CREATIONTIME) VALUES (?,?,?,?,?)", SQLTable.BAN_TABLE);
+    public static final String INSERT_PLAYER_BAN = String.format("INSERT INTO `%s` (UUID, STAFF, BANID, REASON, TIME, CREATIONTIME) VALUES (?,?,?,?,?,?)", SQLTable.BAN_TABLE);
 
     public static final String SELECT_PLAYER = String.format("SELECT * FROM `%s` WHERE UUID = ?", SQLTable.PLAYER_TABLE);
     public static final String SELECT_IP_PLAYER = String.format("SELECT * FROM `%s` WHERE IP = ?", SQLTable.PLAYER_TABLE);
@@ -84,8 +85,10 @@ public final class SQLDatabase implements IMigrationSource {
     public static final String DELETE_PLAYER_HISTORY = String.format("DELETE FROM`%s` WHERE UUID = ?", SQLTable.PLAYER_HISTORY);
 
     public static final String INSERT_REPORT = String.format("INSERT INTO `%s` (UUID, CREATOR, REASON, STATUS, TIMESTAMP) VALUES (?,?,?,?,?)", SQLTable.REPORT_TABLE);
+    public static final String UPDATE_STATUS_REPORT = String.format("UPDATE `%s` SET STATUS = ? WHERE UUID = ?", SQLTable.REPORT_TABLE);
     public static final String SELECT_REPORT = String.format("SELECT * FROM `%s` WHERE UUID = ?", SQLTable.REPORT_TABLE);
-    public static final String DELETE_REPORT = String.format("DELETE FROM `%s` WHERE UUID = ? AND WHERE CREATOR = ?", SQLTable.REPORT_TABLE);
+    public static final String DELETE_REPORT = String.format("DELETE FROM `%s` WHERE UUID = ? AND CREATOR = ?", SQLTable.REPORT_TABLE);
+
     public static final String INSERT_CHATLOG = String.format("INSERT INTO `%s` (UUID, NAME, IP, SERVER, TIMESTAMP, MESSAGE) VALUES (?,?,?,?,?,?)", SQLTable.PLAYER_CHATLOG);
     public static final String SELECT_CHATLOG = String.format("SELECT * FROM `%s` WHERE UUID = ?", SQLTable.PLAYER_CHATLOG);
 
@@ -232,12 +235,12 @@ public final class SQLDatabase implements IMigrationSource {
             try (Connection connection = pool.getConnection()) {
                 PreparedStatement preparedStatement = connection.prepareStatement(INSERT_REPORT);
                 preparedStatement.setString(1, uniqueId.toString());
-                preparedStatement.setString(2, creator.toString());
-                preparedStatement.setString(3, reason);
+                preparedStatement.setString(2, encrypt(creator.toString()));
+                preparedStatement.setString(3, encrypt(reason));
                 preparedStatement.setBoolean(4, status);
-                preparedStatement.setString(5, timestamp);
+                preparedStatement.setString(5, encrypt(timestamp));
                 preparedStatement.executeUpdate();
-                Report report = new Report(uniqueId, creator, reason, status, timestamp);
+                Report report = new Report(getReport(uniqueId).join().getID(), uniqueId, creator, reason, status, timestamp);
                 reportCache.put(uniqueId, report);
                 return report;
             } catch (SQLException e) {
@@ -257,11 +260,12 @@ public final class SQLDatabase implements IMigrationSource {
                 preparedStatement.setString(1, uniqueId.toString());
                 ResultSet set = preparedStatement.executeQuery();
                 if(set.next()) {
-                    UUID creator = UUID.fromString(set.getString("CREATOR"));
-                    String reason = set.getString("REASON");
+                    int id = set.getInt("ID");
+                    UUID creator = UUID.fromString(decrypt(set.getString("CREATOR")));
+                    String reason = decrypt(set.getString("REASON"));
                     boolean status = set.getBoolean("STATUS");
-                    String timestamp = set.getString("TIMESTAMP");
-                    Report report =  new Report(uniqueId, creator, reason, status, timestamp);
+                    String timestamp = decrypt(set.getString("TIMESTAMP"));
+                    Report report =  new Report(id, uniqueId, creator, reason, status, timestamp);
                     reportCache.remove(uniqueId);
                     reportCache.put(uniqueId, report);
                     return report;
@@ -277,10 +281,11 @@ public final class SQLDatabase implements IMigrationSource {
     public CompletableFuture<Report> updateReport(Report report) {
         return CompletableFuture.supplyAsync(() -> {
             try (Connection connection = pool.getConnection()) {
-                PreparedStatement preparedStatement = connection.prepareStatement(SELECT_REPORT);
-                preparedStatement.setString(1, report.getUUID().toString());
+                PreparedStatement preparedStatement = connection.prepareStatement(UPDATE_STATUS_REPORT);
+                preparedStatement.setBoolean(1, report.isStatus());
+                preparedStatement.setString(2, report.getUUID().toString());
                 preparedStatement.executeUpdate();
-                Report meta = new Report(report.getUUID(), report.getCreator(), report.getReason(), report.isStatus(), report.getTimestamp());
+                Report meta = new Report(report.getID(), report.getUUID(), report.getCreator(), report.getReason(), report.isStatus(), report.getTimestamp());
                 if(reportCache.has(report.getUUID())) {
                     reportCache.remove(report.getUUID());
                 }
@@ -298,7 +303,7 @@ public final class SQLDatabase implements IMigrationSource {
             try (Connection connection = pool.getConnection()) {
                 PreparedStatement preparedStatement = connection.prepareStatement(DELETE_REPORT);
                 preparedStatement.setString(1, uniqueId.toString());
-                preparedStatement.setString(2, creator.toString());
+                preparedStatement.setString(2, encrypt(creator.toString()));
                 preparedStatement.executeUpdate();
                 if(reportCache.has(uniqueId)) {
                     reportCache.remove(uniqueId);
@@ -319,7 +324,7 @@ public final class SQLDatabase implements IMigrationSource {
                 if(histories == null) {
                     histories = new ArrayList<>();
                 }
-                histories.add(new History(uniqueId, owner, type, getBan(uniqueId).join().getId(), reason, time, creationTime));
+                histories.add(new History(uniqueId, owner, type, getBan(uniqueId).join().getID(), reason, time, creationTime));
                 Array history = connection.createArrayOf(Array.class.getTypeName(), histories.toArray());
                 PreparedStatement statement = connection.prepareStatement(INSERT_PLAYER_HISTORY);
                 statement.setString(1, uniqueId.toString());
@@ -377,11 +382,11 @@ public final class SQLDatabase implements IMigrationSource {
                 preparedStatement.setString(1, uniqueId.toString());
                 ResultSet set = preparedStatement.executeQuery();
                 if (set.next()) {
-                    String name = set.getString("NAME");
-                    String ip = set.getString("IP");
-                    String server = set.getString("SERVER");
-                    String timestamp = set.getString("TIMESTAMP");
-                    String message = set.getString("MESSAGE");
+                    String name = decrypt(set.getString("NAME"));
+                    String ip = decrypt(set.getString("IP"));
+                    String server = decrypt(set.getString("SERVER"));
+                    String timestamp = decrypt(set.getString("TIMESTAMP"));
+                    String message = decrypt(set.getString("MESSAGE"));
                     return new Chatlog(uniqueId, name, ip, server, timestamp, message);
                 }
                 return null;
@@ -397,11 +402,11 @@ public final class SQLDatabase implements IMigrationSource {
             try (Connection connection = pool.getConnection()) {
                 PreparedStatement preparedStatement = connection.prepareStatement(INSERT_CHATLOG);
                 preparedStatement.setString(1, chatlog.getUUID().toString());
-                preparedStatement.setString(2, chatlog.getName());
-                preparedStatement.setString(3, chatlog.getIp());
-                preparedStatement.setString(4, chatlog.getServer());
-                preparedStatement.setString(5, chatlog.getTimestamp());
-                preparedStatement.setString(6, chatlog.getMessage());
+                preparedStatement.setString(2, encrypt(chatlog.getName()));
+                preparedStatement.setString(3, encrypt(chatlog.getIp()));
+                preparedStatement.setString(4, encrypt(chatlog.getServer()));
+                preparedStatement.setString(5, encrypt(chatlog.getTimestamp()));
+                preparedStatement.setString(6, encrypt(chatlog.getMessage()));
                 preparedStatement.executeUpdate();
             } catch (SQLException e) {
                 logger.warning("A few SQL things went wrong while creating chatlog ", e);
@@ -703,16 +708,16 @@ public final class SQLDatabase implements IMigrationSource {
         }, service);
     }
 
-    public CompletableFuture<Player> createPlayer(UUID uniqueId, String ip, int coins, int level, String language, long onlineTime) {
+    public CompletableFuture<Player> createPlayer(UUID uniqueId, String ip, String coins, String level, String language, String onlineTime) {
         return CompletableFuture.supplyAsync(() -> {
             try (Connection connection = pool.getConnection()) {
                 PreparedStatement statement = connection.prepareStatement(INSERT_PLAYER);
                 statement.setString(1, uniqueId.toString());
-                statement.setString(2, hashString(ip));
-                statement.setInt(3, Integer.parseInt(hashString(String.valueOf(coins))));
-                statement.setInt(4, Integer.parseInt(hashString(String.valueOf(level))));
-                statement.setString(5, hashString(language));
-                statement.setLong(6, Long.parseLong(hashString(String.valueOf(onlineTime))));
+                statement.setString(2, encrypt(ip));
+                statement.setString(3, encrypt(coins));
+                statement.setString(4,encrypt(level));
+                statement.setString(5, encrypt(language));
+                statement.setString(6, encrypt(onlineTime));
                 statement.executeUpdate();
                 Player player = new Player(uniqueId, ip, onlineTime, coins, language, level);
                 playerCache.put(uniqueId, player);
@@ -749,11 +754,11 @@ public final class SQLDatabase implements IMigrationSource {
                 statement.setString(1, uniqueId.toString());
                 ResultSet set = statement.executeQuery();
                 if (set.next()) {
-                    String ip = unhashString(set.getString("IP"));
-                    int coins = Integer.parseInt(unhashString(String.valueOf(set.getInt("COINS"))));
-                    int level = Integer.parseInt(unhashString(String.valueOf(set.getInt("LEVEL"))));
-                    String language = unhashString(set.getString("LANGUAGE"));
-                    long onlineTime = Integer.parseInt(unhashString(String.valueOf(set.getLong("ONLINETIME"))));
+                    String ip = decrypt(set.getString("IP"));
+                    String coins = decrypt(set.getString("COINS"));
+                    String level = decrypt(set.getString("LEVEL"));
+                    String language = decrypt(set.getString("LANGUAGE"));
+                    String onlineTime = decrypt(set.getString("ONLINETIME"));
                     Player player = new Player(uniqueId, ip, onlineTime, coins, language, level);
                     playerCache.put(uniqueId, player);
                     return player;
@@ -777,10 +782,10 @@ public final class SQLDatabase implements IMigrationSource {
                 ResultSet set = statement.executeQuery();
                 if (set.next()) {
                     UUID uniqueId = UUID.fromString(set.getString("UUID"));
-                    int coins = Integer.parseInt(unhashString(String.valueOf(set.getInt("COINS"))));
-                    int level = Integer.parseInt(unhashString(String.valueOf(set.getInt("LEVEL"))));
-                    String language = unhashString(set.getString("LANGUAGE"));
-                    long onlineTime = Long.parseLong(unhashString(String.valueOf(set.getLong("ONLINETIME"))));
+                    String coins = decrypt(set.getString("COINS"));
+                    String level = decrypt(set.getString("LEVEL"));
+                    String language = String.valueOf(decrypt(set.getString("LANGUAGE")));
+                    String onlineTime = decrypt(set.getString("ONLINETIME"));
                     Player player = new Player(uniqueId, ip, onlineTime, coins, language, level);
                     playerIpCache.put(ip, player);
                     return player;
@@ -811,11 +816,11 @@ public final class SQLDatabase implements IMigrationSource {
         return CompletableFuture.supplyAsync(() -> {
             try (Connection connection = pool.getConnection()) {
                 PreparedStatement statement = connection.prepareStatement(UPDATE_PLAYER);
-                statement.setString(1, hashString(player.getIP()));
-                statement.setInt(2, Integer.parseInt(hashString(String.valueOf(player.getCoins()))));
-                statement.setInt(3, Integer.parseInt(hashString(String.valueOf(player.getLevel()))));
-                statement.setString(4, hashString(player.getLanguage()));
-                statement.setLong(5, Long.parseLong(hashString(String.valueOf(player.getOnlineTime()))));
+                statement.setString(1, String.valueOf(encrypt(player.getIP())));
+                statement.setString(2, encrypt(player.getCoins()));
+                statement.setString(3, encrypt(player.getLevel()));
+                statement.setString(4, String.valueOf(encrypt(player.getLanguage())));
+                statement.setString(5, encrypt(player.getOnlineTime()));
                 statement.setString(6, player.getUUID().toString());
                 statement.executeUpdate();
                 playerCache.put(player.getUUID(), player);
@@ -827,17 +832,18 @@ public final class SQLDatabase implements IMigrationSource {
         }, service);
     }
 
-    public CompletableFuture<Ban> banPlayer(final UUID uniqueId, final UUID owner, final String reason, final OffsetDateTime time, final OffsetDateTime creationTime) {
+    public CompletableFuture<Ban> banPlayer(final UUID uniqueId, final UUID owner, final int banId, final String reason, final OffsetDateTime time, final OffsetDateTime creationTime) {
         return CompletableFuture.supplyAsync(() -> {
             try (Connection connection = pool.getConnection()) {
                 PreparedStatement statement = connection.prepareStatement(INSERT_PLAYER_BAN);
                 statement.setString(1, uniqueId.toString());
-                statement.setString(2, owner.toString());
-                statement.setString(3, reason);
-                statement.setString(4, TimeHelper.toString(time));
-                statement.setString(5, TimeHelper.toString(creationTime));
+                statement.setString(2, encrypt(owner.toString()));
+                statement.setString(3, encrypt(String.valueOf(banId)));
+                statement.setString(4, encrypt(reason));
+                statement.setString(5, encrypt(TimeHelper.toString(time)));
+                statement.setString(6, encrypt(TimeHelper.toString(creationTime)));
                 statement.executeUpdate();
-                Ban ban = new Ban(uniqueId, owner, getBan(uniqueId).join().getId(), reason, time, creationTime);
+                Ban ban = new Ban(uniqueId, owner, getBan(uniqueId).join().getID(), banId, reason, time, creationTime);
                 banCache.put(uniqueId, ban);
                 return ban;
             } catch (SQLException e) {
@@ -875,11 +881,12 @@ public final class SQLDatabase implements IMigrationSource {
                 ResultSet set = statement.executeQuery();
                 if (set.next()) {
                     int id = set.getInt("ID");
-                    UUID owner = UUID.fromString(set.getString("STAFF"));
-                    String reason = set.getString("REASON");
-                    OffsetDateTime time = TimeHelper.fromString(set.getString("TIME"));
-                    OffsetDateTime creationTime = TimeHelper.fromString(set.getString("CREATIONTIME"));
-                    Ban ban = new Ban(uniqueId, owner, id, reason, time, creationTime);
+                    UUID owner = UUID.fromString(decrypt(set.getString("STAFF")));
+                    int banId = Integer.parseInt(decrypt(set.getString("BANID")));
+                    String reason = decrypt(set.getString("REASON"));
+                    OffsetDateTime time = TimeHelper.fromString(decrypt(set.getString("TIME")));
+                    OffsetDateTime creationTime = TimeHelper.fromString(decrypt(set.getString("CREATIONTIME")));
+                    Ban ban = new Ban(uniqueId, owner, id, banId, reason, time, creationTime);
                     banCache.put(uniqueId, ban);
                     return ban;
                 }
@@ -890,12 +897,12 @@ public final class SQLDatabase implements IMigrationSource {
             }
         }, service);
     }
-    
-    public String hashString(String message) {
-        return ProxyPlugin.getInstance().getSecure().hashString(message);
+
+    private String encrypt(String clear)  {
+        return ProxyPlugin.getInstance().getSecure().powerfulHash(clear);
     }
 
-    public String unhashString(String message) {
-        return ProxyPlugin.getInstance().getSecure().unhashString(message);
+    private String decrypt(String hashed)  {
+        return ProxyPlugin.getInstance().getSecure().powerfulDecrypt(hashed);
     }
 }

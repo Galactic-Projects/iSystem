@@ -51,7 +51,7 @@ public class ConnectListener implements Listener {
         }
 
         if (playerData == null) {
-            playerData = database.createPlayer(uniqueId, player.getAddress().getAddress().getHostAddress(), 1000, 1, "en-uk", 0L).join();
+            playerData = database.createPlayer(uniqueId, player.getAddress().getAddress().getHostAddress(), "1000", "1", "en-uk", "0").join();
         }
 
 
@@ -112,7 +112,7 @@ public class ConnectListener implements Listener {
                 database.deleteBan(ban.getPlayer()).join();
                 return;
             }
-            BanMessage message = BanMessage.valueOf("COMMAND_BAN_ID_" + ban.getId());
+            BanMessage message = BanMessage.valueOf("COMMAND_BAN_ID_" + ban.getBanID());
             player.disconnect(ComponentParser.parse(plugin.getCommonPlugin().getMessageManager().translate(CommandMessages.COMMAND_PLAYER_BANNED, playerData.getLanguage(), Key.of("time", TimeHelper.BAN_TIME_FORMATTER.format(ban.getTime())), Key.of("reason", message))));
         }
 

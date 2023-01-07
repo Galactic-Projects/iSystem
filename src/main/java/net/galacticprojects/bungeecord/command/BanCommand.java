@@ -67,7 +67,7 @@ public class BanCommand {
             }
             OffsetDateTime creation = OffsetDateTime.now();
             OffsetDateTime time = OffsetDateTime.now().plusHours(info.getHours());
-            database.banPlayer(uniqueId, actor.getId(), info.getReason(), time, creation).thenAccept(ban -> {
+            database.banPlayer(uniqueId, actor.getId(), banId, info.getReason(), time, creation).thenAccept(ban -> {
                 if (ban == null) {
                     // ERROR, NOTHING HAPPENS!
                     return;

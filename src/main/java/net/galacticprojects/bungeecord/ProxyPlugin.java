@@ -29,7 +29,7 @@ import net.galacticprojects.bungeecord.util.OnlineTime;
 import net.galacticprojects.bungeecord.util.TimeHelper;
 import net.galacticprojects.common.CommonPlugin;
 import net.galacticprojects.common.message.MessageProviderFactoryImpl;
-import net.galacticprojects.common.secure.Secure;
+import net.galacticprojects.common.secure.GalacticSecure;
 import net.galacticprojects.common.util.ComponentParser;
 import net.galacticprojects.common.modules.DiscordBot;
 import net.galacticprojects.common.modules.TeamSpeakBot;
@@ -44,7 +44,7 @@ public class ProxyPlugin extends Plugin {
 	private CommonPlugin common;
 
 	private PluginConfiguration pluginConfiguration;
-	private Secure secure;
+	private GalacticSecure secure;
 	private BanConfiguration banConfiguration;
 	private ReportConfiguration reportConfiguration;
 	private BotConfiguration botConfiguration;
@@ -80,7 +80,7 @@ public class ProxyPlugin extends Plugin {
 		discordBot = new DiscordBot();
 		teamSpeakBot = new TeamSpeakBot();
 		try {
-			secure = new Secure();
+			secure = new GalacticSecure();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
@@ -312,7 +312,7 @@ public class ProxyPlugin extends Plugin {
 	 * Getter
 	 */
 
-	public Secure getSecure() {
+	public GalacticSecure getSecure() {
 		return secure;
 	}
 
