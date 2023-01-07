@@ -29,7 +29,7 @@ public class OnlineTimeCommand {
 
             common.getDatabaseRef().asOptional().ifPresent(sql -> {
                 sql.getPlayer(targetUnique).thenAccept(playerData -> {
-                    long time = playerData.getOnlineTime();
+                    long time = Long.parseLong(playerData.getOnlineTime());
                     long minute = (time % 3600) / 60;
                     long hours = (time % 86400) / 3600;
                     long days = (time % 2629746) / 86400;
@@ -42,7 +42,7 @@ public class OnlineTimeCommand {
 
         common.getDatabaseRef().asOptional().ifPresent(sql -> {
             sql.getPlayer(uuid).thenAccept(playerData -> {
-                long time = playerData.getOnlineTime();
+                long time = Long.parseLong(playerData.getOnlineTime());
                 long minute = (time % 3600) / 60;
                 long hours = (time % 86400) / 3600;
                 long days = (time % 2629746) / 86400;

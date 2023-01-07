@@ -109,7 +109,7 @@ public class ReportCommand {
                 return;
             }
 
-            database.updateReport(new Report(uniqueIdTarget, reportData.getCreator(), reportData.getReason(), true, reportData.getTimestamp()));
+            database.updateReport(new Report(reportData.getID(), uniqueIdTarget, reportData.getCreator(), reportData.getReason(), true, reportData.getTimestamp()));
             CloudPlayer cloudPlayer = CloudNetDriver.instance().serviceRegistry().firstProvider(PlayerManager.class).onlinePlayer(player.getUniqueId());
             CloudPlayer targetCloudPlayer = CloudNetDriver.instance().serviceRegistry().firstProvider(PlayerManager.class).onlinePlayer(target.getUniqueId());
             if (cloudPlayer == null || targetCloudPlayer == null) {

@@ -31,7 +31,7 @@ public class CoinsCommand {
 
             common.getDatabaseRef().asOptional().ifPresent(sql -> {
                 sql.getPlayer(uniqueIdTarget).thenAccept(targetData -> {
-                    String coins = formatValue(targetData.getCoins());
+                    String coins = formatValue(Integer.parseInt(targetData.getCoins()));
                     actor.sendTranslatedMessage(CommandMessages.COINS_SHOW_OTHERS, Key.of("player", MojangProfileService.getName(uniqueIdTarget)), Key.of("input", coins));
                 });
             });
@@ -40,7 +40,7 @@ public class CoinsCommand {
 
         common.getDatabaseRef().asOptional().ifPresent(sql -> {
             sql.getPlayer(uniqueId).thenAccept(playerData -> {
-                String coins = formatValue(playerData.getCoins());
+                String coins = formatValue(Integer.parseInt(playerData.getCoins()));
                 actor.sendTranslatedMessage(CommandMessages.COINS_SHOW, Key.of("input", coins));
             });
         });
@@ -58,6 +58,8 @@ public class CoinsCommand {
             sql.getPlayer(uniqueId).thenAccept(playerData -> {
                 ProxiedPlayer target = ProxyServer.getInstance().getPlayer(uniqueIdTarget);
                 Player targetData = sql.getPlayer(uniqueIdTarget).join();
+                int playerCoins = Integer.parseInt(playerData.getCoins());
+                int targetCoins = Integer.parseInt(targetData.getCoins());
 
                 try {
                     if (amount <= 0) {
@@ -65,7 +67,7 @@ public class CoinsCommand {
                         return;
                     }
 
-                    if (amount > playerData.getCoins()) {
+                    if (amount > playerCoins) {
                         actor.sendTranslatedMessage(CommandMessages.COINS_ERRORS_ENOUGH);
                         return;
                     }
@@ -75,13 +77,11 @@ public class CoinsCommand {
                         return;
                     }
 
-                    int playerCoins = playerData.getCoins();
-                    int targetCoins = targetData.getCoins();
 
                     playerCoins = (playerCoins - amount);
                     targetCoins = (targetCoins + amount);
-                    playerData.setCoins(playerCoins);
-                    targetData.setCoins(targetCoins);
+                    playerData.setCoins(String.valueOf(playerCoins));
+                    targetData.setCoins(String.valueOf(targetCoins));
 
                     sql.updatePlayer(playerData);
                     sql.updatePlayer(targetData);
@@ -112,7 +112,7 @@ public class CoinsCommand {
             sql.getPlayer(uniqueId).thenAccept(playerData -> {
                 ProxiedPlayer target = ProxyServer.getInstance().getPlayer(uniqueIdTarget);
                 Player targetData = sql.getPlayer(uniqueIdTarget).join();
-                int oldA = targetData.getCoins();
+                int oldA = Integer.parseInt(targetData.getCoins());
                 String oldAmount = formatValue(oldA);
 
                 try {
@@ -121,14 +121,14 @@ public class CoinsCommand {
                         return;
                     }
 
-                    if (amount == targetData.getCoins()) {
+                    if (amount == (Integer.parseInt(targetData.getCoins()))) {
                         actor.sendTranslatedMessage(CommandMessages.COINS_ERRORS_ALREADY);
                         return;
                     }
 
                     String amountFormat = formatValue(amount);
 
-                    targetData.setCoins(amount);
+                    targetData.setCoins(String.valueOf(amount));
                     sql.updatePlayer(targetData);
                     actor.sendTranslatedMessage(CommandMessages.COINS_OTHERS_SET_PLAYER, Key.of("player", MojangProfileService.getName(uniqueIdTarget)), Key.of("oldamount", oldAmount), Key.of("amount", amountFormat));
                     if (target != null || uniqueIdTarget != uniqueId) {
@@ -154,7 +154,7 @@ public class CoinsCommand {
             sql.getPlayer(uniqueId).thenAccept(playerData -> {
                 ProxiedPlayer target = ProxyServer.getInstance().getPlayer(uniqueIdTarget);
                 Player targetData = sql.getPlayer(uniqueIdTarget).join();
-                int oldA = targetData.getCoins();
+                int oldA = Integer.parseInt(targetData.getCoins());
                 String oldAmount = formatValue(oldA);
 
                 try {
@@ -163,11 +163,11 @@ public class CoinsCommand {
                         return;
                     }
 
-                    int targetCoins = targetData.getCoins();
+                    int targetCoins = Integer.parseInt(targetData.getCoins());
                     targetCoins = (targetCoins + amount);
                     String amountFormat = formatValue(targetCoins);
 
-                    targetData.setCoins(targetCoins);
+                    targetData.setCoins(String.valueOf(targetCoins));
                     sql.updatePlayer(targetData);
                     actor.sendTranslatedMessage(CommandMessages.COINS_OTHERS_ADD_PLAYER, Key.of("player", MojangProfileService.getName(uniqueIdTarget)), Key.of("oldamount", oldAmount), Key.of("amount", amountFormat));
                     if (target != null || uniqueIdTarget != uniqueId) {
@@ -193,7 +193,7 @@ public class CoinsCommand {
             sql.getPlayer(uniqueId).thenAccept(playerData -> {
                 ProxiedPlayer target = ProxyServer.getInstance().getPlayer(uniqueIdTarget);
                 Player targetData = sql.getPlayer(uniqueIdTarget).join();
-                int oldA = targetData.getCoins();
+                int oldA = Integer.parseInt(targetData.getCoins());
                 String oldAmount = formatValue(oldA);
 
                 try {
@@ -207,7 +207,7 @@ public class CoinsCommand {
                         return;
                     }
 
-                    int targetCoins = targetData.getCoins();
+                    int targetCoins = Integer.parseInt(targetData.getCoins());
                     targetCoins = (targetCoins - amount);
                     String amountFormat = formatValue(targetCoins);
 
@@ -216,7 +216,7 @@ public class CoinsCommand {
                         return;
                     }
 
-                    targetData.setCoins(targetCoins);
+                    targetData.setCoins(String.valueOf(targetCoins));
                     sql.updatePlayer(targetData);
                     actor.sendTranslatedMessage(CommandMessages.COINS_OTHERS_REMOVE_PLAYER, Key.of("player", MojangProfileService.getName(uniqueIdTarget)), Key.of("oldamount", oldAmount), Key.of("amount", amountFormat));
                     if (target != null || uniqueIdTarget != uniqueId) {
