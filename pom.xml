@@ -292,20 +292,9 @@
                 </configuration>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.8</version> <!--$NO-MVN-MAN-VER$ -->
-                <executions>
-                    <execution>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>run</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.8</version> <!--$NO-MVN-MAN-VER$ -->
+                <version>1.8</version>
                 <executions>
                     <execution>
                         <phase>install</phase>
