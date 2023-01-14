@@ -2,6 +2,7 @@ package net.galacticprojects.bungeecord;
 
 import java.io.File;
 import java.time.OffsetDateTime;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import eu.cloudnetservice.driver.CloudNetDriver;
@@ -285,8 +286,8 @@ public class ProxyPlugin extends Plugin {
 						CloudNetDriver.instance().permissionManagement().reload();
 						CloudNetDriver.instance().groupConfigurationProvider().reload();
 						CloudNetDriver.instance().moduleProvider().stopAll();
-						for (ServiceInfoSnapshot serviceInfoSnapshots : CloudNetDriver.instance().cloudServiceProvider().services()) {
-
+						for(ServiceInfoSnapshot serviceInfoSnapshot : CloudNetDriver.instance().cloudServiceProvider().runningServices()) {
+							Objects.requireNonNull(CloudNetDriver.instance().cloudServiceProvider().service(serviceInfoSnapshot.serviceId().uniqueId())).provider().stopAsync();
 						}
 						CloudNetDriver.instance().moduleProvider().startAll();
 					}
