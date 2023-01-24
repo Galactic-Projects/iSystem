@@ -3,6 +3,7 @@ package net.galacticprojects.bungeecord.listener;
 import eu.cloudnetservice.driver.CloudNetDriver;
 import me.lauriichan.laylib.localization.Key;
 import net.galacticprojects.bungeecord.ProxyPlugin;
+import net.galacticprojects.bungeecord.channel.LobbyMessage;
 import net.galacticprojects.bungeecord.config.PluginConfiguration;
 import net.galacticprojects.bungeecord.message.BanMessage;
 import net.galacticprojects.bungeecord.message.CommandMessages;
@@ -14,10 +15,7 @@ import net.galacticprojects.bungeecord.util.TablistManager;
 import net.galacticprojects.bungeecord.util.TimeHelper;
 import net.galacticprojects.common.CommonPlugin;
 import net.galacticprojects.common.database.SQLDatabase;
-import net.galacticprojects.common.database.model.Ban;
-import net.galacticprojects.common.database.model.FriendSettings;
-import net.galacticprojects.common.database.model.LinkPlayer;
-import net.galacticprojects.common.database.model.Player;
+import net.galacticprojects.common.database.model.*;
 import net.galacticprojects.common.util.ComponentParser;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -25,6 +23,7 @@ import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.event.EventHandler;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -64,6 +63,16 @@ public class ConnectListener implements Listener {
         }
 
         new TablistManager(plugin, player);
+
+        ArrayList<Friends> arrayList = database.getFriend(player.getUniqueId()).join();
+
+        for(Friends friends : arrayList) {
+            if(ProxyServer.getInstance().getPlayer(friends.getFriendUniqueId()) != null) {
+                new LobbyMessage(player, plugin).sendPlayerMessage(22, true, friends.getFriendUniqueId());
+                return;
+            }
+            new LobbyMessage(player, plugin).sendPlayerMessage(22, false, friends.getFriendUniqueId());
+        }
 
         if (configuration.isMaintenance()) {
             if (!(player.hasPermission("system.maintenance.bypass") || player.hasPermission("system.maintenance.*"))) {
