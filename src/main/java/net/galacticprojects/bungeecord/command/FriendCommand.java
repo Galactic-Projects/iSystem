@@ -124,7 +124,7 @@ public class FriendCommand {
                 }
 
                 actor.sendTranslatedMessage(CommandMessages.FRIEND_LIST);
-                for (Friends friends : sql.getFriend(uniqueId).join()) {
+                for (Friends friends : sql.getFriends(uniqueId).join()) {
                     UUID uniqueIdFriend = friends.getFriendUniqueId();
                     OffsetDateTime time = TimeHelper.fromString(friends.getDate());
                     String date = TimeHelper.BAN_TIME_FORMATTER.format(time);
@@ -168,7 +168,7 @@ public class FriendCommand {
                     return;
                 }
 
-                for (Friends friends : sql.getFriend(uniqueId).join()) {
+                for (Friends friends : sql.getFriends(uniqueId).join()) {
                     UUID uniqueIdFriend = friends.getFriendUniqueId();
                     sql.deleteFriend(uniqueId, uniqueIdFriend);
                     sql.deleteFriend(uniqueIdFriend, uniqueId);

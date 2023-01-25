@@ -65,6 +65,19 @@ public class ConnectListener implements Listener {
 
         new TablistManager(plugin, player);
 
+<<<<<<< Updated upstream
+=======
+        ArrayList<Friends> arrayList = database.getFriends(player.getUniqueId()).join();
+
+        for(Friends friends : arrayList) {
+            if(ProxyServer.getInstance().getPlayer(friends.getFriendUniqueId()) != null) {
+                new LobbyMessage(player, plugin).sendPlayerMessage(22, true, friends.getFriendUniqueId());
+                return;
+            }
+            new LobbyMessage(player, plugin).sendPlayerMessage(22, false, friends.getFriendUniqueId());
+        }
+
+>>>>>>> Stashed changes
         if (configuration.isMaintenance()) {
             if (!(player.hasPermission("system.maintenance.bypass") || player.hasPermission("system.maintenance.*"))) {
                 Key reason = Key.of("reason", commonPlugin.getMessageManager().translate(SystemMessage.SYSTEM_MAINTENANCE_KICK_REASON, language, Key.of("reason", configuration.getMaintenanceReason())));
