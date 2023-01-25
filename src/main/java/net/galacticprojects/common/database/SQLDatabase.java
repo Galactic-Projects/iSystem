@@ -70,11 +70,11 @@ public final class SQLDatabase implements IMigrationSource {
     public static final String DELETE_FRIEND = String.format("DELETE FROM `%s` WHERE (UUID = ? AND FRIENDUUID = ?) OR (UUID = ? AND FRIENDUUID = ?)", SQLTable.FRIENDS_TABLE);
     public static final String INSERT_FRIENDPLAYER = String.format("INSERT INTO `%s` (UUID, FRIENDUUID, DATE) VALUES (?,?,?)", SQLTable.FRIENDS_TABLE);
 
-    public static final String SELECT_FRIENDREQUESTS = String.format("SELECT * FROM `%s` WHERE UUID = ?", SQLTable.FRIENDSREQUEST_TABLE);
-    public static final String SELECT_FRIENDREQUESTS_BOTH = String.format("SELECT * FROM `%s` WHERE UUID = ? AND REQUESTID = ?", SQLTable.FRIENDSREQUEST_TABLE);
-    public static final String SELECT_FRIENDREQUESTS_FROM_REQUESTID = String.format("SELECT * FROM `%s` WHERE REQUESTID = ?", SQLTable.FRIENDSREQUEST_TABLE);
-    public static final String DELETE_FRIENDREQUEST = String.format("DELETE FROM `%s` WHERE UUID = ? AND REQUESTID = ?", SQLTable.FRIENDSREQUEST_TABLE);
-    public static final String INSERT_FRIENDREQUEST = String.format("INSERT INTO `%s` (UUID, REQUESTID) VALUES (?,?,?)", SQLTable.FRIENDSREQUEST_TABLE);
+    public static final String SELECT_FRIENDREQUEST = String.format("SELECT * FROM `%s` WHERE UUID = ? OR REQUEST = ?", SQLTable.FRIENDSREQUEST_TABLE);
+    public static final String SELECT_FRIENDREQUEST_SINGLE = String.format("SELECT * FROM `%s` WHERE REQUEST = ?", SQLTable.FRIENDSREQUEST_TABLE);
+    public static final String SELECT_FRIENDREQUEST_REQUESTOR = String.format("SELECT * FROM `%s` WHERE UUID = ?", SQLTable.FRIENDSREQUEST_TABLE);
+    public static final String DELETE_FRIENDREQUEST = String.format("DELETE FROM `%s` WHERE UUID = ? AND REQUEST = ?", SQLTable.FRIENDSREQUEST_TABLE);
+    public static final String INSERT_FRIENDREQUEST = String.format("INSERT INTO `%s` (UUID, REQUEST) VALUES (?,?,?)", SQLTable.FRIENDSREQUEST_TABLE);
 
     public static final String SELECT_FRIENDSETTINGS = String.format("SELECT * FROM `%s` WHERE UUID = ?", SQLTable.FRIENDS_SETTINGS);
     public static final String UPDATE__FRIENDSETTINGS = String.format("UPDATE `%s` SET REQUESTS = ?, JUMP = ?, MESSAGES = ? WHERE UUID = ?", SQLTable.FRIENDS_SETTINGS);
@@ -503,17 +503,13 @@ public final class SQLDatabase implements IMigrationSource {
         return CompletableFuture.supplyAsync(() -> {
             try (Connection connection = pool.getConnection()) {
                 PreparedStatement preparedStatement = connection.prepareStatement(INSERT_FRIENDREQUEST);
-                ArrayList<FriendRequest> requests;
-                requests = getFriendRequest(uniqueId).join();
-                if(requests == null) {
-                    requests = new ArrayList<>();
-                }
-                requests.add(new FriendRequest(uniqueId, requestUniqueId, date));
-                preparedStatement.setArray(1, connection.createArrayOf(Array.class.getTypeName(), requests.toArray()));
+                preparedStatement.setString(1, uniqueId.toString());
+                preparedStatement.setString(2, requestUniqueId.toString());
+                preparedStatement.setString(3, date);
                 preparedStatement.executeUpdate();
                 return new FriendRequest(uniqueId, requestUniqueId, date);
             } catch (SQLException e) {
-                logger.warning("A few SQL things went wrong while creating friendrequest ", e);
+                logger.warning("A few SQL things went wrong while creating friend ", e);
                 return null;
             }
         }, service);
@@ -522,14 +518,16 @@ public final class SQLDatabase implements IMigrationSource {
     public CompletableFuture<Boolean> deleteFriendRequest(UUID uniqueId, UUID requestUniqueId) {
         return CompletableFuture.supplyAsync(() -> {
             try (Connection connection = pool.getConnection()) {
-                PreparedStatement preparedStatement = connection.prepareStatement(DELETE_FRIENDREQUEST);
+                PreparedStatement preparedStatement = connection.prepareStatement(DELETE_FRIEND);
                 preparedStatement.setString(1, uniqueId.toString());
                 preparedStatement.setString(2, requestUniqueId.toString());
+                preparedStatement.setString(3, requestUniqueId.toString());
+                preparedStatement.setString(4, uniqueId.toString());
                 preparedStatement.executeUpdate();
-                return true;
+                return null;
             } catch (SQLException e) {
                 logger.warning("A few SQL things went wrong while creating friendrequest ", e);
-                return false;
+                return null;
             }
         }, service);
     }
@@ -537,7 +535,7 @@ public final class SQLDatabase implements IMigrationSource {
     public CompletableFuture<Boolean> isFriendRequested(UUID uniqueId, UUID requesterUniqueId) {
         return CompletableFuture.supplyAsync(() -> {
             try (Connection connection = pool.getConnection()) {
-                PreparedStatement preparedStatement = connection.prepareStatement(SELECT_FRIENDREQUESTS_BOTH);
+                PreparedStatement preparedStatement = connection.prepareStatement(SELECT_FRIENDREQUEST);
                 preparedStatement.setString(1, uniqueId.toString());
                 preparedStatement.setString(2, requesterUniqueId.toString());
                 ResultSet set = preparedStatement.executeQuery();
@@ -552,7 +550,7 @@ public final class SQLDatabase implements IMigrationSource {
     public CompletableFuture<Boolean> isFriendRequested(UUID uniqueId) {
         return CompletableFuture.supplyAsync(() -> {
             try (Connection connection = pool.getConnection()) {
-                PreparedStatement preparedStatement = connection.prepareStatement(SELECT_FRIENDREQUESTS);
+                PreparedStatement preparedStatement = connection.prepareStatement(SELECT_FRIENDREQUEST_SINGLE);
                 preparedStatement.setString(1, uniqueId.toString());
                 ResultSet set = preparedStatement.executeQuery();
                 return set.next() && set.getArray("REQUESTS") != null;
@@ -566,14 +564,17 @@ public final class SQLDatabase implements IMigrationSource {
     public CompletableFuture<Boolean> isFriendRequestedByRequestor(UUID uniqueId) {
         return CompletableFuture.supplyAsync(() -> {
             try (Connection connection = pool.getConnection()) {
-                PreparedStatement preparedStatement = connection.prepareStatement(SELECT_FRIENDREQUESTS_FROM_REQUESTID);
+                PreparedStatement preparedStatement = connection.prepareStatement(SELECT_FRIENDREQUEST_SINGLE);
                 preparedStatement.setString(1, uniqueId.toString());
                 ResultSet set = preparedStatement.executeQuery();
-                Array array = set.getArray("REQUESTS");
-                FriendRequest[] friendRequests = (FriendRequest[]) array.getArray();
-                for(FriendRequest request : friendRequests) {
-                    if(request.getRequestUUID().equals(uniqueId)) {
-                        return true;
+                ArrayList<FriendRequest> friendRequests = getFriendRequest(uniqueId).join();
+                while (set.next()) {
+                    String request = set.getString("REQUEST");
+                    for (FriendRequest friendRequest : friendRequests) {
+                        if(friendRequest.getRequestUUID().equals(UUID.fromString(request))) {
+                            createFriend(uniqueId, UUID.fromString(request), TimeHelper.BAN_TIME_FORMATTER.format(OffsetDateTime.now()));
+                            return true;
+                        }
                     }
                 }
                 return false;
@@ -588,20 +589,16 @@ public final class SQLDatabase implements IMigrationSource {
         ArrayList<FriendRequest> friendRequests = new ArrayList<>();
         return CompletableFuture.supplyAsync(() -> {
             try (Connection connection = pool.getConnection()) {
-                PreparedStatement preparedStatement = connection.prepareStatement(SELECT_FRIENDREQUESTS);
+                PreparedStatement preparedStatement = connection.prepareStatement(SELECT_FRIENDREQUEST_SINGLE);
                 preparedStatement.setString(1, uniqueId.toString());
                 ResultSet set = preparedStatement.executeQuery();
-                if (set.next()) {
-                    UUID uuid = UUID.fromString(set.getString("REQUESTID"));
-                    String date = set.getString("DATE");
-                    FriendRequest friendRequest = new FriendRequest(uniqueId, uuid, date);
-                    friendRequests.add(friendRequest);
-                    logger.info(new Throwable("Amount getFriendRequest: " + friendRequests.size()));
-                    return friendRequests;
+                ArrayList<FriendRequest> friends = new ArrayList<>();
+                while(set.next()) {
+                    FriendRequest friend = new FriendRequest(uniqueId, UUID.fromString(set.getString("UUID").equals(uniqueId.toString()) ? set.getString("FRIENDUUID") : set.getString("UUID")), set.getString("DATE"));
+                    friends.add(friend);
                 }
-                preparedStatement.close();
-                set.close();
-                return null;
+                logger.info(new Throwable("Amount getFriend: " + friends.size()));
+                return friends;
             } catch (SQLException e) {
                 logger.warning("A few SQL things went wrong while creating friendrequest ", e);
                 return null;
@@ -613,21 +610,16 @@ public final class SQLDatabase implements IMigrationSource {
         ArrayList<FriendRequest> friendRequests = new ArrayList<>();
         return CompletableFuture.supplyAsync(() -> {
             try (Connection connection = pool.getConnection()) {
-                PreparedStatement preparedStatement = connection.prepareStatement(SELECT_FRIENDREQUESTS_FROM_REQUESTID);
+                PreparedStatement preparedStatement = connection.prepareStatement(SELECT_FRIENDREQUEST_REQUESTOR);
                 preparedStatement.setString(1, uniqueId.toString());
                 ResultSet set = preparedStatement.executeQuery();
-                while (set.next()) {
-                    UUID uuid = UUID.fromString(set.getString("UUID"));
-                    String date = set.getString("DATE");
-                    FriendRequest friendRequest = new FriendRequest(uuid, uniqueId, date);
-                    friendRequestCache.put(uniqueId, friendRequest);
-                    friendRequests.add(friendRequest);
-                    logger.info(new Throwable("Amount getFriendRequestByRequesterId: " + friendRequests.size()));
-                    return friendRequests;
+                ArrayList<FriendRequest> friends = new ArrayList<>();
+                while(set.next()) {
+                    FriendRequest friend = new FriendRequest(uniqueId, UUID.fromString(set.getString("UUID").equals(uniqueId.toString()) ? set.getString("FRIENDUUID") : set.getString("UUID")), set.getString("DATE"));
+                    friends.add(friend);
                 }
-                preparedStatement.close();
-                set.close();
-                return null;
+                logger.info(new Throwable("Amount getFriend: " + friends.size()));
+                return friends;
             } catch (SQLException e) {
                 logger.warning("A few SQL things went wrong while creating friendrequest ", e);
                 return null;

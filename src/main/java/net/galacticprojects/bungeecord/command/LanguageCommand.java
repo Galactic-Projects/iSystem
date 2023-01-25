@@ -29,7 +29,7 @@ public class LanguageCommand {
             database.getPlayer(senderActor.getId()).thenAccept(player -> {
                 actor.setLanguage("de-de");
                 ProxiedPlayer proxiedPlayer = actor.as(ProxiedPlayer.class).getHandle();
-                LobbyMessage lobbyMessage = new LobbyMessage(proxiedPlayer);
+                LobbyMessage lobbyMessage = new LobbyMessage(proxiedPlayer, plugin);
                 lobbyMessage.sendMessageData(452, null);
                 senderActor.sendMessage(common.getMessageManager().translate("command.language.changed", "de-de", Key.of("language", "Deutsch")));
             });
@@ -39,7 +39,7 @@ public class LanguageCommand {
             database.getPlayer(senderActor.getId()).thenAccept(player -> {
                 actor.setLanguage("en-uk");
                 ProxiedPlayer proxiedPlayer = actor.as(ProxiedPlayer.class).getHandle();
-                LobbyMessage lobbyMessage = new LobbyMessage(proxiedPlayer);
+                LobbyMessage lobbyMessage = new LobbyMessage(proxiedPlayer, plugin);
                 lobbyMessage.sendMessageData(452, null);
                 senderActor.sendMessage(common.getMessageManager().translate("command.language.changed", "en-uk", Key.of("language", "English")));
             });

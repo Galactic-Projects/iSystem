@@ -13,13 +13,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 @Migration(source = SQLDatabase.class, type = SQLMigrationType.class)
-public class FriendsRequestMigration2022_10_14_20_15 extends MySQLMigration {
+public class FriendsRequestMigration2023_01_24_17_25 extends MySQLMigration {
 
-    public FriendsRequestMigration2022_10_14_20_15 () { super(SQLTable.FRIENDSREQUEST_TABLE); }
+    public FriendsRequestMigration2023_01_24_17_25() { super(SQLTable.FRIENDSREQUEST_TABLE); }
 
     @Override
     protected long getDate() {
-        return Date.of(20, 15, 14, 10, 2022);
+        return Date.of(17, 25, 24, 1, 2023);
     }
 
     @Override
@@ -29,7 +29,7 @@ public class FriendsRequestMigration2022_10_14_20_15 extends MySQLMigration {
 
     @Override
     public String getNewFormat() {
-        return "ID INT AUTO_INCREMENT PRIMARY KEY, UUID VARCHAR(36), REQUESTS LONGTEXT";
+        return "ID INT AUTO_INCREMENT PRIMARY KEY, UUID VARCHAR(36), REQUEST VARCHAR(36), DATE VARCHAR(36)";
     }
 
     @Override

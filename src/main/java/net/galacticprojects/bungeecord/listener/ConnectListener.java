@@ -63,16 +63,7 @@ public class ConnectListener implements Listener {
         }
 
         new TablistManager(plugin, player);
-
-        ArrayList<Friends> arrayList = database.getFriend(player.getUniqueId()).join();
-
-        for(Friends friends : arrayList) {
-            if(ProxyServer.getInstance().getPlayer(friends.getFriendUniqueId()) != null) {
-                new LobbyMessage(player, plugin).sendPlayerMessage(22, true, friends.getFriendUniqueId());
-                return;
-            }
-            new LobbyMessage(player, plugin).sendPlayerMessage(22, false, friends.getFriendUniqueId());
-        }
+        // ArrayList<Friends> arrayList = database.getFriend(player.getUniqueId()).join();
 
         if (configuration.isMaintenance()) {
             if (!(player.hasPermission("system.maintenance.bypass") || player.hasPermission("system.maintenance.*"))) {
