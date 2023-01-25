@@ -65,6 +65,7 @@ public class ProxyPlugin extends Plugin {
 	@Override
 	public void onEnable() {
 		getProxy().registerChannel("BungeeCord");
+		getProxy().registerChannel("AntiCheat");
 		plugin = this;
 		registerMessages();
 		common.getCommandManager().setInjector(new BungeeCommandInjector(common.getCommandManager(), common.getMessageManager(), common, this));
@@ -122,6 +123,7 @@ public class ProxyPlugin extends Plugin {
 		manager.registerListener(this, new ServerSwitchListener(this));
 		manager.registerListener(this, new DisconnectListener(this));
 		manager.registerListener(this, new ChatListener(this));
+		manager.registerListener(this, new MessageListener(this));
 	}
 
 	private void registerArgumentTypes() {

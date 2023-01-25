@@ -1,12 +1,10 @@
 package net.galacticprojects.common.database;
 
 import com.zaxxer.hikari.pool.HikariPool;
-import eu.cloudnetservice.driver.permission.CachedPermissionManagement;
 import me.lauriichan.laylib.logger.ISimpleLogger;
 import me.lauriichan.minecraft.wildcard.migration.IMigrationSource;
 import net.galacticprojects.bungeecord.ProxyPlugin;
 import net.galacticprojects.bungeecord.util.Type;
-import net.galacticprojects.common.database.migration.LinkMigration2022_11_10_15_15;
 import net.galacticprojects.common.database.migration.impl.MigrationManager;
 import net.galacticprojects.common.database.model.*;
 import net.galacticprojects.common.secure.GalacticSecure;
@@ -15,11 +13,7 @@ import net.galacticprojects.common.util.cache.Cache;
 import net.galacticprojects.common.util.cache.ThreadSafeCache;
 import net.galacticprojects.common.database.migration.impl.SQLMigrationType;
 import net.galacticprojects.common.util.Ref;
-import org.apache.http.impl.conn.ProxySelectorRoutePlanner;
-import org.bukkit.entity.Husk;
 
-import javax.swing.*;
-import java.net.ConnectException;
 import java.sql.*;
 import java.time.OffsetDateTime;
 import java.util.*;

@@ -45,6 +45,16 @@ public class ConnectListener implements Listener {
         String language = "en-uk";
         Player playerData = database.getPlayer(uniqueId).join();
 
+        Ban ban = database.getBan(uniqueId).join();
+        if (ban != null) {
+            if (!ban.isExpired()) {
+                BanMessage message = BanMessage.valueOf("COMMAND_BAN_ID_" + ban.getBanID());
+                player.disconnect(ComponentParser.parse(plugin.getCommonPlugin().getMessageManager().translate(CommandMessages.COMMAND_PLAYER_BANNED, playerData.getLanguage(), Key.of("time", TimeHelper.format(playerData.getLanguage()).format(ban.getTime())), Key.of("reason", message))));
+                return;
+            }
+            database.deleteBan(ban.getPlayer()).join();
+        }
+
         for (int i = 0; i != 99; i++) {
             player.sendMessage(ComponentParser.parse(""));
         }
@@ -104,16 +114,6 @@ public class ConnectListener implements Listener {
         if(linkPlayer == null) {
             linkPlayer = database.createLinkPlayer(uniqueId).join();
             return;
-        }
-
-        Ban ban = database.getBan(uniqueId).join();
-        if (ban != null) {
-            if (ban.isExpired()) {
-                database.deleteBan(ban.getPlayer()).join();
-                return;
-            }
-            BanMessage message = BanMessage.valueOf("COMMAND_BAN_ID_" + ban.getBanID());
-            player.disconnect(ComponentParser.parse(plugin.getCommonPlugin().getMessageManager().translate(CommandMessages.COMMAND_PLAYER_BANNED, playerData.getLanguage(), Key.of("time", TimeHelper.BAN_TIME_FORMATTER.format(ban.getTime())), Key.of("reason", message))));
         }
 
         PartyManager manager = new PartyManager(player);
