@@ -32,11 +32,7 @@ public class FriendsMigration2022_10_14_20_07 extends MySQLMigration {
 
     @Override
     public String getNewFormat() {
-<<<<<<< Updated upstream
-        return "ID INT AUTO_INCREMENT PRIMARY KEY, UUID VARCHAR(36), FRIENDS LONGTEXT";
-=======
         return "ID INT AUTO_INCREMENT PRIMARY KEY, UUID VARCHAR(36), FRIENDUUID VARCHAR(36), DATE VARCHAR(64)";
->>>>>>> Stashed changes
     }
 
     @Override
