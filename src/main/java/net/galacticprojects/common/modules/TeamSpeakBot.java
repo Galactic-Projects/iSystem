@@ -11,7 +11,7 @@ public class TeamSpeakBot {
 
     private final TS3Query ts3Query;
     private final TS3Api api;
-    private TS3ApiAsync aapi;
+    private TS3ApiAsync asyncApi;
 
     public TeamSpeakBot() {
         BotConfiguration configuration = ProxyPlugin.getInstance().getBotConfiguration();
@@ -23,7 +23,7 @@ public class TeamSpeakBot {
 
 
         api = ts3Query.getApi();
-        aapi = ts3Query.getAsyncApi();
+        asyncApi = ts3Query.getAsyncApi();
         api.login(configuration.getUser(), configuration.getPassword());
         api.selectVirtualServerById(1);
         api.setNickname(configuration.getName());
@@ -37,7 +37,7 @@ public class TeamSpeakBot {
 
         api.logout();
         ts3Query.exit();
-        aapi = null;
+        asyncApi = null;
     }
 
     public TS3Api getAPI() {
@@ -45,6 +45,6 @@ public class TeamSpeakBot {
     }
 
     public TS3ApiAsync getAsyncAPI() {
-        return aapi;
+        return asyncApi;
     }
 }

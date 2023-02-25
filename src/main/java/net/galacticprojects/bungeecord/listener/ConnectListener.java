@@ -1,6 +1,8 @@
 package net.galacticprojects.bungeecord.listener;
 
-import eu.cloudnetservice.driver.CloudNetDriver;
+import dev.derklaro.aerogel.Inject;
+import dev.derklaro.aerogel.Injector;
+import eu.cloudnetservice.driver.inject.InjectionLayer;
 import me.lauriichan.laylib.localization.Key;
 import net.galacticprojects.bungeecord.ProxyPlugin;
 import net.galacticprojects.bungeecord.channel.LobbyMessage;
@@ -16,20 +18,31 @@ import net.galacticprojects.bungeecord.util.TimeHelper;
 import net.galacticprojects.common.CommonPlugin;
 import net.galacticprojects.common.database.SQLDatabase;
 import net.galacticprojects.common.database.model.*;
+import net.galacticprojects.common.util.CodeGenerator;
 import net.galacticprojects.common.util.ComponentParser;
+import net.galacticprojects.common.util.Verify;
+import net.galacticprojects.common.util.color.ColorParser;
+import net.galacticprojects.common.util.color.ComponentColor;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.plugin.Listener;
+import net.md_5.bungee.api.scheduler.ScheduledTask;
 import net.md_5.bungee.event.EventHandler;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 public class ConnectListener implements Listener {
 
     private ProxyPlugin plugin;
+    private static TablistManager tablist;
+    private ScheduledTask verification = null;
+
 
     public ConnectListener(ProxyPlugin plugin) {
         this.plugin = plugin;
@@ -44,15 +57,32 @@ public class ConnectListener implements Listener {
         CommonPlugin commonPlugin = plugin.getCommonPlugin();
         String language = "en-uk";
         Player playerData = database.getPlayer(uniqueId).join();
+        Verify verify = plugin.getVerify();
+
+        Ban ban = database.getBan(uniqueId).join();
+        if (ban != null) {
+            if (!ban.isExpired()) {
+                BanMessage message = BanMessage.valueOf("COMMAND_BAN_ID_" + ban.getBanID());
+                player.disconnect(ComponentParser.parse(plugin.getCommonPlugin().getMessageManager().translate(CommandMessages.COMMAND_PLAYER_BANNED, playerData.getLanguage(), Key.of("time", TimeHelper.format(playerData.getLanguage()).format(ban.getTime())), Key.of("reason", message))));
+                return;
+            }
+            database.deleteBan(ban.getPlayer()).join();
+        }
 
         for (int i = 0; i != 99; i++) {
             player.sendMessage(ComponentParser.parse(""));
         }
 
+        String ip = player.getAddress().getAddress().getHostAddress();
+
         if (playerData == null) {
-            playerData = database.createPlayer(uniqueId, player.getAddress().getAddress().getHostAddress(), "1000", "1", "en-uk", "0").join();
+            playerData = database.createPlayer(uniqueId, ip, "1000", "1", "en-uk", "0", "false").join();
         }
 
+        if (!(Objects.equals(ip, playerData.getIP()))) {
+            playerData.setIp(ip);
+            database.updatePlayer(playerData);
+        }
 
         if (playerData.getLanguage() != null) {
             language = playerData.getLanguage();
@@ -62,7 +92,7 @@ public class ConnectListener implements Listener {
             Countdown.online.add(player.getUniqueId());
         }
 
-        new TablistManager(plugin, player);
+        tablist = new TablistManager(plugin, player);
         // ArrayList<Friends> arrayList = database.getFriend(player.getUniqueId()).join();
 
         if (configuration.isMaintenance()) {
@@ -94,6 +124,28 @@ public class ConnectListener implements Listener {
             });
         }
 
+
+        if (!(playerData.isVerified())) {
+            String code = new CodeGenerator().generate(8);
+            verify.add(uniqueId, code);
+            player.sendMessage(new TextComponent(ComponentColor.apply(commonPlugin.getMessageManager().translate(SystemMessage.VERIFY_CODE, playerData.getLanguage(), Key.of("code", code)))));
+
+            Player finalPlayerData = playerData;
+            verification = ProxyServer.getInstance().getScheduler().schedule(plugin, new Runnable() {
+                @Override
+                public void run() {
+                    if (!(verify.contains(uniqueId))) {
+                        verification.cancel();
+                        return;
+                    }
+                    verify.remove(uniqueId);
+                    player.disconnect(new TextComponent(ComponentColor.apply(commonPlugin.getMessageManager().translate(SystemMessage.VERIFY_DELAY, finalPlayerData.getLanguage()))));
+                }
+            }, 1, TimeUnit.MINUTES);
+            return;
+        }
+
+
         FriendSettings friendSettings = database.getFriendSettings(uniqueId).join();
         if (friendSettings == null) {
             friendSettings = database.createFriendSettings(uniqueId).join();
@@ -101,19 +153,9 @@ public class ConnectListener implements Listener {
         }
 
         LinkPlayer linkPlayer = database.getLinkedPlayer(uniqueId).join();
-        if(linkPlayer == null) {
+        if (linkPlayer == null) {
             linkPlayer = database.createLinkPlayer(uniqueId).join();
             return;
-        }
-
-        Ban ban = database.getBan(uniqueId).join();
-        if (ban != null) {
-            if (ban.isExpired()) {
-                database.deleteBan(ban.getPlayer()).join();
-                return;
-            }
-            BanMessage message = BanMessage.valueOf("COMMAND_BAN_ID_" + ban.getBanID());
-            player.disconnect(ComponentParser.parse(plugin.getCommonPlugin().getMessageManager().translate(CommandMessages.COMMAND_PLAYER_BANNED, playerData.getLanguage(), Key.of("time", TimeHelper.BAN_TIME_FORMATTER.format(ban.getTime())), Key.of("reason", message))));
         }
 
         PartyManager manager = new PartyManager(player);
@@ -140,5 +182,9 @@ public class ConnectListener implements Listener {
                 }
             }
         }
+    }
+
+    public static TablistManager tablist() {
+        return tablist;
     }
 }

@@ -12,14 +12,16 @@ public class Player {
     private String coins;
     private String language;
     private String level;
+    private String verified;
 
-    public Player (UUID uuid, String ip, String onlineTime, String coins, String language, String level) {
+    public Player (UUID uuid, String ip, String onlineTime, String coins, String language, String level, String verified) {
         this.uuid = uuid;
         this.ip = ip;
         this.onlineTime = onlineTime;
         this.coins = coins;
         this.language = language;
         this.level = level;
+        this.verified = verified;
     }
 
     public UUID getUUID() {
@@ -40,6 +42,14 @@ public class Player {
     public String getLanguage() {return language;}
     public String getLevel() { return level;}
 
+    public String getVerified() {
+        return this.verified;
+    }
+
+    public boolean isVerified() {
+        return (this.verified.equals("true") ? true : false);
+    }
+
     public void setLanguage(String language) {
         this.language = language;
     }
@@ -58,5 +68,9 @@ public class Player {
 
     public void setLevel(String level) {
         this.level = level;
+    }
+
+    public void setVerified(String verified) {
+        this.verified = verified;
     }
 }

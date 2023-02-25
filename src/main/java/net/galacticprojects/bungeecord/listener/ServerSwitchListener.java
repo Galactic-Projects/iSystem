@@ -1,10 +1,14 @@
 package net.galacticprojects.bungeecord.listener;
 
-import eu.cloudnetservice.driver.CloudNetDriver;
+import dev.derklaro.aerogel.Injector;
+import eu.cloudnetservice.driver.inject.InjectionLayer;
+import eu.cloudnetservice.driver.provider.CloudServiceProvider;
+import eu.cloudnetservice.driver.registry.ServiceRegistry;
 import eu.cloudnetservice.modules.bridge.player.PlayerManager;
 import net.galacticprojects.bungeecord.ProxyPlugin;
 import net.galacticprojects.bungeecord.party.Party;
 import net.galacticprojects.bungeecord.party.PartyManager;
+import net.galacticprojects.common.database.SQLDatabase;
 import net.galacticprojects.common.util.ComponentParser;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -19,16 +23,24 @@ import java.util.concurrent.TimeUnit;
 
 public class ServerSwitchListener implements Listener {
 
-    ProxyPlugin plugin;
+    private final ProxyPlugin plugin;
+    private final Injector injector;
 
     public ServerSwitchListener(ProxyPlugin plugin) {
+        this.injector = InjectionLayer.ext().injector();
         this.plugin = plugin;
     }
     @EventHandler
     public void onServerSwitch(ServerSwitchEvent event) {
         ProxiedPlayer player = event.getPlayer();
 
-        for(int i = 0; i != 14; i++){
+        SQLDatabase database = plugin.getCommonPlugin().getDatabaseRef().get();
+
+        if(!(database.getPlayer(player.getUniqueId()).join().isVerified())) {
+            return;
+        }
+
+        for (int i = 0; i != 14; i++) {
             player.sendMessage(ComponentParser.parse(""));
         }
 
@@ -41,10 +53,8 @@ public class ServerSwitchListener implements Listener {
             return;
         }
         ProxyServer.getInstance().getScheduler().schedule(plugin, () -> {
-            PlayerManager manager = CloudNetDriver.instance().serviceRegistry().firstProvider(PlayerManager.class);
-            UUID serviceUUID = manager.onlinePlayer(player.getUniqueId()).connectedService().uniqueId();
             for(UUID uniqueId : party.getMember()) {
-                manager.onlinePlayer(uniqueId).playerExecutor().connect(CloudNetDriver.instance().cloudServiceProvider().service(serviceUUID).serviceId().taskName());
+                ProxyServer.getInstance().getPlayer(uniqueId).connect(ProxyServer.getInstance().getServerInfo(player.getServer().getInfo().getName()));
             }
         }, 1L, TimeUnit.SECONDS);
     }
