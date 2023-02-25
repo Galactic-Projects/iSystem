@@ -1,6 +1,9 @@
 package net.galacticprojects.bungeecord.command;
 
-import eu.cloudnetservice.driver.CloudNetDriver;
+import dev.derklaro.aerogel.Inject;
+import dev.derklaro.aerogel.Injector;
+import eu.cloudnetservice.driver.inject.InjectionLayer;
+import eu.cloudnetservice.driver.permission.PermissionManagement;
 import me.lauriichan.laylib.command.annotation.Action;
 import me.lauriichan.laylib.command.annotation.Argument;
 import me.lauriichan.laylib.command.annotation.Command;
@@ -41,6 +44,11 @@ import java.util.UUID;
 public class LinkCommand {
 
     private final LinkAPI linkAPI = new LinkAPI();
+    private Injector injector;
+
+    public LinkCommand () {
+        this.injector = InjectionLayer.ext().injector();
+    }
 
     @Action("discord")
     public void discord(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin, @Argument(name = "discord tag") String tag) {
@@ -122,7 +130,7 @@ public class LinkCommand {
             return;
         }
 
-        linkAPI.verifyTeamSpeak(player.getAddress().getAddress().getHostAddress(), CloudNetDriver.instance().permissionManagement().user(uniqueId));
+        linkAPI.verifyTeamSpeak(player.getAddress().getAddress().getHostAddress(), injector.instance(PermissionManagement.class).user(uniqueId));
 
         linkPlayer.setTeamspeakIp(player.getAddress().getAddress().getHostAddress());
         linkPlayer.setTeamspeakIdentifier(linkAPI.getIdentifier());

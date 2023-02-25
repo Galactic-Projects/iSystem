@@ -112,4 +112,21 @@ public class SystemMessage {
 
     @Message(id = "system.no.permission", content = "You do not have permission to execute this command!")
     public static MessageProvider SYSTEM_NO_PERMISSION;
+
+    @Message(id = "verify.prefix", content = "&8&l「 &5&lVERIFY &8&l」&7")
+    public static MessageProvider VERIFY_PREFIX;
+
+    @Message(id = "verify.code", content = "$#verify.prefix &7Your &bverification code &7is &3$code&7.")
+    public static MessageProvider VERIFY_CODE;
+
+    @Message(id = "verify.error.delay", content = "$#verify.prefix &cAn error occurred while trying to verify. Please rejoin or contact a staff member!")
+    public static MessageProvider VERIFY_ERROR;
+    @Message(id = "verify.error.delay", content = "$#verify.prefix &cUnfortunately, you did not succeed in entering the verification code within the one minute time limit.")
+    public static MessageProvider VERIFY_DELAY;
+
+    @Message(id = "verify.error.wrong", content = "$#verify.prefix &cThe code is wrong. Please try again!")
+    public static MessageProvider VERIFY_WRONG;
+
+    @Message(id = "verify.success", content = "$#verify.prefix &7You have &asuccessfully &3verified &7that you are not a &brobot&7.")
+    public static MessageProvider VERIFY_SUCCESS;
 }

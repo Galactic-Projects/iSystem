@@ -7,8 +7,10 @@ import net.galacticprojects.bungeecord.message.SystemMessage;
 import net.galacticprojects.bungeecord.party.Party;
 import net.galacticprojects.bungeecord.party.PartyManager;
 import net.galacticprojects.bungeecord.util.Countdown;
+import net.galacticprojects.bungeecord.util.TablistManager;
 import net.galacticprojects.common.CommonPlugin;
 import net.galacticprojects.common.util.ComponentParser;
+import net.galacticprojects.spigot.listener.ConnectionListener;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -31,6 +33,7 @@ public class DisconnectListener implements Listener {
     public void onDisconnect(PlayerDisconnectEvent event) {
         ProxiedPlayer player = event.getPlayer();
 
+        ConnectListener.tablist().reset(player);
         PartyManager manager = new PartyManager(player);
         Party party = manager.getParty();
 

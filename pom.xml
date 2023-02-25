@@ -6,7 +6,7 @@
 
     <groupId>net.galacticprojects</groupId>
     <artifactId>iSystem</artifactId>
-    <version>1.1.0-SNAPSHOT</version>
+    <version>1.2.0-SNAPSHOT</version>
 
     <pluginRepositories>
         <pluginRepository>
@@ -14,6 +14,19 @@
             <url>https://repository.apache.org/snapshots/</url>
         </pluginRepository>
     </pluginRepositories>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>eu.cloudnetservice.cloudnet</groupId>
+                <artifactId>bom</artifactId>
+                <version>4.0.0-RC7</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
 
     <repositories>
         <repository>
@@ -68,25 +81,25 @@
         <dependency>
             <groupId>eu.cloudnetservice.cloudnet</groupId>
             <artifactId>driver</artifactId>
-            <version>4.0.0-RC5</version>
+            <version>4.0.0-RC7</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>eu.cloudnetservice.cloudnet</groupId>
             <artifactId>bridge</artifactId>
-            <version>4.0.0-RC5</version>
+            <version>4.0.0-RC7</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>eu.cloudnetservice.cloudnet</groupId>
             <artifactId>wrapper-jvm</artifactId>
-            <version>4.0.0-RC5</version>
+            <version>4.0.0-RC7</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>eu.cloudnetservice.cloudnet</groupId>
             <artifactId>syncproxy</artifactId>
-            <version>4.0.0-RC5</version>
+            <version>4.0.0-RC7</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -101,7 +114,7 @@
             <classifier>remapped-mojang</classifier>
             <scope>provided</scope>
         </dependency>
-        <dependency>
+<!--        <dependency>
             <groupId>net.md-5</groupId>
             <artifactId>bungeecord-api</artifactId>
             <version>1.19-R0.1-SNAPSHOT</version>
@@ -113,6 +126,20 @@
             <artifactId>bungeecord-api</artifactId>
             <version>1.19-R0.1-SNAPSHOT</version>
             <type>javadoc</type>
+            <scope>provided</scope>
+        </dependency> -->
+        <dependency>
+            <groupId>io.github.waterfallmc</groupId>
+            <artifactId>waterfall-api</artifactId>
+            <version>1.19-R0.1-SNAPSHOT</version>
+            <type>javadoc</type>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.github.waterfallmc</groupId>
+            <artifactId>waterfall-api</artifactId>
+            <version>1.19-R0.1-SNAPSHOT</version>
+            <type>jar</type>
             <scope>provided</scope>
         </dependency>
         <dependency>

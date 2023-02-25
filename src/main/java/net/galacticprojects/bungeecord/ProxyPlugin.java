@@ -1,15 +1,9 @@
 package net.galacticprojects.bungeecord;
 
 import java.io.File;
-import java.time.OffsetDateTime;
-import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 
-import eu.cloudnetservice.driver.CloudNetDriver;
-import eu.cloudnetservice.driver.service.ServiceInfoSnapshot;
 import me.lauriichan.laylib.command.ArgumentRegistry;
 import me.lauriichan.laylib.command.CommandManager;
-import me.lauriichan.laylib.localization.Key;
 import me.lauriichan.laylib.localization.MessageManager;
 import me.lauriichan.laylib.localization.source.*;
 import me.lauriichan.laylib.logger.ISimpleLogger;
@@ -27,16 +21,15 @@ import net.galacticprojects.bungeecord.message.SystemMessage;
 import net.galacticprojects.bungeecord.message.TimeMessage;
 import net.galacticprojects.bungeecord.util.Countdown;
 import net.galacticprojects.bungeecord.util.OnlineTime;
-import net.galacticprojects.bungeecord.util.TimeHelper;
+import net.galacticprojects.bungeecord.util.RestartCounter;
 import net.galacticprojects.common.CommonPlugin;
 import net.galacticprojects.common.message.MessageProviderFactoryImpl;
 import net.galacticprojects.common.secure.GalacticSecure;
-import net.galacticprojects.common.util.ComponentParser;
 import net.galacticprojects.common.modules.DiscordBot;
 import net.galacticprojects.common.modules.TeamSpeakBot;
+import net.galacticprojects.common.util.Verify;
 import net.galacticprojects.spigot.message.CommandDescription;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.api.plugin.PluginManager;
 
@@ -52,6 +45,7 @@ public class ProxyPlugin extends Plugin {
 	private static ProxyPlugin plugin;
 	private static DiscordBot discordBot;
 	private static TeamSpeakBot teamSpeakBot;
+	private static Verify verify;
 
 	@Override
 	public void onLoad() {
@@ -64,8 +58,8 @@ public class ProxyPlugin extends Plugin {
 
 	@Override
 	public void onEnable() {
-		getProxy().registerChannel("BungeeCord");
-		getProxy().registerChannel("AntiCheat");
+		ProxyServer.getInstance().registerChannel("BungeeCord");
+		ProxyServer.getInstance().registerChannel("AntiCheat");
 		plugin = this;
 		registerMessages();
 		common.getCommandManager().setInjector(new BungeeCommandInjector(common.getCommandManager(), common.getMessageManager(), common, this));
@@ -78,7 +72,7 @@ public class ProxyPlugin extends Plugin {
 		registerCommands();
 		Countdown.setupCountdown(this);
 		new OnlineTime(this);
-		countDown();
+		new RestartCounter();
 		discordBot = new DiscordBot();
 		teamSpeakBot = new TeamSpeakBot();
 		try {
@@ -86,6 +80,7 @@ public class ProxyPlugin extends Plugin {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+		verify = new Verify();
 	}
 
 	private void registerMessages() {
@@ -118,12 +113,12 @@ public class ProxyPlugin extends Plugin {
 
 	private void registerListeners() {
 		PluginManager manager = getProxy().getPluginManager();
+		manager.registerListener(this, new MessageListener(this));
 		manager.registerListener(this, new ConnectListener(this));
 		manager.registerListener(this, new PingListener(this));
 		manager.registerListener(this, new ServerSwitchListener(this));
 		manager.registerListener(this, new DisconnectListener(this));
 		manager.registerListener(this, new ChatListener(this));
-		manager.registerListener(this, new MessageListener(this));
 	}
 
 	private void registerArgumentTypes() {
@@ -149,154 +144,6 @@ public class ProxyPlugin extends Plugin {
 		commandManager.register(SystemCommand.class);
 		commandManager.register(TeamChatCommand.class);
 		commandManager.register(LinkCommand.class);
-	}
-
-	public void countDown() {
-		ProxyServer.getInstance().getScheduler().schedule(this, () -> {
-			OffsetDateTime offsetDateTime = OffsetDateTime.now();
-			String time = TimeHelper.BAN_TIME_FORMATTER.format(offsetDateTime);
-
-			if (time.contains("04:00:00")) {
-				for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
-					common.getDatabaseRef().asOptional().ifPresent(sql -> {
-						sql.getPlayer(player.getUniqueId()).thenAccept(data -> {
-							player.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.SYSTEM_NETWORK_RESTART_ALMOST, data.getLanguage(),
-									Key.of("hour", 1), Key.of("minute", 0), Key.of("second", 0))));
-						});
-					});
-				}
-				return;
-			}
-
-			if (time.contains("04:15:00")) {
-				for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
-					common.getDatabaseRef().asOptional().ifPresent(sql -> {
-						sql.getPlayer(player.getUniqueId()).thenAccept(data -> {
-							player.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.SYSTEM_NETWORK_RESTART_ALMOST, data.getLanguage(),
-									Key.of("hour", 0), Key.of("minute", 45), Key.of("second", 0))));
-						});
-					});
-				}
-				return;
-			}
-
-			if (time.contains("04:30:00")) {
-				for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
-					common.getDatabaseRef().asOptional().ifPresent(sql -> {
-						sql.getPlayer(player.getUniqueId()).thenAccept(data -> {
-							player.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.SYSTEM_NETWORK_RESTART_ALMOST, data.getLanguage(),
-									Key.of("hour", 0), Key.of("minute", 30), Key.of("second", 0))));
-						});
-					});
-				}
-				return;
-			}
-
-			if (time.contains("04:45:00")) {
-				for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
-					common.getDatabaseRef().asOptional().ifPresent(sql -> {
-						sql.getPlayer(player.getUniqueId()).thenAccept(data -> {
-							player.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.SYSTEM_NETWORK_RESTART_ALMOST, data.getLanguage(),
-									Key.of("hour", 0), Key.of("minute", 15), Key.of("second", 0))));
-						});
-					});
-				}
-				return;
-			}
-
-			if (time.contains("04:50:00")) {
-				for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
-					common.getDatabaseRef().asOptional().ifPresent(sql -> {
-						sql.getPlayer(player.getUniqueId()).thenAccept(data -> {
-							player.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.SYSTEM_NETWORK_RESTART_ALMOST, data.getLanguage(),
-									Key.of("hour", 0), Key.of("minute", 10), Key.of("second", 0))));
-						});
-					});
-				}
-				return;
-			}
-
-			if (time.contains("04:55:00")) {
-				for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
-					common.getDatabaseRef().asOptional().ifPresent(sql -> {
-						sql.getPlayer(player.getUniqueId()).thenAccept(data -> {
-							player.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.SYSTEM_NETWORK_RESTART_ALMOST, data.getLanguage(),
-									Key.of("hour", 0), Key.of("minute", 5), Key.of("second", 0))));
-						});
-					});
-				}
-				return;
-			}
-
-			if (time.contains("04:59:00")) {
-				for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
-					common.getDatabaseRef().asOptional().ifPresent(sql -> {
-						sql.getPlayer(player.getUniqueId()).thenAccept(data -> {
-							player.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.SYSTEM_NETWORK_RESTART_ALMOST, data.getLanguage(),
-									Key.of("hour", 0), Key.of("minute", 1), Key.of("second", 0))));
-						});
-					});
-				}
-				return;
-			}
-
-			if (time.contains("04:59:30")) {
-				for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
-					common.getDatabaseRef().asOptional().ifPresent(sql -> {
-						sql.getPlayer(player.getUniqueId()).thenAccept(data -> {
-							player.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.SYSTEM_NETWORK_RESTART_ALMOST, data.getLanguage(),
-									Key.of("hour", 0), Key.of("minute", 0), Key.of("second", 30))));
-						});
-					});
-					return;
-				}
-
-				if (time.contains("04:59:50")) {
-					for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
-						common.getDatabaseRef().asOptional().ifPresent(sql -> {
-							sql.getPlayer(player.getUniqueId()).thenAccept(data -> {
-								player.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.SYSTEM_NETWORK_RESTART_ALMOST, data.getLanguage(),
-										Key.of("hour", 0), Key.of("minute", 0), Key.of("second", 10))));
-							});
-						});
-					}
-				}
-			}
-
-			if (time.contains("04:59:55")) {
-				for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
-					common.getDatabaseRef().asOptional().ifPresent(sql -> {
-						sql.getPlayer(player.getUniqueId()).thenAccept(data -> {
-							player.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.SYSTEM_NETWORK_RESTART_ALMOST, data.getLanguage(),
-									Key.of("hour", 0), Key.of("minute", 0), Key.of("second", 5))));
-						});
-					});
-				}
-			}
-
-			if (time.contains("05:00:00")) {
-				for (ProxiedPlayer player : ProxyServer.getInstance().getPlayers()) {
-					common.getDatabaseRef().asOptional().ifPresent(sql -> {
-						sql.getPlayer(player.getUniqueId()).thenAccept(data -> {
-							player.sendMessage(ComponentParser.parse(common.getMessageManager().translate(CommandMessages.SYSTEM_NETWORK_RESTART_NOW, data.getLanguage())));
-						});
-					});
-				}
-				ProxyServer.getInstance().getScheduler().schedule(this, new Runnable() {
-					@Override
-					public void run() {
-						CloudNetDriver.instance().permissionManagement().reload();
-						CloudNetDriver.instance().groupConfigurationProvider().reload();
-						CloudNetDriver.instance().moduleProvider().stopAll();
-						for(ServiceInfoSnapshot serviceInfoSnapshot : CloudNetDriver.instance().cloudServiceProvider().runningServices()) {
-							Objects.requireNonNull(CloudNetDriver.instance().cloudServiceProvider().service(serviceInfoSnapshot.serviceId().uniqueId())).provider().stopAsync();
-						}
-						CloudNetDriver.instance().moduleProvider().startAll();
-					}
-				}, 1, TimeUnit.SECONDS);
-			}
-
-		}, 1L, 1L, TimeUnit.SECONDS);
 	}
 
 	/*
@@ -347,8 +194,11 @@ public class ProxyPlugin extends Plugin {
 		return common;
 	}
 
+	public Verify getVerify() {
+		return verify;
+	}
+
 	public static ProxyPlugin getInstance() {
 		return plugin;
 	}
-
 }

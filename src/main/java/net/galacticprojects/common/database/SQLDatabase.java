@@ -56,8 +56,8 @@ public final class SQLDatabase implements IMigrationSource {
     public static final String SELECT_PLAYER = String.format("SELECT * FROM `%s` WHERE UUID = ?", SQLTable.PLAYER_TABLE);
     public static final String SELECT_IP_PLAYER = String.format("SELECT * FROM `%s` WHERE IP = ?", SQLTable.PLAYER_TABLE);
     public static final String DELETE_PLAYER = String.format("DELETE FROM `%s` WHERE UUID = ?", SQLTable.PLAYER_TABLE);
-    public static final String INSERT_PLAYER = String.format("INSERT INTO `%s` (UUID, IP, COINS, LEVEL, LANGUAGE, ONLINETIME) VALUES (?, ?, ?, ?, ?, ?)", SQLTable.PLAYER_TABLE);
-    public static final String UPDATE_PLAYER = String.format("UPDATE `%s` SET IP = ?, COINS = ?, LEVEL = ?, LANGUAGE = ?, ONLINETIME = ? WHERE UUID = ?", SQLTable.PLAYER_TABLE);
+    public static final String INSERT_PLAYER = String.format("INSERT INTO `%s` (UUID, IP, COINS, LEVEL, LANGUAGE, ONLINETIME, VERIFIED) VALUES (?, ?, ?, ?, ?, ?, ?)", SQLTable.PLAYER_TABLE);
+    public static final String UPDATE_PLAYER = String.format("UPDATE `%s` SET IP = ?, COINS = ?, LEVEL = ?, LANGUAGE = ?, ONLINETIME = ?, VERIFIED = ? WHERE UUID = ?", SQLTable.PLAYER_TABLE);
 
     public static final String SELECT_FRIENDPLAYER = String.format("SELECT * FROM `%s` WHERE UUID = ? OR FRIENDUUID = ?", SQLTable.FRIENDS_TABLE);
     public static final String SELECT_FRIENDPLAYER_REQUEST = String.format("SELECT * FROM `%s` WHERE UUID = ? OR FRIENDUUID = ?", SQLTable.FRIENDS_TABLE);
@@ -687,7 +687,7 @@ public final class SQLDatabase implements IMigrationSource {
         }, service);
     }
 
-    public CompletableFuture<Player> createPlayer(UUID uniqueId, String ip, String coins, String level, String language, String onlineTime) {
+    public CompletableFuture<Player> createPlayer(UUID uniqueId, String ip, String coins, String level, String language, String onlineTime, String verified) {
         return CompletableFuture.supplyAsync(() -> {
             try (Connection connection = pool.getConnection()) {
                 PreparedStatement statement = connection.prepareStatement(INSERT_PLAYER);
@@ -697,8 +697,9 @@ public final class SQLDatabase implements IMigrationSource {
                 statement.setString(4,encrypt(level));
                 statement.setString(5, encrypt(language));
                 statement.setString(6, encrypt(onlineTime));
+                statement.setString(7, encrypt(verified));
                 statement.executeUpdate();
-                Player player = new Player(uniqueId, ip, onlineTime, coins, language, level);
+                Player player = new Player(uniqueId, ip, onlineTime, coins, language, level, verified);
                 playerCache.put(uniqueId, player);
                 return player;
             } catch (SQLException e) {
@@ -738,7 +739,8 @@ public final class SQLDatabase implements IMigrationSource {
                     String level = decrypt(set.getString("LEVEL"));
                     String language = decrypt(set.getString("LANGUAGE"));
                     String onlineTime = decrypt(set.getString("ONLINETIME"));
-                    Player player = new Player(uniqueId, ip, onlineTime, coins, language, level);
+                    String verified = decrypt(set.getString("VERIFIED"));
+                    Player player = new Player(uniqueId, ip, onlineTime, coins, language, level, verified);
                     playerCache.put(uniqueId, player);
                     return player;
                 }
@@ -765,7 +767,8 @@ public final class SQLDatabase implements IMigrationSource {
                     String level = decrypt(set.getString("LEVEL"));
                     String language = String.valueOf(decrypt(set.getString("LANGUAGE")));
                     String onlineTime = decrypt(set.getString("ONLINETIME"));
-                    Player player = new Player(uniqueId, ip, onlineTime, coins, language, level);
+                    String verified = decrypt(set.getString("VERIFIED"));
+                    Player player = new Player(uniqueId, ip, onlineTime, coins, language, level, verified);
                     playerIpCache.put(ip, player);
                     return player;
                 }
@@ -800,7 +803,8 @@ public final class SQLDatabase implements IMigrationSource {
                 statement.setString(3, encrypt(player.getLevel()));
                 statement.setString(4, String.valueOf(encrypt(player.getLanguage())));
                 statement.setString(5, encrypt(player.getOnlineTime()));
-                statement.setString(6, player.getUUID().toString());
+                statement.setString(6, encrypt(player.getVerified()));
+                statement.setString(7, player.getUUID().toString());
                 statement.executeUpdate();
                 playerCache.put(player.getUUID(), player);
                 return player;

@@ -31,7 +31,6 @@ public class MessageListener implements Listener {
     @EventHandler
     public void onMessage(PluginMessageEvent event) {
         ByteArrayDataInput in = ByteStreams.newDataInput(event.getData());
-
         ProxiedPlayer player = (ProxiedPlayer) event.getReceiver();
 
         String subChannel = in.readUTF();
@@ -39,7 +38,7 @@ public class MessageListener implements Listener {
             String arg = in.readUTF();
             String type = in.readUTF();
             if(arg.equals("kick")) {
-                player.disconnect(new TextComponent("§5§lGalacticSecurity §8" + UniCode.ARROWS_RIGHT + " §7" + capitalizeString(type.toLowerCase()) + " Detected!!"));
+                player.disconnect(new TextComponent("§5§lGalacticSecurity §8" + UniCode.ARROWS_RIGHT + " §7" + capitalizeString(type.toLowerCase()) + " detected!!"));
             }
             if(arg.equals("ban")) {
                 SQLDatabase database = plugin.getCommonPlugin().getDatabaseRef().get();
@@ -188,15 +187,9 @@ public class MessageListener implements Listener {
                     default -> {
                         player.disconnect(new TextComponent("§c§l" + type));
                     }
-
-
                 }
-
-
             }
-
         }
-
     }
 
     public static String capitalizeString(String string) {

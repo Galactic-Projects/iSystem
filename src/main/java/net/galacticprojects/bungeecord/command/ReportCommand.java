@@ -1,6 +1,10 @@
 package net.galacticprojects.bungeecord.command;
 
-import eu.cloudnetservice.driver.CloudNetDriver;
+import dev.derklaro.aerogel.Inject;
+import dev.derklaro.aerogel.Injector;
+import eu.cloudnetservice.driver.inject.InjectionLayer;
+import eu.cloudnetservice.driver.permission.PermissionManagement;
+import eu.cloudnetservice.driver.registry.ServiceRegistry;
 import eu.cloudnetservice.modules.bridge.player.CloudPlayer;
 import eu.cloudnetservice.modules.bridge.player.PlayerManager;
 import me.lauriichan.laylib.command.annotation.*;
@@ -29,8 +33,12 @@ import java.util.UUID;
 
 @Command(name = "report", description = "Report a player")
 public class ReportCommand {
-
     private Checkmode checkmode;
+    private Injector injector;
+
+    public ReportCommand () {
+        this.injector = InjectionLayer.ext().injector();
+    }
 
     @Action("create")
     public void create(BungeeActor<?> actor, CommonPlugin common, ProxyPlugin plugin, @Argument(name = "player") String name, @Argument(name = "reason", params = {
@@ -110,8 +118,8 @@ public class ReportCommand {
             }
 
             database.updateReport(new Report(reportData.getID(), uniqueIdTarget, reportData.getCreator(), reportData.getReason(), true, reportData.getTimestamp()));
-            CloudPlayer cloudPlayer = CloudNetDriver.instance().serviceRegistry().firstProvider(PlayerManager.class).onlinePlayer(player.getUniqueId());
-            CloudPlayer targetCloudPlayer = CloudNetDriver.instance().serviceRegistry().firstProvider(PlayerManager.class).onlinePlayer(target.getUniqueId());
+            CloudPlayer cloudPlayer = injector.instance(ServiceRegistry.class).firstProvider(PlayerManager.class).onlinePlayer(player.getUniqueId());
+            CloudPlayer targetCloudPlayer = injector.instance(ServiceRegistry.class).firstProvider(PlayerManager.class).onlinePlayer(target.getUniqueId());
             if (cloudPlayer == null || targetCloudPlayer == null) {
                 return;
             }

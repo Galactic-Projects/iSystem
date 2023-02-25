@@ -15,6 +15,7 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.event.player.PlayerCommandSendEvent;
 
 import java.lang.reflect.Method;
+import java.util.Objects;
 
 public class PlayerCommandListener implements Listener {
 
@@ -22,6 +23,9 @@ public class PlayerCommandListener implements Listener {
 
     @EventHandler
     public void onCommandSend(PlayerCommandSendEvent event) {
+        if(event.getPlayer().hasPermission("system.commands.allowed.bypass")) {
+            return;
+        }
         event.getCommands().clear();
         event.getCommands().addAll(SpigotPlugin.getProperties().getAllowedCommands());
     }
@@ -40,16 +44,16 @@ public class PlayerCommandListener implements Listener {
 
         Player player = database.getPlayer(event.getPlayer().getUniqueId()).join();
 
-        if((simpleCommandMap.getCommand(command) == null) || (!(SpigotPlugin.getProperties().getAllowedCommands().contains(command)))) {
-            SpigotPlugin.getInstance().getMessageManager().translate(Messages.NO_COMMAND, player.getLanguage());
-            return;
-        }
-
-        if(SpigotPlugin.getProperties().getAllowedCommands().contains(command)) {
+        if(event.getPlayer().hasPermission("system.commands.allowed.bypass")){
             event.setCancelled(false);
             return;
         }
 
-        event.setCancelled(true);
+
+        if((simpleCommandMap.getCommand(command) == null) || (!(SpigotPlugin.getProperties().getAllowedCommands().contains(command)))) {
+            SpigotPlugin.getInstance().getMessageManager().translate(Messages.NO_COMMAND, player.getLanguage());
+            event.setCancelled(true);
+            return;
+        }
     }
 }

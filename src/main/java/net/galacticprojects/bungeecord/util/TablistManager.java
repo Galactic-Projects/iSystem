@@ -1,29 +1,27 @@
 package net.galacticprojects.bungeecord.util;
 
-import eu.cloudnetservice.driver.CloudNetDriver;
+import dev.derklaro.aerogel.Inject;
+import dev.derklaro.aerogel.Injector;
+import eu.cloudnetservice.driver.inject.InjectionLayer;
 import eu.cloudnetservice.modules.bridge.player.CloudPlayer;
 import eu.cloudnetservice.modules.bridge.player.PlayerManager;
+import eu.cloudnetservice.modules.bridge.player.PlayerProvider;
 import me.lauriichan.laylib.localization.Key;
 import net.galacticprojects.bungeecord.ProxyPlugin;
-import net.galacticprojects.bungeecord.config.PluginConfiguration;
 import net.galacticprojects.common.database.SQLDatabase;
 import net.galacticprojects.common.database.model.Player;
 import net.galacticprojects.common.util.ComponentParser;
 import net.md_5.bungee.api.ProxyServer;
-import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import net.md_5.bungee.protocol.AbstractPacketHandler;
-import net.md_5.bungee.protocol.DefinedPacket;
-import net.md_5.bungee.protocol.PacketWrapper;
-import net.md_5.bungee.protocol.packet.PlayerListHeaderFooter;
-import net.md_5.bungee.protocol.packet.TabCompleteResponse;
 
-import java.nio.ByteBuffer;
-import java.sql.SQLData;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+
+import static net.minecraft.locale.Language.inject;
 
 public class TablistManager {
 
+    @Inject
     public TablistManager(ProxyPlugin plugin, ProxiedPlayer player) {
         SQLDatabase database = plugin.getCommonPlugin().getDatabaseRef().get();
 
@@ -44,13 +42,8 @@ public class TablistManager {
                 if (playerData.getLanguage() != null) {
                     language = playerData.getLanguage();
                 }
-                CloudPlayer cloudPlayer = CloudNetDriver.instance().serviceRegistry().firstProvider(PlayerManager.class).onlinePlayer(player.getUniqueId());
 
-                if(cloudPlayer == null) {
-                    return;
-                }
-
-                Key server = Key.of("server", cloudPlayer.connectedService().taskName());
+                Key server = Key.of("server", ProxyPlugin.getInstance().getProxy().getPlayer(player.getUniqueId()).getServer().getInfo().getName());
                 Key players = Key.of("online", plugin.getProxy().getOnlineCount());
                 Key maxPlayers = Key.of("max", plugin.getPluginConfiguration().getPlayerAmount());
 
@@ -61,9 +54,11 @@ public class TablistManager {
         }, 1L, 1L, TimeUnit.SECONDS);
     }
 
+    public void set() {
+
+    }
 
     public void reset(ProxiedPlayer player) {
         player.resetTabHeader();
     }
-
 }
