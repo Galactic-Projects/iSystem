@@ -59,16 +59,16 @@ public final class SQLDatabase implements IMigrationSource {
     public static final String INSERT_PLAYER = String.format("INSERT INTO `%s` (UUID, IP, COINS, LEVEL, LANGUAGE, ONLINETIME, VERIFIED) VALUES (?, ?, ?, ?, ?, ?, ?)", SQLTable.PLAYER_TABLE);
     public static final String UPDATE_PLAYER = String.format("UPDATE `%s` SET IP = ?, COINS = ?, LEVEL = ?, LANGUAGE = ?, ONLINETIME = ?, VERIFIED = ? WHERE UUID = ?", SQLTable.PLAYER_TABLE);
 
-    public static final String SELECT_FRIENDPLAYER = String.format("SELECT * FROM `%s` WHERE UUID = ? OR FRIENDUUID = ?", SQLTable.FRIENDS_TABLE);
+    public static final String SELECT_FRIENDPLAYER = String.format("SELECT * FROM `%s` WHERE UUID = ?", SQLTable.FRIENDS_TABLE);
     public static final String SELECT_FRIENDPLAYER_REQUEST = String.format("SELECT * FROM `%s` WHERE UUID = ? OR FRIENDUUID = ?", SQLTable.FRIENDS_TABLE);
-    public static final String DELETE_FRIEND = String.format("DELETE FROM `%s` WHERE (UUID = ? AND FRIENDUUID = ?) OR (UUID = ? AND FRIENDUUID = ?)", SQLTable.FRIENDS_TABLE);
+    public static final String DELETE_FRIEND = String.format("DELETE FROM `%s` WHERE UUID = ? AND FRIENDUUID = ?", SQLTable.FRIENDS_TABLE);
     public static final String INSERT_FRIENDPLAYER = String.format("INSERT INTO `%s` (UUID, FRIENDUUID, DATE) VALUES (?,?,?)", SQLTable.FRIENDS_TABLE);
 
     public static final String SELECT_FRIENDREQUEST = String.format("SELECT * FROM `%s` WHERE UUID = ? OR REQUEST = ?", SQLTable.FRIENDSREQUEST_TABLE);
     public static final String SELECT_FRIENDREQUEST_SINGLE = String.format("SELECT * FROM `%s` WHERE REQUEST = ?", SQLTable.FRIENDSREQUEST_TABLE);
     public static final String SELECT_FRIENDREQUEST_REQUESTOR = String.format("SELECT * FROM `%s` WHERE UUID = ?", SQLTable.FRIENDSREQUEST_TABLE);
     public static final String DELETE_FRIENDREQUEST = String.format("DELETE FROM `%s` WHERE UUID = ? AND REQUEST = ?", SQLTable.FRIENDSREQUEST_TABLE);
-    public static final String INSERT_FRIENDREQUEST = String.format("INSERT INTO `%s` (UUID, REQUEST) VALUES (?,?,?)", SQLTable.FRIENDSREQUEST_TABLE);
+    public static final String INSERT_FRIENDREQUEST = String.format("INSERT INTO `%s` (UUID, REQUEST, DATE) VALUES (?,?,?)", SQLTable.FRIENDSREQUEST_TABLE);
 
     public static final String SELECT_FRIENDSETTINGS = String.format("SELECT * FROM `%s` WHERE UUID = ?", SQLTable.FRIENDS_SETTINGS);
     public static final String UPDATE__FRIENDSETTINGS = String.format("UPDATE `%s` SET REQUESTS = ?, JUMP = ?, MESSAGES = ? WHERE UUID = ?", SQLTable.FRIENDS_SETTINGS);
@@ -447,13 +447,13 @@ public final class SQLDatabase implements IMigrationSource {
                 ResultSet set = preparedStatement.executeQuery();
                 ArrayList<Friends> friends = new ArrayList<>();
                 while(set.next()) {
-                    Friends friend = new Friends(uniqueId, UUID.fromString(set.getString("UUID").equals(uniqueId.toString()) ? set.getString("FRIENDUUID") : set.getString("UUID")), set.getString("DATE"));
+                    Friends friend = new Friends(uniqueId, UUID.fromString(set.getString("FRIENDUUID")), set.getString("DATE"));
                     friends.add(friend);
                 }
                 logger.info(new Throwable("Amount getFriend: " + friends.size()));
                 return friends;
             } catch (SQLException e) {
-                logger.warning("A few SQL things went wrong while creating friendrequest ", e);
+                logger.warning("A few SQL things went wrong while creating friend request ", e);
                 return null;
             }
         }, service);
@@ -466,8 +466,6 @@ public final class SQLDatabase implements IMigrationSource {
                 PreparedStatement preparedStatement = connection.prepareStatement(DELETE_FRIEND);
                 preparedStatement.setString(1, uniqueId.toString());
                 preparedStatement.setString(2, friendUniqueId.toString());
-                preparedStatement.setString(3, friendUniqueId.toString());
-                preparedStatement.setString(4, uniqueId.toString());
                 preparedStatement.executeUpdate();
                 return null;
             } catch (SQLException e) {
@@ -512,11 +510,9 @@ public final class SQLDatabase implements IMigrationSource {
     public CompletableFuture<Boolean> deleteFriendRequest(UUID uniqueId, UUID requestUniqueId) {
         return CompletableFuture.supplyAsync(() -> {
             try (Connection connection = pool.getConnection()) {
-                PreparedStatement preparedStatement = connection.prepareStatement(DELETE_FRIEND);
+                PreparedStatement preparedStatement = connection.prepareStatement(DELETE_FRIENDREQUEST);
                 preparedStatement.setString(1, uniqueId.toString());
                 preparedStatement.setString(2, requestUniqueId.toString());
-                preparedStatement.setString(3, requestUniqueId.toString());
-                preparedStatement.setString(4, uniqueId.toString());
                 preparedStatement.executeUpdate();
                 return null;
             } catch (SQLException e) {
@@ -533,9 +529,9 @@ public final class SQLDatabase implements IMigrationSource {
                 preparedStatement.setString(1, uniqueId.toString());
                 preparedStatement.setString(2, requesterUniqueId.toString());
                 ResultSet set = preparedStatement.executeQuery();
-                return set.next() && set.getArray("REQUESTS") != null;
+                return set.next() && set.getString("UUID") != null && set.getString("REQUEST") != null;
             } catch (SQLException e) {
-                logger.warning("A few SQL things went wrong while creating friendrequest ", e);
+                logger.warning("A few SQL things went wrong while creating friend request ", e);
                 return false;
             }
         }, service);
@@ -547,7 +543,14 @@ public final class SQLDatabase implements IMigrationSource {
                 PreparedStatement preparedStatement = connection.prepareStatement(SELECT_FRIENDREQUEST_SINGLE);
                 preparedStatement.setString(1, uniqueId.toString());
                 ResultSet set = preparedStatement.executeQuery();
-                return set.next() && set.getArray("REQUESTS") != null;
+                List<UUID> friendUnique = new ArrayList<>();
+                while (set.next()) {
+                    friendUnique.add(UUID.fromString(set.getString("UUID")));
+                }
+                if(friendUnique.contains(uniqueId)) {
+                    return true;
+                }
+                return false;
             } catch (SQLException e) {
                 logger.warning("A few SQL things went wrong while creating friendrequest ", e);
                 return false;
@@ -687,7 +690,7 @@ public final class SQLDatabase implements IMigrationSource {
         }, service);
     }
 
-    public CompletableFuture<Player> createPlayer(UUID uniqueId, String ip, String coins, String level, String language, String onlineTime, String verified) {
+    public CompletableFuture<Player> createPlayer(UUID uniqueId, String ip, int coins, int level, String language, long onlineTime, boolean verified) {
         return CompletableFuture.supplyAsync(() -> {
             try (Connection connection = pool.getConnection()) {
                 PreparedStatement statement = connection.prepareStatement(INSERT_PLAYER);
@@ -735,11 +738,11 @@ public final class SQLDatabase implements IMigrationSource {
                 ResultSet set = statement.executeQuery();
                 if (set.next()) {
                     String ip = decrypt(set.getString("IP"));
-                    String coins = decrypt(set.getString("COINS"));
-                    String level = decrypt(set.getString("LEVEL"));
+                    int coins = Integer.parseInt(decrypt(set.getString("COINS")));
+                    int level = Integer.parseInt(decrypt(set.getString("LEVEL")));
                     String language = decrypt(set.getString("LANGUAGE"));
-                    String onlineTime = decrypt(set.getString("ONLINETIME"));
-                    String verified = decrypt(set.getString("VERIFIED"));
+                    long onlineTime = Long.parseLong(decrypt(set.getString("ONLINETIME")));
+                    boolean verified = Boolean.parseBoolean(decrypt(set.getString("VERIFIED")));
                     Player player = new Player(uniqueId, ip, onlineTime, coins, language, level, verified);
                     playerCache.put(uniqueId, player);
                     return player;
@@ -763,11 +766,11 @@ public final class SQLDatabase implements IMigrationSource {
                 ResultSet set = statement.executeQuery();
                 if (set.next()) {
                     UUID uniqueId = UUID.fromString(set.getString("UUID"));
-                    String coins = decrypt(set.getString("COINS"));
-                    String level = decrypt(set.getString("LEVEL"));
+                    int coins = Integer.parseInt(decrypt(set.getString("COINS")));
+                    int level = Integer.parseInt(decrypt(set.getString("LEVEL")));
                     String language = String.valueOf(decrypt(set.getString("LANGUAGE")));
-                    String onlineTime = decrypt(set.getString("ONLINETIME"));
-                    String verified = decrypt(set.getString("VERIFIED"));
+                    long onlineTime = Long.parseLong(decrypt(set.getString("ONLINETIME")));
+                    boolean verified = Boolean.parseBoolean(decrypt(set.getString("VERIFIED")));
                     Player player = new Player(uniqueId, ip, onlineTime, coins, language, level, verified);
                     playerIpCache.put(ip, player);
                     return player;
@@ -881,8 +884,8 @@ public final class SQLDatabase implements IMigrationSource {
         }, service);
     }
 
-    private String encrypt(String clear)  {
-        return ProxyPlugin.getInstance().getSecure().powerfulHash(clear);
+    private String encrypt(Object clear)  {
+        return ProxyPlugin.getInstance().getSecure().powerfulHash(String.valueOf(clear));
     }
 
     private String decrypt(String hashed)  {

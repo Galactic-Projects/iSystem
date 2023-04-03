@@ -34,10 +34,10 @@ public class OnlineTime {
                     if (!(time.containsKey(player.getUniqueId()))) {
                         plugin.getCommonPlugin().getDatabaseRef().asOptional().ifPresent(sqlDatabase -> {
                             sqlDatabase.getPlayer(player.getUniqueId()).thenAccept(playerData -> {
-                                long onlineTime = Long.parseLong(playerData.getOnlineTime());
+                                long onlineTime = playerData.getOnlineTime();
                                 onlineTime = onlineTime + 60;
                                 time.put(player.getUniqueId(), onlineTime);
-                                playerData.setOnlineTime(String.valueOf(onlineTime));
+                                playerData.setOnlineTime(onlineTime);
                                 sqlDatabase.updatePlayer(playerData);
                                 time.remove(player.getUniqueId());
                             });
