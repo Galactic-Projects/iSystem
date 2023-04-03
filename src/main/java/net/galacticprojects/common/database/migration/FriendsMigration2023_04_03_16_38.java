@@ -7,19 +7,18 @@ import net.galacticprojects.common.database.SQLTable;
 import net.galacticprojects.common.database.migration.impl.MySQLMigration;
 import net.galacticprojects.common.database.migration.impl.SQLMigrationType;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 @Migration(source = SQLDatabase.class, type = SQLMigrationType.class)
-public class FriendsRequestMigration2023_01_24_17_25 extends MySQLMigration {
+public class FriendsMigration2023_04_03_16_38 extends MySQLMigration {
 
-    public FriendsRequestMigration2023_01_24_17_25() { super(SQLTable.FRIENDSREQUEST_TABLE); }
+    public FriendsMigration2023_04_03_16_38() {
+        super(SQLTable.FRIENDS_TABLE);
+    }
 
     @Override
     protected long getDate() {
-        return Date.of(17, 25, 24, 1, 2023);
+        return Date.of(16, 38, 3, 4, 2023);
     }
 
     @Override
@@ -29,7 +28,7 @@ public class FriendsRequestMigration2023_01_24_17_25 extends MySQLMigration {
 
     @Override
     public String getNewFormat() {
-        return "ID INT AUTO_INCREMENT PRIMARY KEY, UUID VARCHAR(36), REQUEST VARCHAR(36), DATE VARCHAR(36)";
+        return "ID INT AUTO_INCREMENT PRIMARY KEY, UUID VARCHAR(36), FRIENDUUID VARCHAR(36), DATE VARCHAR(36)";
     }
 
     @Override

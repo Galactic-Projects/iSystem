@@ -36,7 +36,7 @@ public class ServerSwitchListener implements Listener {
 
         SQLDatabase database = plugin.getCommonPlugin().getDatabaseRef().get();
 
-        if(!(database.getPlayer(player.getUniqueId()).join().isVerified())) {
+        if(!(database.getPlayer(player.getUniqueId()).join().getVerified())) {
             return;
         }
 

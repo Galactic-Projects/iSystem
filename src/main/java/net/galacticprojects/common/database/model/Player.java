@@ -7,14 +7,14 @@ public class Player {
 
     private final UUID uuid;
     private String ip;
-    private String onlineTime;
+    private long onlineTime;
 
-    private String coins;
+    private int coins;
     private String language;
-    private String level;
-    private String verified;
+    private int level;
+    private boolean verified;
 
-    public Player (UUID uuid, String ip, String onlineTime, String coins, String language, String level, String verified) {
+    public Player (UUID uuid, String ip, long onlineTime, int coins, String language, int level, boolean verified) {
         this.uuid = uuid;
         this.ip = ip;
         this.onlineTime = onlineTime;
@@ -32,33 +32,29 @@ public class Player {
         return ip;
     }
 
-    public String getOnlineTime() { return onlineTime; }
+    public long getOnlineTime() { return onlineTime; }
 
 
-    public String getCoins() {
+    public int getCoins() {
         return coins;
     }
 
     public String getLanguage() {return language;}
-    public String getLevel() { return level;}
+    public int getLevel() { return level;}
 
-    public String getVerified() {
+    public boolean getVerified() {
         return this.verified;
-    }
-
-    public boolean isVerified() {
-        return (this.verified.equals("true") ? true : false);
     }
 
     public void setLanguage(String language) {
         this.language = language;
     }
 
-    public void setOnlineTime(String onlineTime) {
+    public void setOnlineTime(long onlineTime) {
         this.onlineTime = onlineTime;
     }
 
-    public void setCoins(String coins) {
+    public void setCoins(int coins) {
         this.coins = coins;
     }
 
@@ -66,11 +62,11 @@ public class Player {
         this.ip = ip;
     }
 
-    public void setLevel(String level) {
+    public void setLevel(int level) {
         this.level = level;
     }
 
-    public void setVerified(String verified) {
+    public void setVerified(boolean verified) {
         this.verified = verified;
     }
 }

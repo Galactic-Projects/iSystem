@@ -54,7 +54,7 @@ public class LevelCommand {
             sql.getPlayer(uniqueId).thenAccept(playerData -> {
                 ProxiedPlayer target = ProxyServer.getInstance().getPlayer(uniqueIdTarget);
                 Player targetData = sql.getPlayer(uniqueIdTarget).join();
-                int oldAmount = Integer.parseInt(targetData.getLevel());
+                int oldAmount = targetData.getLevel();
 
                 try {
                     if (amount <= 0) {
@@ -62,7 +62,7 @@ public class LevelCommand {
                         return;
                     }
 
-                    if (amount == Integer.parseInt(targetData.getLevel())) {
+                    if (amount == targetData.getLevel()) {
                         actor.sendTranslatedMessage(CommandMessages.LEVEL_ERRORS_ALREADY);
                         return;
                     }
@@ -72,7 +72,7 @@ public class LevelCommand {
                         return;
                     }
 
-                    targetData.setLevel(String.valueOf(amount));
+                    targetData.setLevel(amount);
                     sql.updatePlayer(targetData);
                     actor.sendTranslatedMessage(CommandMessages.LEVEL_OTHERS_SET_PLAYER, Key.of("player", MojangProfileService.getName(uniqueIdTarget)), Key.of("oldamount", oldAmount), Key.of("amount", amount));
                     if (target != null || uniqueIdTarget != uniqueId) {
@@ -98,7 +98,7 @@ public class LevelCommand {
             sql.getPlayer(uniqueId).thenAccept(playerData -> {
                 ProxiedPlayer target = ProxyServer.getInstance().getPlayer(uniqueIdTarget);
                 Player targetData = sql.getPlayer(uniqueIdTarget).join();
-                int oldAmount = Integer.parseInt(targetData.getLevel());
+                int oldAmount = targetData.getLevel();
 
                 try {
                     if (amount <= 0) {
@@ -113,7 +113,7 @@ public class LevelCommand {
                         return;
                     }
 
-                    targetData.setLevel(String.valueOf(newAmount));
+                    targetData.setLevel(newAmount);
                     sql.updatePlayer(targetData);
                     actor.sendTranslatedMessage(CommandMessages.LEVEL_OTHERS_ADD_PLAYER, Key.of("player", MojangProfileService.getName(uniqueIdTarget)), Key.of("oldamount", oldAmount), Key.of("amount", newAmount));
                     if (target != null || uniqueIdTarget != uniqueId) {
@@ -139,7 +139,7 @@ public class LevelCommand {
             sql.getPlayer(uniqueId).thenAccept(playerData -> {
                 ProxiedPlayer target = ProxyServer.getInstance().getPlayer(uniqueIdTarget);
                 Player targetData = sql.getPlayer(uniqueIdTarget).join();
-                int oldAmount = Integer.parseInt(targetData.getLevel());
+                int oldAmount = targetData.getLevel();
 
                 try {
                     if (amount <= 0) {
@@ -147,7 +147,7 @@ public class LevelCommand {
                         return;
                     }
 
-                    if(Integer.parseInt(targetData.getLevel()) < amount) {
+                    if(targetData.getLevel() < amount) {
                         actor.sendTranslatedMessage(CommandMessages.LEVEL_ERRORS_SMALL);
                         return;
                     }
@@ -159,7 +159,7 @@ public class LevelCommand {
                         return;
                     }
 
-                    targetData.setLevel(String.valueOf(newAmount));
+                    targetData.setLevel(newAmount);
                     sql.updatePlayer(targetData);
                     actor.sendTranslatedMessage(CommandMessages.LEVEL_OTHERS_REMOVE_PLAYER, Key.of("player", MojangProfileService.getName(uniqueIdTarget)), Key.of("oldamount", oldAmount), Key.of("amount", newAmount));
                     if (target != null || uniqueIdTarget != uniqueId) {

@@ -40,6 +40,7 @@ import java.util.UUID;
 public class ChatListener implements Listener {
     private ProxyPlugin plugin;
     private final Injector injector;
+
     public ChatListener(ProxyPlugin plugin) {
         this.plugin = plugin;
         this.injector = InjectionLayer.ext().injector();
@@ -58,36 +59,34 @@ public class ChatListener implements Listener {
         if (event.getSender() instanceof ProxiedPlayer player) {
             PermissionGroup info = injector.instance(PermissionManagement.class).highestPermissionGroup(Objects.requireNonNull(injector.instance(PermissionManagement.class).user(player.getUniqueId())));
 
-            if(info == null){
+            if (info == null) {
                 return;
             }
 
             if (event.getMessage().startsWith("/") || commonPlugin.getCommandManager().getProcess(player.getUniqueId()) != null) {
                 return;
             }
+            UUID uniqueId = player.getUniqueId();
 
-            commonPlugin.getDatabaseRef().asOptional().ifPresent(sqlDatabase -> {
-                UUID uniqueId = player.getUniqueId();
+            database.getPlayer(uniqueId).thenAccept(playerData -> {
+                if (!(playerData.getVerified())) {
+                    event.setCancelled(true);
+                    if (!(plugin.getVerify().contains(uniqueId))) {
+                        player.sendMessage(new TextComponent(ComponentColor.apply(commonPlugin.getMessageManager().translate(SystemMessage.VERIFY_ERROR, playerData.getLanguage()))));
+                        return;
+                    }
 
-                sqlDatabase.getPlayer(uniqueId).thenAccept(playerData -> {
-                   if(!(playerData.isVerified())) {
-                       event.setCancelled(true);
-                       if(!(plugin.getVerify().contains(uniqueId))) {
-                           player.sendMessage(new TextComponent(ComponentColor.apply(commonPlugin.getMessageManager().translate(SystemMessage.VERIFY_ERROR, playerData.getLanguage()))));
-                           return;
-                       }
+                    if (!(event.getMessage().equals(plugin.getVerify().get(uniqueId)))) {
+                        player.sendMessage(new TextComponent(ComponentColor.apply(commonPlugin.getMessageManager().translate(SystemMessage.VERIFY_WRONG, playerData.getLanguage()))));
+                        return;
+                    }
 
-                       if(!(event.getMessage().equals(plugin.getVerify().get(uniqueId)))) {
-                           player.sendMessage(new TextComponent(ComponentColor.apply(commonPlugin.getMessageManager().translate(SystemMessage.VERIFY_WRONG, playerData.getLanguage()))));
-                           return;
-                       }
+                    plugin.getVerify().remove(uniqueId);
+                    playerData.setVerified(true);
+                    database.updatePlayer(playerData);
+                    player.sendMessage(new TextComponent(ComponentColor.apply(commonPlugin.getMessageManager().translate(SystemMessage.VERIFY_SUCCESS, playerData.getLanguage()))));
+                }
 
-                       plugin.getVerify().remove(uniqueId);
-                       playerData.setVerified("true");
-                       sqlDatabase.updatePlayer(playerData);
-                       player.sendMessage(new TextComponent(ComponentColor.apply(commonPlugin.getMessageManager().translate(SystemMessage.VERIFY_SUCCESS, playerData.getLanguage()))));
-                   }
-                });
 
                 String name = player.getName();
                 String ip = player.getAddress().getAddress().getHostAddress();
@@ -101,7 +100,7 @@ public class ChatListener implements Listener {
                     chatlog = new Chatlog(uniqueId, name, ip, server, timestamp, event.getMessage());
                 }
 
-                sqlDatabase.createChatlog(chatlog);
+                database.createChatlog(chatlog);
             });
 
             if (TeamChatCommand.TEAMCHAT.contains(player.getUniqueId()) && player.hasPermission("system.teamchat") && event.getMessage().startsWith("@")) {

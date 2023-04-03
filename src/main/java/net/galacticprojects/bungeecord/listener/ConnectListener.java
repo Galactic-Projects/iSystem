@@ -76,7 +76,7 @@ public class ConnectListener implements Listener {
         String ip = player.getAddress().getAddress().getHostAddress();
 
         if (playerData == null) {
-            playerData = database.createPlayer(uniqueId, ip, "1000", "1", "en-uk", "0", "false").join();
+            playerData = database.createPlayer(uniqueId, ip, 1000, 1, "en-uk", 0, false).join();
         }
 
         if (!(Objects.equals(ip, playerData.getIP()))) {
@@ -125,7 +125,7 @@ public class ConnectListener implements Listener {
         }
 
 
-        if (!(playerData.isVerified())) {
+        if (!(playerData.getVerified())) {
             String code = new CodeGenerator().generate(8);
             verify.add(uniqueId, code);
             player.sendMessage(new TextComponent(ComponentColor.apply(commonPlugin.getMessageManager().translate(SystemMessage.VERIFY_CODE, playerData.getLanguage(), Key.of("code", code)))));
